@@ -29,13 +29,13 @@ const LevelSelectionPage: React.FC = () => {
 
   const getLevelColor = (levelName: string) => {
     const colors: Record<string, string> = {
-      'N5': '#4caf50',
-      'N4': '#2196f3',
-      'N3': '#ff9800',
-      'N2': '#9c27b0',
-      'N1': '#f44336',
+      'N5': '#D1F4F9', // Pastel Cyan
+      'N4': '#C9E4FF', // Pastel Blue
+      'N3': '#FBE8C8', // Pastel Yellow
+      'N2': '#FBC8C8', // Pastel Red
+      'N1': '#C8F3D1', // Pastel Green
     };
-    return colors[levelName] || '#757575';
+    return colors[levelName] || '#E0E0E0';
   };
 
   const isLevelUnlocked = (order: number) => {
@@ -49,33 +49,38 @@ const LevelSelectionPage: React.FC = () => {
 
   return (
     <LearnerLayout>
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Box sx={{ textAlign: 'center', mb: 5 }}>
-          <School sx={{ fontSize: 60, color: 'primary.main', mb: 2 }} />
-          <Typography variant="h4" fontWeight="bold" gutterBottom>
+      <Container maxWidth="lg" sx={{ py: 6 }}>
+        <Box sx={{ textAlign: 'center', mb: 8 }}>
+          <School sx={{ fontSize: 72, color: 'primary.main', mb: 2, opacity: 0.8 }} />
+          <Typography variant="h3" fontWeight="800" gutterBottom sx={{ color: '#1A0B2E', letterSpacing: '-0.03em' }}>
             Chọn cấp độ học
           </Typography>
-          <Typography variant="body1" color="text.secondary">
-            Hãy chọn cấp độ phù hợp với trình độ của bạn
+          <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 500 }}>
+            Hãy chọn trình độ phù hợp để bắt đầu hành trình chinh phục tiếng Nhật của bạn
           </Typography>
         </Box>
 
-        <Grid container spacing={3}>
+        <Grid container spacing={4}>
           {mockLevels.map((level) => {
             const progress = levelProgress[level.id];
             const unlocked = isLevelUnlocked(level.order);
+            const levelColor = getLevelColor(level.name);
 
             return (
-              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={level.id}>
+              <Grid item xs={12} sm={6} md={4} key={level.id}>
                 <Card
                   sx={{
                     height: '100%',
                     position: 'relative',
-                    opacity: unlocked ? 1 : 0.6,
-                    transition: 'transform 0.2s, box-shadow 0.2s',
+                    borderRadius: 6,
+                    overflow: 'hidden',
+                    opacity: unlocked ? 1 : 0.7,
+                    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                    border: '1px solid rgba(0, 0, 0, 0.03)',
+                    boxShadow: '0 10px 30px rgba(0, 0, 0, 0.04)',
                     '&:hover': unlocked ? {
-                      transform: 'translateY(-8px)',
-                      boxShadow: 6,
+                      transform: 'translateY(-12px)',
+                      boxShadow: '0 20px 60px rgba(0, 0, 0, 0.08)',
                     } : {},
                   }}
                 >
@@ -86,37 +91,51 @@ const LevelSelectionPage: React.FC = () => {
                   >
                     <Box
                       sx={{
-                        height: 8,
-                        backgroundColor: getLevelColor(level.name),
+                        height: 12,
+                        backgroundColor: levelColor,
                       }}
                     />
-                    <CardContent sx={{ p: 3 }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                    <CardContent sx={{ p: 4 }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                         <Typography
-                          variant="h3"
-                          fontWeight="bold"
-                          sx={{ color: getLevelColor(level.name) }}
+                          variant="h2"
+                          fontWeight="800"
+                          sx={{
+                            color: '#1A0B2E',
+                            fontSize: '3rem',
+                            position: 'relative',
+                            '&::after': {
+                              content: '""',
+                              position: 'absolute',
+                              bottom: 0,
+                              left: 0,
+                              width: '100%',
+                              height: '4px',
+                              backgroundColor: levelColor,
+                              borderRadius: '2px',
+                            }
+                          }}
                         >
                           {level.name}
                         </Typography>
                         {progress?.completed ? (
-                          <CheckCircle sx={{ color: 'success.main', fontSize: 32 }} />
+                          <CheckCircle sx={{ color: '#4caf50', fontSize: 40 }} />
                         ) : !unlocked ? (
-                          <Lock sx={{ color: 'grey.500', fontSize: 32 }} />
+                          <Lock sx={{ color: 'grey.300', fontSize: 40 }} />
                         ) : null}
                       </Box>
 
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 2, minHeight: 40 }}>
+                      <Typography variant="body1" color="text.secondary" sx={{ mb: 4, minHeight: 48, fontWeight: 500, lineHeight: 1.6 }}>
                         {level.description}
                       </Typography>
 
                       {unlocked && (
-                        <>
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                            <Typography variant="caption" color="text.secondary">
-                              Tiến độ
+                        <Box sx={{ mb: 3 }}>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
+                            <Typography variant="body2" sx={{ fontWeight: 600, color: '#4D4459' }}>
+                              Tiến độ hoàn thành
                             </Typography>
-                            <Typography variant="caption" fontWeight="bold">
+                            <Typography variant="body2" fontWeight="800" color="primary">
                               {progress?.progress || 0}%
                             </Typography>
                           </Box>
@@ -124,28 +143,38 @@ const LevelSelectionPage: React.FC = () => {
                             variant="determinate"
                             value={progress?.progress || 0}
                             sx={{
-                              height: 8,
-                              borderRadius: 4,
-                              backgroundColor: 'grey.200',
+                              height: 10,
+                              borderRadius: 5,
+                              backgroundColor: 'rgba(0,0,0,0.03)',
                               '& .MuiLinearProgress-bar': {
-                                backgroundColor: getLevelColor(level.name),
-                                borderRadius: 4,
+                                backgroundColor: levelColor,
+                                borderRadius: 5,
                               },
                             }}
                           />
-                        </>
+                        </Box>
                       )}
 
-                      <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
+                      <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
                         <Chip
-                          size="small"
+                          size="medium"
                           label={`${4} chủ đề`}
-                          variant="outlined"
+                          sx={{
+                            borderRadius: 2,
+                            fontWeight: 600,
+                            backgroundColor: 'rgba(0,0,0,0.03)',
+                            border: 'none'
+                          }}
                         />
                         <Chip
-                          size="small"
+                          size="medium"
                           label={`${20} từ vựng`}
-                          variant="outlined"
+                          sx={{
+                            borderRadius: 2,
+                            fontWeight: 600,
+                            backgroundColor: 'rgba(0,0,0,0.03)',
+                            border: 'none'
+                          }}
                         />
                       </Box>
                     </CardContent>

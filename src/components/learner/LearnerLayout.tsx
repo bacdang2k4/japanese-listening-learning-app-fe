@@ -56,36 +56,58 @@ const LearnerLayout: React.FC<LearnerLayoutProps> = ({ children }) => {
   };
 
   const drawer = (
-    <Box sx={{ width: 250 }}>
-      <Box sx={{ p: 2, textAlign: 'center' }}>
-        <Headphones sx={{ fontSize: 40, color: 'primary.main' }} />
-        <Typography variant="h6" fontWeight="bold" color="primary">
-          日本語リスニング
+    <Box sx={{ width: 280, backgroundColor: '#F2F9FF', height: '100%' }}>
+      <Box sx={{ p: 4, textAlign: 'center' }}>
+        <Headphones sx={{ fontSize: 48, color: '#C9E4FF', mb: 1 }} />
+        <Typography variant="h5" fontWeight="800" color="#0D1E36">
+          NIHONGO
         </Typography>
       </Box>
-      <Divider />
-      <List>
-        {menuItems.map((item) => (
-          <ListItem key={item.text} disablePadding>
-            <ListItemButton
-              selected={location.pathname === item.path}
-              onClick={() => {
-                navigate(item.path);
-                setDrawerOpen(false);
-              }}
-            >
-              <ListItemIcon>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
+      <Divider sx={{ opacity: 0.1 }} />
+      <List sx={{ px: 2, py: 2 }}>
+        {menuItems.map((item) => {
+          const active = location.pathname === item.path;
+          return (
+            <ListItem key={item.text} disablePadding sx={{ mb: 1 }}>
+              <ListItemButton
+                selected={active}
+                onClick={() => {
+                  navigate(item.path);
+                  setDrawerOpen(false);
+                }}
+                sx={{
+                  borderRadius: 4,
+                  py: 1.5,
+                  backgroundColor: active ? '#C9E4FF !important' : 'transparent',
+                  '& .MuiListItemIcon-root': {
+                    color: active ? '#0D1E36' : '#44515E',
+                  },
+                  '& .MuiListItemText-primary': {
+                    fontWeight: active ? 700 : 600,
+                    color: active ? '#0D1E36' : '#44515E',
+                  }
+                }}
+              >
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.text} />
+              </ListItemButton>
+            </ListItem>
+          );
+        })}
       </List>
-      <Divider />
-      <List>
+      <Divider sx={{ opacity: 0.1 }} />
+      <List sx={{ px: 2, py: 2 }}>
         <ListItem disablePadding>
-          <ListItemButton onClick={handleLogout}>
-            <ListItemIcon><Logout /></ListItemIcon>
-            <ListItemText primary="Đăng xuất" />
+          <ListItemButton
+            onClick={handleLogout}
+            sx={{
+              borderRadius: 4,
+              py: 1.5,
+              '&:hover': { backgroundColor: 'rgba(251, 200, 200, 0.2)' }
+            }}
+          >
+            <ListItemIcon><Logout sx={{ color: '#FBC8C8' }} /></ListItemIcon>
+            <ListItemText primary="Đăng xuất" sx={{ '& .MuiListItemText-primary': { color: '#D32F2F', fontWeight: 600 } }} />
           </ListItemButton>
         </ListItem>
       </List>
@@ -93,9 +115,18 @@ const LearnerLayout: React.FC<LearnerLayoutProps> = ({ children }) => {
   );
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: '#f5f5f5' }}>
-      <AppBar position="sticky" color="default" elevation={1}>
-        <Toolbar>
+    <Box sx={{ minHeight: '100vh', bgcolor: '#F2F9FF' }}>
+      <AppBar
+        position="sticky"
+        elevation={0}
+        sx={{
+          backgroundColor: 'rgba(255, 255, 255, 0.7)',
+          backdropFilter: 'blur(12px)',
+          borderBottom: '1px solid rgba(0, 0, 0, 0.05)',
+          color: '#0D1E36'
+        }}
+      >
+        <Toolbar sx={{ justifyContent: 'space-between' }}>
           {isMobile && (
             <IconButton
               edge="start"
@@ -110,34 +141,56 @@ const LearnerLayout: React.FC<LearnerLayoutProps> = ({ children }) => {
             sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
             onClick={() => navigate('/learn')}
           >
-            <Headphones sx={{ fontSize: 32, color: 'primary.main', mr: 1 }} />
-            <Typography variant="h6" fontWeight="bold" color="primary">
-              日本語リスニング
+            <Headphones sx={{ fontSize: 36, color: '#C9E4FF', mr: 1.5 }} />
+            <Typography variant="h5" fontWeight="800" sx={{ color: '#0D1E36', letterSpacing: '-0.02em' }}>
+              NIHONGO
             </Typography>
           </Box>
 
           {!isMobile && (
             <Box sx={{ ml: 4, display: 'flex', gap: 1 }}>
-              {menuItems.map((item) => (
-                <Button
-                  key={item.text}
-                  startIcon={item.icon}
-                  onClick={() => navigate(item.path)}
-                  sx={{
-                    color: location.pathname === item.path ? 'primary.main' : 'text.secondary',
-                    fontWeight: location.pathname === item.path ? 'bold' : 'normal',
-                  }}
-                >
-                  {item.text}
-                </Button>
-              ))}
+              {menuItems.map((item) => {
+                const active = location.pathname === item.path;
+                return (
+                  <Button
+                    key={item.text}
+                    startIcon={item.icon}
+                    onClick={() => navigate(item.path)}
+                    sx={{
+                      px: 2,
+                      py: 1,
+                      borderRadius: 3,
+                      color: active ? '#0D1E36' : '#44515E',
+                      backgroundColor: active ? '#C9E4FF' : 'transparent',
+                      fontWeight: active ? 700 : 600,
+                      '&:hover': {
+                        backgroundColor: active ? '#C9E4FF' : 'rgba(201, 228, 255, 0.1)',
+                      }
+                    }}
+                  >
+                    {item.text}
+                  </Button>
+                );
+              })}
             </Box>
           )}
 
           <Box sx={{ flexGrow: 1 }} />
 
-          <IconButton onClick={(e) => setAnchorEl(e.currentTarget)}>
-            <Avatar sx={{ bgcolor: 'primary.main' }}>A</Avatar>
+          <IconButton onClick={(e) => setAnchorEl(e.currentTarget)} sx={{ p: 0.5 }}>
+            <Avatar
+              sx={{
+                bgcolor: '#C9E4FF',
+                color: '#0D1E36',
+                fontWeight: 700,
+                width: 44,
+                height: 44,
+                border: '2px solid #fff',
+                boxShadow: '0 4px 10px rgba(0,0,0,0.05)'
+              }}
+            >
+              A
+            </Avatar>
           </IconButton>
 
           <Menu

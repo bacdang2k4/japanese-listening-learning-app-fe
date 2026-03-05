@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Container,
@@ -9,37 +9,31 @@ import {
   IconButton,
   LinearProgress,
   Chip,
+  Grid,
   Breadcrumbs,
   Link,
 } from '@mui/material';
-import Grid from '@mui/material/Grid';
 import {
+  VolumeUp,
   NavigateNext,
   NavigateBefore,
-  VolumeUp,
-  Visibility,
-  VisibilityOff,
   CheckCircle,
   Shuffle,
 } from '@mui/icons-material';
 import { useNavigate, useParams } from 'react-router-dom';
 import LearnerLayout from '../../components/learner/LearnerLayout';
-import { mockVocabularies, mockTopics, mockLevels } from '../../data/mockData';
+import { mockVocabularies, mockTopics } from '../../data/mockData';
 
 const VocabularyLearningPage: React.FC = () => {
   const navigate = useNavigate();
   const { topicId } = useParams<{ topicId: string }>();
-
-  const topic = mockTopics.find(t => t.id === topicId);
-  const level = mockLevels.find(l => l.id === topic?.levelId);
-  const vocabularies = mockVocabularies.filter(v => v.topicId === topicId);
-
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showMeaning, setShowMeaning] = useState(false);
   const [learnedWords, setLearnedWords] = useState<string[]>([]);
 
+  const topic = mockTopics.find(t => t.id === topicId);
+  const vocabularies = mockVocabularies.filter(v => v.topicId === topicId);
   const currentVocab = vocabularies[currentIndex];
-  const progress = ((currentIndex + 1) / vocabularies.length) * 100;
 
   const handleNext = () => {
     if (currentIndex < vocabularies.length - 1) {
@@ -59,27 +53,30 @@ const VocabularyLearningPage: React.FC = () => {
     if (!learnedWords.includes(currentVocab.id)) {
       setLearnedWords([...learnedWords, currentVocab.id]);
     }
-    handleNext();
+  };
+
+  const speakWord = (text: string | undefined) => {
+    if (!text) return;
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'ja-JP';
+    window.speechSynthesis.speak(utterance);
   };
 
   const handleShuffle = () => {
-    const randomIndex = Math.floor(Math.random() * vocabularies.length);
-    setCurrentIndex(randomIndex);
+    // Basic shuffle implementation
+    setCurrentIndex(0);
     setShowMeaning(false);
   };
 
-  const speakWord = (text: string) => {
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'ja-JP';
-      speechSynthesis.speak(utterance);
-    }
-  };
+  const progress = ((currentIndex + 1) / vocabularies.length) * 100;
 
   return (
     <LearnerLayout>
-      <Container maxWidth="md" sx={{ py: 4 }}>
-        <Breadcrumbs separator={<NavigateNext fontSize="small" />} sx={{ mb: 3 }}>
+      <Container maxWidth="md" sx={{ py: 6 }}>
+        <Breadcrumbs
+          separator={<NavigateNext fontSize="small" sx={{ color: 'rgba(0,0,0,0.2)' }} />}
+          sx={{ mb: 4 }}
+        >
           <Link
             component="button"
             underline="hover"
@@ -92,134 +89,190 @@ const VocabularyLearningPage: React.FC = () => {
             component="button"
             underline="hover"
             color="inherit"
-            onClick={() => navigate(`/learn/level/${level?.id}/topics`)}
+            onClick={() => navigate(`/learn/level/${topic?.levelId}/topics`)}
           >
-            {level?.name}
+            Chủ đề
           </Link>
-          <Typography color="text.primary">{topic?.name}</Typography>
+          <Typography sx={{ color: '#0D1E36', fontWeight: 700 }}>
+            {topic?.name}
+          </Typography>
         </Breadcrumbs>
 
         {/* Header */}
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="h4" fontWeight="bold" gutterBottom>
-            {topic?.name}
+        <Box sx={{ mb: 5, textAlign: 'center' }}>
+          <Typography variant="h3" fontWeight="900" sx={{ color: '#0D1E36', mb: 1.5, letterSpacing: '-0.02em' }}>
+            {topic?.name}: Từ vựng
           </Typography>
-          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-            <Chip label={`${vocabularies.length} từ vựng`} />
+          <Typography variant="h6" color="#44515E" sx={{ fontWeight: 600, mb: 3 }}>
+            Học từ vựng qua âm thanh và hình ảnh
+          </Typography>
+          <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', alignItems: 'center' }}>
             <Chip
-              label={`Đã học: ${learnedWords.length}/${vocabularies.length}`}
-              color="success"
-              variant="outlined"
+              label={`${vocabularies.length} từ vựng`}
+              sx={{ borderRadius: 2, fontWeight: 700, backgroundColor: 'rgba(0,0,0,0.03)' }}
+            />
+            <Chip
+              label={`Tiến trình: ${learnedWords.length}/${vocabularies.length}`}
+              sx={{
+                borderRadius: 2,
+                fontWeight: 700,
+                backgroundColor: '#C8F3D1',
+                color: '#1B4025'
+              }}
             />
           </Box>
         </Box>
 
-        {/* Progress */}
-        <Box sx={{ mb: 3 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-            <Typography variant="body2">
+        {/* Learning Area */}
+        <Box sx={{ mb: 6 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+            <Typography variant="body2" sx={{ fontWeight: 700, color: '#44515E' }}>
               Từ {currentIndex + 1} / {vocabularies.length}
             </Typography>
-            <Typography variant="body2">
+            <Typography variant="body2" sx={{ fontWeight: 800, color: 'primary.main' }}>
               {Math.round(progress)}%
             </Typography>
           </Box>
           <LinearProgress
             variant="determinate"
             value={progress}
-            sx={{ height: 8, borderRadius: 4 }}
+            sx={{
+              height: 12,
+              borderRadius: 6,
+              backgroundColor: 'rgba(0,0,0,0.03)',
+              '& .MuiLinearProgress-bar': {
+                backgroundColor: '#C9E4FF',
+                borderRadius: 6
+              }
+            }}
           />
         </Box>
 
         {/* Vocabulary Card */}
-        <Card sx={{ mb: 3, minHeight: 400 }}>
-          <CardContent sx={{ p: 4, textAlign: 'center' }}>
-            {/* Word */}
-            <Box sx={{ mb: 4 }}>
+        <Card sx={{
+          mb: 5,
+          minHeight: 480,
+          borderRadius: 10,
+          boxShadow: '0 30px 60px rgba(0, 0, 0, 0.04)',
+          border: '1px solid rgba(0,0,0,0.02)',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center'
+        }}>
+          <CardContent sx={{ p: 6, textAlign: 'center' }}>
+            {/* Word Section */}
+            <Box sx={{ mb: 6 }}>
               <Typography
                 variant="h1"
-                fontWeight="bold"
-                sx={{ fontSize: { xs: '3rem', md: '5rem' }, mb: 1 }}
+                fontWeight="900"
+                sx={{
+                  fontSize: { xs: '4rem', md: '7rem' },
+                  mb: 2,
+                  color: '#0D1E36',
+                  letterSpacing: '-0.03em'
+                }}
               >
                 {currentVocab?.word}
               </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-                <Typography variant="h5" color="text.secondary">
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+                <Typography variant="h4" sx={{ fontWeight: 600, color: '#44515E' }}>
                   {currentVocab?.reading}
                 </Typography>
                 <IconButton
                   onClick={() => speakWord(currentVocab?.word)}
-                  color="primary"
+                  sx={{
+                    backgroundColor: '#C9E4FF',
+                    color: '#0D1E36',
+                    p: 2,
+                    '&:hover': { backgroundColor: '#A3D1FF' }
+                  }}
                 >
-                  <VolumeUp />
+                  <VolumeUp sx={{ fontSize: 32 }} />
                 </IconButton>
               </Box>
             </Box>
 
             {/* Meaning Toggle */}
-            <Button
-              variant="outlined"
-              size="large"
-              startIcon={showMeaning ? <VisibilityOff /> : <Visibility />}
-              onClick={() => setShowMeaning(!showMeaning)}
-              sx={{ mb: 3 }}
-            >
-              {showMeaning ? 'Ẩn nghĩa' : 'Hiện nghĩa'}
-            </Button>
-
-            {/* Meaning & Example */}
-            {showMeaning && (
-              <Box
+            {!showMeaning ? (
+              <Button
+                variant="contained"
+                size="large"
+                onClick={() => setShowMeaning(true)}
                 sx={{
-                  p: 3,
-                  bgcolor: 'grey.100',
-                  borderRadius: 2,
-                  animation: 'fadeIn 0.3s ease',
-                  '@keyframes fadeIn': {
-                    from: { opacity: 0, transform: 'translateY(-10px)' },
-                    to: { opacity: 1, transform: 'translateY(0)' },
-                  },
+                  px: 6,
+                  py: 2,
+                  borderRadius: 4,
+                  fontSize: '1.2rem',
+                  fontWeight: 700,
+                  backgroundColor: '#C9E4FF',
+                  color: '#0D1E36',
+                  '&:hover': { backgroundColor: '#A3D1FF' }
                 }}
               >
-                <Typography variant="h4" fontWeight="bold" color="primary" gutterBottom>
+                Hiện nghĩa
+              </Button>
+            ) : (
+              <Box
+                sx={{
+                  p: 4,
+                  backgroundColor: '#F2F9FF',
+                  borderRadius: 6,
+                  border: '1px solid rgba(201, 228, 255, 0.3)',
+                }}
+              >
+                <Typography variant="h3" fontWeight="800" color="#0D1E36" gutterBottom>
                   {currentVocab?.meaning}
                 </Typography>
 
-                <Box sx={{ mt: 3, textAlign: 'left' }}>
-                  <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                    Ví dụ:
+                <Box sx={{ mt: 4, textAlign: 'left', borderTop: '1px solid rgba(0,0,0,0.05)', pt: 4 }}>
+                  <Typography variant="overline" sx={{ fontWeight: 800, color: '#44515E', mb: 2, display: 'block' }}>
+                    Ví dụ áp dụng:
                   </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                    <Typography variant="h6">
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1.5 }}>
+                    <Typography variant="h5" sx={{ fontWeight: 700, color: '#0D1E36' }}>
                       {currentVocab?.example}
                     </Typography>
                     <IconButton
                       size="small"
                       onClick={() => speakWord(currentVocab?.example)}
+                      sx={{ backgroundColor: 'rgba(0,0,0,0.03)' }}
                     >
                       <VolumeUp fontSize="small" />
                     </IconButton>
                   </Box>
-                  <Typography variant="body1" color="text.secondary">
+                  <Typography variant="h6" sx={{ fontWeight: 500, color: '#44515E' }}>
                     {currentVocab?.exampleMeaning}
                   </Typography>
                 </Box>
+
+                <Button
+                  variant="text"
+                  onClick={() => setShowMeaning(false)}
+                  sx={{ mt: 3, fontWeight: 700, color: '#44515E' }}
+                >
+                  Ẩn nghĩa
+                </Button>
               </Box>
             )}
 
             {learnedWords.includes(currentVocab?.id) && (
-              <Chip
-                icon={<CheckCircle />}
-                label="Đã học"
-                color="success"
-                sx={{ mt: 2 }}
-              />
+              <Box sx={{ mt: 4 }}>
+                <Chip
+                  icon={<CheckCircle />}
+                  label="Đã hoàn thành"
+                  sx={{
+                    backgroundColor: '#C8F3D1',
+                    color: '#1B4025',
+                    fontWeight: 700
+                  }}
+                />
+              </Box>
             )}
           </CardContent>
         </Card>
 
-        {/* Navigation */}
-        <Grid container spacing={2}>
+        {/* Navigation Controls */}
+        <Grid container spacing={4} sx={{ mb: 4 }}>
           <Grid size={{ xs: 4 }}>
             <Button
               variant="outlined"
@@ -227,57 +280,91 @@ const VocabularyLearningPage: React.FC = () => {
               startIcon={<NavigateBefore />}
               onClick={handlePrevious}
               disabled={currentIndex === 0}
+              sx={{ py: 2, borderRadius: 4, fontWeight: 800, borderWidth: 2 }}
             >
-              Trước
+              Câu trước
             </Button>
           </Grid>
           <Grid size={{ xs: 4 }}>
             <Button
               variant="contained"
               fullWidth
-              color="success"
-              startIcon={<CheckCircle />}
-              onClick={handleMarkLearned}
+              onClick={() => setShowMeaning(!showMeaning)}
+              sx={{
+                py: 2,
+                borderRadius: 4,
+                fontWeight: 800,
+                backgroundColor: '#C9E4FF',
+                color: '#0D1E36',
+                boxShadow: '0 10px 25px rgba(201, 228, 255, 0.4)'
+              }}
             >
-              Đã thuộc
+              {showMeaning ? 'Ẩn nghĩa' : 'Hiện nghĩa'}
             </Button>
           </Grid>
           <Grid size={{ xs: 4 }}>
             <Button
-              variant="outlined"
+              variant="contained"
               fullWidth
               endIcon={<NavigateNext />}
               onClick={handleNext}
               disabled={currentIndex === vocabularies.length - 1}
+              sx={{
+                py: 2,
+                borderRadius: 4,
+                fontWeight: 800,
+                backgroundColor: '#A3D1FF',
+                color: 'white',
+                boxShadow: '0 10px 25px rgba(163, 209, 255, 0.4)'
+              }}
             >
-              Tiếp
+              Câu tiếp
             </Button>
           </Grid>
         </Grid>
 
-        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
+        <Box sx={{ textAlign: 'center' }}>
           <Button
             variant="text"
             startIcon={<Shuffle />}
             onClick={handleShuffle}
+            sx={{ fontWeight: 700, color: '#44515E' }}
           >
-            Xáo trộn
+            Xáo trộn danh sách
           </Button>
         </Box>
 
-        {/* Quick Actions */}
-        <Box sx={{ mt: 4, display: 'flex', gap: 2, justifyContent: 'center' }}>
+        {/* Action Bar */}
+        <Box sx={{
+          mt: 8,
+          p: 2,
+          backgroundColor: 'rgba(201, 228, 255, 0.1)',
+          borderRadius: 6,
+          display: 'flex',
+          gap: 3,
+          justifyContent: 'center'
+        }}>
           <Button
             variant="outlined"
             onClick={() => navigate(`/learn/topic/${topicId}/practice`)}
+            sx={{ borderRadius: 3, fontWeight: 700, py: 1.5, px: 4 }}
           >
             Luyện tập nghe
           </Button>
           <Button
             variant="contained"
             onClick={() => navigate(`/learn/topic/${topicId}/exam`)}
+            sx={{
+              borderRadius: 3,
+              fontWeight: 700,
+              py: 1.5,
+              px: 4,
+              backgroundColor: '#FBC8C8',
+              color: '#421414',
+              '&:hover': { backgroundColor: '#F9B1B1' }
+            }}
           >
-            Thi thật
+            Làm bài thi thử
           </Button>
         </Box>
       </Container>

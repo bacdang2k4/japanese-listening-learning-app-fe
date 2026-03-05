@@ -39,32 +39,41 @@ const TopicSelectionPage: React.FC = () => {
 
   return (
     <LearnerLayout>
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Breadcrumbs separator={<NavigateNext fontSize="small" />} sx={{ mb: 3 }}>
+      <Container maxWidth="lg" sx={{ py: 6 }}>
+        <Breadcrumbs
+          separator={<NavigateNext fontSize="small" sx={{ color: 'rgba(0,0,0,0.2)' }} />}
+          sx={{
+            mb: 4,
+            '& .MuiBreadcrumbs-li': {
+              fontSize: '0.9rem',
+              fontWeight: 600,
+            }
+          }}
+        >
           <Link
             component="button"
             underline="hover"
-            color="inherit"
+            color="#4D4459"
             onClick={() => navigate('/learn')}
           >
             Cấp độ
           </Link>
-          <Typography color="text.primary" fontWeight="bold">
+          <Typography sx={{ color: '#1A0B2E', fontWeight: 700 }}>
             {level?.name}
           </Typography>
         </Breadcrumbs>
 
-        <Box sx={{ textAlign: 'center', mb: 5 }}>
-          <MenuBook sx={{ fontSize: 60, color: 'primary.main', mb: 2 }} />
-          <Typography variant="h4" fontWeight="bold" gutterBottom>
-            Chọn chủ đề - {level?.name}
+        <Box sx={{ textAlign: 'center', mb: 8 }}>
+          <MenuBook sx={{ fontSize: 72, color: '#D9C8FB', mb: 2, opacity: 0.8 }} />
+          <Typography variant="h3" fontWeight="900" sx={{ color: '#0D1E36', mb: 1.5, letterSpacing: '-0.02em' }}>
+            {level?.name}: Chủ đề học tập
           </Typography>
-          <Typography variant="body1" color="text.secondary">
-            {level?.description}
+          <Typography variant="h6" color="#44515E" sx={{ fontWeight: 600 }}>
+            Hôm nay bạn muốn luyện nghe về chủ đề gì nào?
           </Typography>
         </Box>
 
-        <Grid container spacing={3}>
+        <Grid container spacing={4}>
           {topics.map((topic, index) => {
             const progress = topicProgress[topic.id];
             const vocabCount = getVocabCount(topic.id);
@@ -74,83 +83,135 @@ const TopicSelectionPage: React.FC = () => {
                 <Card
                   sx={{
                     height: '100%',
-                    transition: 'transform 0.2s, box-shadow 0.2s',
+                    borderRadius: 6,
+                    border: '1px solid rgba(0, 0, 0, 0.03)',
+                    boxShadow: '0 10px 40px rgba(0, 0, 0, 0.03)',
+                    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                     '&:hover': {
-                      transform: 'translateY(-8px)',
-                      boxShadow: 6,
+                      transform: 'translateY(-12px)',
+                      boxShadow: '0 20px 60px rgba(0, 0, 0, 0.06)',
                     },
                   }}
                 >
-                  <CardContent sx={{ p: 3 }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                  <CardContent sx={{ p: 4 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
                       <Box>
                         <Chip
                           size="small"
                           label={`Chủ đề ${index + 1}`}
-                          color="primary"
-                          sx={{ mb: 1 }}
+                          sx={{
+                            mb: 1.5,
+                            fontWeight: 700,
+                            backgroundColor: '#D9C8FB',
+                            color: '#2D1A4D',
+                            borderRadius: 2
+                          }}
                         />
-                        <Typography variant="h5" fontWeight="bold">
+                        <Typography variant="h4" fontWeight="800" sx={{ color: '#1A0B2E' }}>
                           {topic.name}
                         </Typography>
                       </Box>
                       {progress?.completed && (
-                        <CheckCircle sx={{ color: 'success.main', fontSize: 28 }} />
+                        <CheckCircle sx={{ color: '#4caf50', fontSize: 32 }} />
                       )}
                     </Box>
 
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2, minHeight: 40 }}>
+                    <Typography variant="body1" color="text.secondary" sx={{ mb: 4, minHeight: 48, fontWeight: 500, lineHeight: 1.6 }}>
                       {topic.description}
                     </Typography>
 
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                      <Typography variant="caption" color="text.secondary">
-                        Tiến độ học
-                      </Typography>
-                      <Typography variant="caption" fontWeight="bold">
-                        {progress?.progress || 0}%
-                      </Typography>
+                    <Box sx={{ mb: 3 }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
+                        <Typography variant="body2" sx={{ fontWeight: 600, color: '#4D4459' }}>
+                          Tiến độ hoàn thành
+                        </Typography>
+                        <Typography variant="body2" fontWeight="800" color="primary">
+                          {progress?.progress || 0}%
+                        </Typography>
+                      </Box>
+                      <LinearProgress
+                        variant="determinate"
+                        value={progress?.progress || 0}
+                        sx={{
+                          height: 10,
+                          borderRadius: 5,
+                          backgroundColor: 'rgba(0,0,0,0.03)',
+                          '& .MuiLinearProgress-bar': {
+                            backgroundColor: '#D9C8FB',
+                            borderRadius: 5
+                          }
+                        }}
+                      />
                     </Box>
-                    <LinearProgress
-                      variant="determinate"
-                      value={progress?.progress || 0}
-                      sx={{ height: 6, borderRadius: 3, mb: 2 }}
-                    />
 
-                    <Box sx={{ display: 'flex', gap: 1, mb: 3 }}>
-                      <Chip size="small" label={`${vocabCount} từ vựng`} variant="outlined" />
-                      <Chip size="small" label="2 bài test" variant="outlined" />
+                    <Box sx={{ display: 'flex', gap: 1.5, mb: 4, flexWrap: 'wrap' }}>
+                      <Chip size="medium" label={`${vocabCount} từ vựng`} sx={{ fontWeight: 600, borderRadius: 2 }} variant="outlined" />
+                      <Chip size="medium" label="2 bài test" sx={{ fontWeight: 600, borderRadius: 2 }} variant="outlined" />
                     </Box>
 
-                    <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                       <Button
                         variant="contained"
                         startIcon={<PlayArrow />}
                         fullWidth
                         onClick={() => navigate(`/learn/topic/${topic.id}`)}
+                        sx={{
+                          py: 1.5,
+                          borderRadius: 4,
+                          fontWeight: 700,
+                          boxShadow: '0 8px 20px rgba(217, 200, 251, 0.4)'
+                        }}
                       >
-                        Học từ vựng
+                        Bắt đầu học
                       </Button>
-                    </Box>
 
-                    <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        fullWidth
-                        onClick={() => navigate(`/learn/topic/${topic.id}/practice`)}
-                      >
-                        Luyện tập
-                      </Button>
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        fullWidth
-                        color="secondary"
-                        onClick={() => navigate(`/learn/topic/${topic.id}/exam`)}
-                      >
-                        Thi thật
-                      </Button>
+                      <Box sx={{ display: 'flex', gap: 2 }}>
+                        <Button
+                          variant="outlined"
+                          size="medium"
+                          fullWidth
+                          onClick={() => navigate(`/learn/topic/${topic.id}/practice`)}
+                          sx={{ borderRadius: 3, fontWeight: 600, py: 1 }}
+                        >
+                          Luyện tập
+                        </Button>
+                        <Button
+                          variant="contained"
+                          fullWidth
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/learn/topic/${topic.id}/vocab`);
+                          }}
+                          sx={{
+                            borderRadius: 3,
+                            fontWeight: 800,
+                            backgroundColor: '#C9E4FF',
+                            color: '#0D1E36',
+                            '&:hover': { backgroundColor: '#A3D1FF' }
+                          }}
+                        >
+                          HỌC TỪ VỰNG
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          size="medium"
+                          fullWidth
+                          onClick={() => navigate(`/learn/topic/${topic.id}/exam`)}
+                          sx={{
+                            borderRadius: 3,
+                            fontWeight: 600,
+                            py: 1,
+                            borderColor: '#FBC8C8',
+                            color: '#D32F2F',
+                            '&:hover': {
+                              borderColor: '#FBC8C8',
+                              backgroundColor: 'rgba(251, 200, 200, 0.1)'
+                            }
+                          }}
+                        >
+                          Thi thật
+                        </Button>
+                      </Box>
                     </Box>
                   </CardContent>
                 </Card>

@@ -133,8 +133,8 @@ const QuestionsPage: React.FC = () => {
         <Chip
           label={row.options[value]}
           size="small"
-          color="success"
           variant="outlined"
+          sx={{ color: '#3da258', borderColor: '#298d44', fontWeight: 600 }}
         />
       ),
     },

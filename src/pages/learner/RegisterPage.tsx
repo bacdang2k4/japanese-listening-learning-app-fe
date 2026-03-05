@@ -66,19 +66,29 @@ const RegisterPage: React.FC = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: 'linear-gradient(135deg, #C9E4FF 0%, #E1F0FF 100%)',
         padding: 2,
       }}
     >
-      <Card sx={{ maxWidth: 450, width: '100%', borderRadius: 3 }}>
-        <CardContent sx={{ p: 4 }}>
-          <Box sx={{ textAlign: 'center', mb: 4 }}>
-            <Headphones sx={{ fontSize: 60, color: 'primary.main', mb: 2 }} />
-            <Typography variant="h4" fontWeight="bold" color="primary">
-              Đăng ký tài khoản
+      <Card
+        sx={{
+          maxWidth: 480,
+          width: '100%',
+          borderRadius: 8,
+          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.05)',
+          border: '1px solid rgba(255, 255, 255, 0.5)',
+          backgroundColor: 'rgba(255, 255, 255, 0.8)',
+          backdropFilter: 'blur(20px)',
+        }}
+      >
+        <CardContent sx={{ p: 5 }}>
+          <Box sx={{ textAlign: 'center', mb: 5 }}>
+            <Headphones sx={{ fontSize: 72, color: '#C9E4FF', mb: 2 }} />
+            <Typography variant="h3" fontWeight="800" sx={{ color: '#0D1E36', letterSpacing: '-0.03em' }}>
+              Đăng ký
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-              Tạo tài khoản để bắt đầu học nghe tiếng Nhật
+            <Typography variant="body1" color="#44515E" sx={{ mt: 1, fontWeight: 500 }}>
+              Tạo tài khoản học tập của bạn
             </Typography>
           </Box>
 

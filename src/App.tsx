@@ -28,7 +28,7 @@ import ExamTestPage from './pages/learner/ExamTestPage';
 const App = () => (
   <ThemeProvider theme={theme}>
     <CssBaseline />
-    <BrowserRouter>
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Routes>
         {/* Admin Routes */}
         <Route path="/" element={<Dashboard />} />

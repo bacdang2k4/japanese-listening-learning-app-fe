@@ -67,7 +67,7 @@ const ExamTestPage: React.FC = () => {
   // Timer
   useEffect(() => {
     if (!examStarted) return;
-    
+
     const timer = setInterval(() => {
       setTimeRemaining(prev => {
         if (prev <= 1) {
@@ -164,78 +164,93 @@ const ExamTestPage: React.FC = () => {
     return (
       <LearnerLayout>
         <Container maxWidth="md" sx={{ py: 4 }}>
-          <Card>
-            <CardContent sx={{ p: 4, textAlign: 'center' }}>
-              <Warning sx={{ fontSize: 80, color: 'warning.main', mb: 2 }} />
-              <Typography variant="h4" fontWeight="bold" gutterBottom>
-                Thi thật - {topic?.name}
+          <Card
+            sx={{
+              borderRadius: 10,
+              boxShadow: '0 40px 100px rgba(0,0,0,0.05)',
+              border: '1px solid rgba(0,0,0,0.03)'
+            }}
+          >
+            <CardContent sx={{ p: 6, textAlign: 'center' }}>
+              <Box sx={{
+                width: 120,
+                height: 120,
+                borderRadius: '50%',
+                bgcolor: '#FFF1F1',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 32px'
+              }}>
+                <Warning sx={{ fontSize: 64, color: '#f44336' }} />
+              </Box>
+
+              <Typography variant="h3" fontWeight="900" sx={{ color: '#0D1E36', letterSpacing: '-0.02em', mb: 1 }}>
+                SẴN SÀNG CHƯA?
               </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-                Bạn chuẩn bị bắt đầu bài thi chính thức
+              <Typography variant="h5" color="#44515E" sx={{ mb: 5, fontWeight: 600 }}>
+                Bạn sắp bước vào bài thi thật: {topic?.name}
               </Typography>
 
-              <Alert severity="warning" sx={{ mb: 3, textAlign: 'left' }}>
-                <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
-                  Lưu ý quan trọng:
+              <Box sx={{
+                textAlign: 'left',
+                bgcolor: '#f5f5f5',
+                p: 4,
+                borderRadius: 6,
+                mb: 6,
+                border: '1px solid rgba(0,0,0,0.03)'
+              }}>
+                <Typography variant="h6" fontWeight="800" sx={{ color: '#0D1E36', mb: 2 }}>
+                  QUY ĐỊNH PHÒNG THI
                 </Typography>
-                <ul style={{ margin: 0, paddingLeft: 20 }}>
-                  <li>Thời gian làm bài: 30 phút</li>
-                  <li>Mỗi phần nghe chỉ được phát 1 lần</li>
-                  <li>Điểm liệt: {passCondition}%</li>
-                  <li>Kết quả sẽ được lưu vào hồ sơ của bạn</li>
-                  <li>Không thể thoát giữa chừng</li>
-                </ul>
-              </Alert>
+                <Grid container spacing={3}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <Box sx={{ display: 'flex', gap: 1.5, mb: 2 }}>
+                      <CheckCircle sx={{ color: '#4caf50' }} />
+                      <Typography variant="body1" fontWeight={600}>Thời gian làm bài: 30 phút</Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', gap: 1.5, mb: 2 }}>
+                      <CheckCircle sx={{ color: '#4caf50' }} />
+                      <Typography variant="body1" fontWeight={600}>Mỗi audio chỉ phát 1 lần duy nhất</Typography>
+                    </Box>
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <Box sx={{ display: 'flex', gap: 1.5, mb: 2 }}>
+                      <CheckCircle sx={{ color: '#4caf50' }} />
+                      <Typography variant="body1" fontWeight={600}>Cần đạt tối thiểu {passCondition}%</Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', gap: 1.5 }}>
+                      <CheckCircle sx={{ color: '#4caf50' }} />
+                      <Typography variant="body1" fontWeight={600}>Kết quả được tính vào học bạ</Typography>
+                    </Box>
+                  </Grid>
+                </Grid>
+              </Box>
 
-              <Grid container spacing={2} sx={{ mb: 3 }}>
-                <Grid size={{ xs: 4 }}>
-                  <Card variant="outlined">
-                    <CardContent>
-                      <Typography variant="h4" fontWeight="bold" color="primary">
-                        {questions.length}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Câu hỏi
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-                <Grid size={{ xs: 4 }}>
-                  <Card variant="outlined">
-                    <CardContent>
-                      <Typography variant="h4" fontWeight="bold" color="primary">
-                        30
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Phút
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-                <Grid size={{ xs: 4 }}>
-                  <Card variant="outlined">
-                    <CardContent>
-                      <Typography variant="h4" fontWeight="bold" color="primary">
-                        {passCondition}%
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Điểm liệt
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              </Grid>
-
-              <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
-                <Button variant="outlined" onClick={() => navigate(-1)}>
-                  Quay lại
+              <Box sx={{ display: 'flex', gap: 3, justifyContent: 'center' }}>
+                <Button
+                  variant="outlined"
+                  onClick={() => navigate(-1)}
+                  sx={{ py: 2, px: 6, borderRadius: 4, fontWeight: 800, borderWidth: 2 }}
+                >
+                  HỦY BỎ
                 </Button>
                 <Button
                   variant="contained"
                   size="large"
                   onClick={() => setExamStarted(true)}
+                  sx={{
+                    py: 2,
+                    px: 8,
+                    borderRadius: 4,
+                    fontWeight: 800,
+                    backgroundColor: '#C9E4FF',
+                    color: '#0D1E36',
+                    boxShadow: '0 10px 30px rgba(201, 228, 255, 0.5)',
+                    fontSize: '1.2rem'
+                  }}
                 >
-                  Bắt đầu thi
+                  BẮT ĐẦU THI
                 </Button>
               </Box>
             </CardContent>
@@ -249,17 +264,31 @@ const ExamTestPage: React.FC = () => {
     <LearnerLayout>
       <Container maxWidth="md" sx={{ py: 4 }}>
         {/* Header with Timer */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 5 }}>
           <Box>
-            <Chip label="Chế độ thi thật" color="warning" sx={{ mb: 1 }} />
-            <Typography variant="h5" fontWeight="bold">
+            <Chip
+              label="CHẾ ĐỘ THI THẬT"
+              sx={{
+                mb: 1.5,
+                fontWeight: 900,
+                backgroundColor: '#FBE8C8',
+                color: '#593E00',
+                borderRadius: 2
+              }}
+            />
+            <Typography variant="h4" fontWeight="900" sx={{ color: '#0D1E36' }}>
               {topic?.name}
             </Typography>
           </Box>
-          <Card sx={{ bgcolor: timeRemaining < 300 ? 'error.main' : 'primary.main', color: 'white' }}>
-            <CardContent sx={{ py: 1, px: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Timer />
-              <Typography variant="h5" fontWeight="bold">
+          <Card sx={{
+            borderRadius: 5,
+            background: timeRemaining < 300 ? '#f44336' : '#0D1E36',
+            color: 'white',
+            boxShadow: '0 10px 25px rgba(13, 30, 54, 0.3)'
+          }}>
+            <CardContent sx={{ py: 1.5, px: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Timer fontSize="large" />
+              <Typography variant="h4" fontWeight="900">
                 {formatTime(timeRemaining)}
               </Typography>
             </CardContent>
@@ -284,7 +313,7 @@ const ExamTestPage: React.FC = () => {
         </Box>
 
         {/* Audio Player */}
-        <Card sx={{ mb: 3, bgcolor: audioPlayed[currentQuestionIndex] ? 'grey.400' : 'primary.main', color: 'white' }}>
+        <Card sx={{ mb: 3, bgcolor: audioPlayed[currentQuestionIndex] ? 'grey.400' : '#C9E4FF', color: audioPlayed[currentQuestionIndex] ? 'white' : '#0D1E36' }}>
           <CardContent>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
               <VolumeUp sx={{ mr: 1 }} />
@@ -298,9 +327,9 @@ const ExamTestPage: React.FC = () => {
               <IconButton
                 onClick={handlePlayAudio}
                 disabled={audioPlayed[currentQuestionIndex]}
-                sx={{ 
-                  bgcolor: 'white', 
-                  color: audioPlayed[currentQuestionIndex] ? 'grey.500' : 'primary.main',
+                sx={{
+                  bgcolor: 'white',
+                  color: audioPlayed[currentQuestionIndex] ? 'grey.500' : '#0D1E36',
                   '&:hover': { bgcolor: 'grey.100' },
                   '&:disabled': { bgcolor: 'grey.300' }
                 }}

@@ -89,14 +89,26 @@ const TestHistoryPage: React.FC = () => {
   return (
     <LearnerLayout>
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
-          <History sx={{ fontSize: 40, color: 'primary.main', mr: 2 }} />
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 5 }}>
+          <Box sx={{
+            width: 64,
+            height: 64,
+            borderRadius: 4,
+            bgcolor: '#F2F9FF',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            mr: 3,
+            boxShadow: '0 10px 20px rgba(0,0,0,0.05)'
+          }}>
+            <History sx={{ fontSize: 32, color: '#0D1E36' }} />
+          </Box>
           <Box>
-            <Typography variant="h4" fontWeight="bold">
-              Lịch sử làm bài
+            <Typography variant="h3" fontWeight="900" sx={{ color: '#0D1E36', mb: 1.5, letterSpacing: '-0.02em' }}>
+              Lịch sử thi & Luyện tập
             </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Xem lại kết quả các bài thi đã hoàn thành
+            <Typography variant="h6" color="#44515E" sx={{ fontWeight: 600 }}>
+              Theo dõi quá trình tiến bộ của bạn
             </Typography>
           </Box>
         </Box>
@@ -162,13 +174,13 @@ const TestHistoryPage: React.FC = () => {
           <TableContainer>
             <Table>
               <TableHead>
-                <TableRow sx={{ bgcolor: 'grey.100' }}>
-                  <TableCell>Tên bài thi</TableCell>
-                  <TableCell align="center">Chế độ</TableCell>
-                  <TableCell align="center">Điểm</TableCell>
-                  <TableCell align="center">Kết quả</TableCell>
-                  <TableCell align="center">Thời gian</TableCell>
-                  <TableCell align="center">Thao tác</TableCell>
+                <TableRow sx={{ bgcolor: '#F7F5FC' }}>
+                  <TableCell sx={{ fontWeight: 900, color: '#2D1A4D', py: 2.5 }}>TÊN BÀI THI</TableCell>
+                  <TableCell align="center" sx={{ fontWeight: 900, color: '#2D1A4D' }}>CHẾ ĐỘ</TableCell>
+                  <TableCell align="center" sx={{ fontWeight: 900, color: '#2D1A4D' }}>ĐIỂM SỐ</TableCell>
+                  <TableCell align="center" sx={{ fontWeight: 900, color: '#2D1A4D' }}>KẾT QUẢ</TableCell>
+                  <TableCell align="center" sx={{ fontWeight: 900, color: '#2D1A4D' }}>THỜI GIAN</TableCell>
+                  <TableCell align="center" sx={{ fontWeight: 900, color: '#2D1A4D' }}>THAO TÁC</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>

@@ -24,8 +24,8 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
       position="static"
       elevation={0}
       sx={{
-        backgroundColor: '#fff',
-        borderBottom: '1px solid #e0e0e0',
+        backgroundColor: 'background.default',
+        borderBottom: '1px solid rgba(0, 0, 0, 0.05)',
       }}
     >
       <Toolbar sx={{ justifyContent: 'space-between' }}>

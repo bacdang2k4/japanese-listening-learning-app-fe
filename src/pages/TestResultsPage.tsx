@@ -61,7 +61,13 @@ const TestResultsPage: React.FC = () => {
       label: 'Level',
       minWidth: 80,
       format: (value: string) => (
-        <Chip label={value} size="small" color="primary" variant="outlined" />
+        <Chip
+          label={value}
+          size="small"
+          color="primary"
+          variant="outlined"
+          sx={{ color: '#0D1E36', borderColor: '#0D3B80', fontWeight: 600 }}
+        />
       ),
     },
     { id: 'testName', label: 'Bài test', minWidth: 180 },

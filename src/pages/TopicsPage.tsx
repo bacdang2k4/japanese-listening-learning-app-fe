@@ -103,7 +103,13 @@ const TopicsPage: React.FC = () => {
       label: 'Cấp độ',
       minWidth: 80,
       format: (value: string) => (
-        <Chip label={getLevelName(value)} size="small" color="primary" variant="outlined" />
+        <Chip
+          label={getLevelName(value)}
+          size="small"
+          color="primary"
+          variant="outlined"
+          sx={{ color: '#0D1E36', borderColor: '#0D3B80', fontWeight: 600 }}
+        />
       ),
     },
     { id: 'name', label: 'Tên chủ đề', minWidth: 150 },

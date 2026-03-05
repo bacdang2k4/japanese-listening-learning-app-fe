@@ -3,50 +3,49 @@ import { createTheme } from '@mui/material/styles';
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#1976d2',
-      light: '#42a5f5',
-      dark: '#1565c0',
-      contrastText: '#ffffff',
+      main: '#C9E4FF', // Pastel Blue (matching HSL 210 90% 88%)
+      light: '#E1F0FF',
+      dark: '#A3D1FF',
+      contrastText: '#0D1E36',
     },
     secondary: {
-      main: '#dc004e',
-      light: '#ff4081',
-      dark: '#9a0036',
-      contrastText: '#ffffff',
+      main: '#D1F4F9', // Pastel Cyan (matching HSL 184 65% 91%)
+      light: '#E7F9FB',
+      dark: '#A6E9F2',
+      contrastText: '#183B40',
     },
     background: {
-      default: '#f5f5f5',
+      default: '#F2F9FF', // Very light pastel blue tint
       paper: '#ffffff',
     },
     text: {
-      primary: '#1a1a2e',
-      secondary: '#666666',
+      primary: '#0D1E36',
+      secondary: '#44515E',
     },
     success: {
-      main: '#4caf50',
-      light: '#81c784',
-      dark: '#388e3c',
+      main: '#C8F3D1', // Pastel Green
+      contrastText: '#1B4025',
     },
     warning: {
-      main: '#ff9800',
-      light: '#ffb74d',
-      dark: '#f57c00',
+      main: '#FBE8C8', // Pastel Yellow/Orange
+      contrastText: '#423214',
     },
     error: {
-      main: '#f44336',
-      light: '#e57373',
-      dark: '#d32f2f',
+      main: '#FBC8C8', // Pastel Red
+      contrastText: '#421414',
     },
   },
   typography: {
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    fontFamily: '"Outfit", "Inter", sans-serif', // More modern fonts
     h1: {
       fontSize: '2.5rem',
-      fontWeight: 600,
+      fontWeight: 700,
+      letterSpacing: '-0.02em',
     },
     h2: {
       fontSize: '2rem',
-      fontWeight: 600,
+      fontWeight: 700,
+      letterSpacing: '-0.01em',
     },
     h3: {
       fontSize: '1.75rem',
@@ -66,31 +65,39 @@ const theme = createTheme({
     },
   },
   shape: {
-    borderRadius: 8,
+    borderRadius: 20, // Large Material 3 style radius
   },
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
           textTransform: 'none',
-          fontWeight: 500,
+          fontWeight: 600,
+          borderRadius: 24, // Pill shape for buttons
+          padding: '10px 24px',
+          boxShadow: 'none',
+          '&:hover': {
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+          },
         },
       },
     },
     MuiCard: {
       styleOverrides: {
         root: {
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+          borderRadius: 24,
+          boxShadow: '0 10px 40px rgba(0, 0, 0, 0.03)',
+          border: '1px solid rgba(0, 0, 0, 0.03)',
         },
       },
     },
     MuiTableHead: {
       styleOverrides: {
         root: {
-          backgroundColor: '#f8f9fa',
+          backgroundColor: '#F2F9FF',
           '& .MuiTableCell-root': {
             fontWeight: 600,
-            color: '#1a1a2e',
+            color: '#0D1E36',
           },
         },
       },

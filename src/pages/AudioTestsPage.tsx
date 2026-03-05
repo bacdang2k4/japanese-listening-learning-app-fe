@@ -50,6 +50,10 @@ const AudioTestsPage: React.FC = () => {
     return level?.name || 'N/A';
   };
 
+  const LevelChip: React.FC<{ label: string }> = ({ label }) => (
+    <Chip label={label} size="small" color="primary" variant="outlined" sx={{ color: '#0D1E36', borderColor: '#0D3B80', fontWeight: 600 }} />
+  );
+
   const handleOpenDialog = (test?: AudioTest) => {
     if (test) {
       setSelectedTest(test);
@@ -108,9 +112,7 @@ const AudioTestsPage: React.FC = () => {
       id: 'levelId',
       label: 'Cấp độ',
       minWidth: 80,
-      format: (value: string) => (
-        <Chip label={getLevelName(value)} size="small" color="primary" variant="outlined" />
-      ),
+      format: (value: string) => <LevelChip label={getLevelName(value)} />,
     },
     {
       id: 'passCondition',

@@ -50,9 +50,16 @@ const DataTable: React.FC<DataTableProps> = ({
   };
 
   return (
-    <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+    <Paper sx={{
+      width: '100%',
+      overflow: 'visible',
+      borderRadius: (theme) => `${theme.shape.borderRadius}px`,
+      boxShadow: '0 10px 40px rgba(0, 0, 0, 0.03)',
+      border: '1px solid rgba(0, 0, 0, 0.03)',
+      position: 'relative',
+    }}>
       {onSearch && (
-        <Box sx={{ p: 2 }}>
+        <Box sx={{ p: 2, display: 'flex', alignItems: 'center' }}>
           <TextField
             size="small"
             placeholder={searchPlaceholder}
@@ -61,11 +68,20 @@ const DataTable: React.FC<DataTableProps> = ({
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <SearchIcon sx={{ color: '#999' }} />
+                  <SearchIcon sx={{ color: 'text.secondary' }} />
                 </InputAdornment>
               ),
             }}
-            sx={{ width: 300 }}
+            sx={{
+              width: 320,
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 3,
+                backgroundColor: 'background.default',
+                '& fieldset': {
+                  borderColor: 'rgba(0, 0, 0, 0.05)',
+                },
+              }
+            }}
           />
         </Box>
       )}

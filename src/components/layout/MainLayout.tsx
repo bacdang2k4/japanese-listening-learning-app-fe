@@ -16,9 +16,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
         component="main"
         sx={{
           flexGrow: 1,
-          backgroundColor: '#f5f5f5',
+          backgroundColor: 'background.default',
           display: 'flex',
           flexDirection: 'column',
+          transition: 'background-color 0.3s ease',
         }}
       >
         <Header title={title} />

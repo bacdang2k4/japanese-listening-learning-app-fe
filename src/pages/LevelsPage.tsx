@@ -81,7 +81,20 @@ const LevelsPage: React.FC = () => {
 
   const columns = [
     { id: 'order', label: 'STT', minWidth: 60 },
-    { id: 'name', label: 'Tên cấp độ', minWidth: 100 },
+    {
+      id: 'name',
+      label: 'Tên cấp độ',
+      minWidth: 100,
+      format: (value: string) => (
+        <Chip
+          label={value}
+          size="small"
+          color="primary"
+          variant="outlined"
+          sx={{ color: '#0D1E36', borderColor: '#0D3B80', fontWeight: 600 }}
+        />
+      ),
+    },
     { id: 'description', label: 'Mô tả', minWidth: 200 },
     {
       id: 'createdAt',

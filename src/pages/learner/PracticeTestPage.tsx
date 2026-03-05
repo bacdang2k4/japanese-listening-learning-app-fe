@@ -131,13 +131,22 @@ const PracticeTestPage: React.FC = () => {
     <LearnerLayout>
       <Container maxWidth="md" sx={{ py: 4 }}>
         {/* Header */}
-        <Box sx={{ mb: 3 }}>
-          <Chip label="Chế độ luyện tập" color="info" sx={{ mb: 1 }} />
-          <Typography variant="h5" fontWeight="bold">
-            {topic?.name} - Luyện nghe
+        <Box sx={{ mb: 5 }}>
+          <Chip
+            label="Chế độ luyện tập"
+            sx={{
+              mb: 2,
+              fontWeight: 800,
+              backgroundColor: '#C9E4FF',
+              color: '#0D1E36',
+              borderRadius: 2
+            }}
+          />
+          <Typography variant="h4" fontWeight="900" sx={{ color: '#0D1E36', letterSpacing: '-0.02em' }}>
+            {topic?.name}: Luyện nghe
           </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Câu {currentQuestionIndex + 1} / {questions.length}
+          <Typography variant="body1" sx={{ color: '#44515E', fontWeight: 600, mt: 0.5 }}>
+            Câu hỏi hiện tại: {currentQuestionIndex + 1} / {questions.length}
           </Typography>
         </Box>
 
@@ -149,24 +158,38 @@ const PracticeTestPage: React.FC = () => {
         />
 
         {/* Audio Player */}
-        <Card sx={{ mb: 3, bgcolor: 'primary.main', color: 'white' }}>
-          <CardContent>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-              <VolumeUp sx={{ mr: 1 }} />
-              <Typography fontWeight="bold">Phần nghe</Typography>
+        <Card sx={{
+          mb: 5,
+          borderRadius: 6,
+          background: 'linear-gradient(135deg, #C9E4FF 0%, #A3D1FF 100%)',
+          color: 'white',
+          boxShadow: '0 15px 40px rgba(163, 209, 255, 0.3)',
+          border: 'none',
+          overflow: 'hidden'
+        }}>
+          <CardContent sx={{ p: 4 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+              <VolumeUp sx={{ mr: 1.5, fontSize: 28 }} />
+              <Typography variant="h6" fontWeight="800">BẢN TIN AUDIO</Typography>
             </Box>
 
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
               <IconButton
                 onClick={handlePlayAudio}
-                sx={{ bgcolor: 'white', color: 'primary.main', '&:hover': { bgcolor: 'grey.100' } }}
+                sx={{
+                  bgcolor: 'white',
+                  color: '#0D1E36',
+                  width: 56,
+                  height: 56,
+                  '&:hover': { bgcolor: 'rgba(255,255,255,0.9)' }
+                }}
               >
-                {isPlaying ? <Pause /> : <PlayArrow />}
+                {isPlaying ? <Pause fontSize="large" /> : <PlayArrow fontSize="large" />}
               </IconButton>
 
               <IconButton
                 onClick={handleReplayAudio}
-                sx={{ color: 'white' }}
+                sx={{ color: 'white', border: '2px solid rgba(255,255,255,0.3)' }}
               >
                 <Replay />
               </IconButton>
@@ -176,20 +199,24 @@ const PracticeTestPage: React.FC = () => {
                   value={audioProgress}
                   sx={{
                     color: 'white',
-                    '& .MuiSlider-thumb': { bgcolor: 'white' },
-                    '& .MuiSlider-track': { bgcolor: 'white' },
-                    '& .MuiSlider-rail': { bgcolor: 'rgba(255,255,255,0.3)' },
+                    height: 8,
+                    '& .MuiSlider-thumb': {
+                      bgcolor: 'white',
+                      boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+                    },
+                    '& .MuiSlider-track': { border: 'none' },
+                    '& .MuiSlider-rail': { bgcolor: 'rgba(255,255,255,0.3)', opacity: 1 },
                   }}
                 />
               </Box>
 
-              <Typography variant="body2">
+              <Typography variant="body2" sx={{ fontWeight: 800, minWidth: 60, textAlign: 'right' }}>
                 {Math.floor(audioProgress * 0.3)}s / 30s
               </Typography>
             </Box>
 
-            <Typography variant="caption" sx={{ opacity: 0.8, display: 'block', mt: 1 }}>
-              Bạn có thể nghe lại nhiều lần trong chế độ luyện tập
+            <Typography variant="caption" sx={{ opacity: 0.9, display: 'block', mt: 2, fontWeight: 600 }}>
+              * Chế độ luyện tập: Nghe không giới hạn số lần
             </Typography>
           </CardContent>
         </Card>
@@ -218,40 +245,46 @@ const PracticeTestPage: React.FC = () => {
                     key={index}
                     value={index}
                     disabled={showExplanation}
-                    control={<Radio />}
+                    control={<Radio sx={{ color: '#D9C8FB', '&.Mui-checked': { color: '#2D1A4D' } }} />}
                     label={
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Typography>{option}</Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, py: 1 }}>
+                        <Typography variant="body1" sx={{ fontWeight: 600, color: '#1A0B2E' }}>
+                          {option}
+                        </Typography>
                         {showStatus && isCorrect && (
-                          <CheckCircle sx={{ color: 'success.main', fontSize: 20 }} />
+                          <CheckCircle sx={{ color: '#4caf50', fontSize: 24 }} />
                         )}
                         {showStatus && isSelected && !isCorrect && (
-                          <Cancel sx={{ color: 'error.main', fontSize: 20 }} />
+                          <Cancel sx={{ color: '#FBC8C8', fontSize: 24 }} />
                         )}
                       </Box>
                     }
                     sx={{
-                      mb: 1,
-                      p: 1.5,
-                      borderRadius: 2,
-                      border: '1px solid',
+                      mb: 2,
+                      p: 2,
+                      width: '100%',
+                      mx: 0,
+                      borderRadius: 4,
+                      border: '2px solid',
+                      transition: 'all 0.2s ease',
                       borderColor: showStatus
                         ? isCorrect
-                          ? 'success.main'
+                          ? '#C8F3D1'
                           : isSelected
-                          ? 'error.main'
-                          : 'grey.300'
-                        : 'grey.300',
+                            ? '#FBC8C8'
+                            : 'rgba(0,0,0,0.05)'
+                        : isSelected
+                          ? '#D9C8FB'
+                          : 'rgba(0,0,0,0.05)',
                       bgcolor: showStatus
                         ? isCorrect
-                          ? 'success.light'
+                          ? '#E8FBF0'
                           : isSelected
-                          ? 'error.light'
-                          : 'transparent'
-                        : 'transparent',
-                      '&:hover': {
-                        bgcolor: showExplanation ? undefined : 'grey.50',
-                      },
+                            ? '#FFF1F1'
+                            : 'transparent'
+                        : isSelected
+                          ? '#F7F5FC'
+                          : 'transparent',
                     }}
                   />
                 );
@@ -282,25 +315,38 @@ const PracticeTestPage: React.FC = () => {
         </Card>
 
         {/* Navigation */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Button
-            variant="outlined"
-            startIcon={<NavigateBefore />}
-            onClick={handlePrevious}
-            disabled={currentQuestionIndex === 0}
-          >
-            Câu trước
-          </Button>
+        <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Grid size={{ xs: 6 }}>
+            <Button
+              variant="outlined"
+              startIcon={<NavigateBefore />}
+              onClick={handlePrevious}
+              disabled={currentQuestionIndex === 0}
+              fullWidth
+              sx={{ py: 1.5, borderRadius: 4, fontWeight: 700, borderWidth: 2 }}
+            >
+              Câu trước
+            </Button>
+          </Grid>
 
-          <Button
-            variant="contained"
-            endIcon={<NavigateNext />}
-            onClick={handleNext}
-            disabled={currentAnswer?.selectedAnswer === null}
-          >
-            {currentQuestionIndex === questions.length - 1 ? 'Hoàn thành' : 'Câu tiếp'}
-          </Button>
-        </Box>
+          <Grid size={{ xs: 6 }}>
+            <Button
+              variant="contained"
+              endIcon={<NavigateNext />}
+              onClick={handleNext}
+              disabled={currentAnswer?.selectedAnswer === null}
+              fullWidth
+              sx={{
+                py: 1.5,
+                borderRadius: 4,
+                fontWeight: 700,
+                boxShadow: '0 8px 20px rgba(201, 228, 255, 0.4)'
+              }}
+            >
+              {currentQuestionIndex === questions.length - 1 ? 'Hoàn thành' : 'Câu tiếp'}
+            </Button>
+          </Grid>
+        </Grid>
 
         {/* Result Dialog */}
         <Dialog open={resultDialogOpen} maxWidth="sm" fullWidth>

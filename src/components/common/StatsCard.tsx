@@ -1,11 +1,16 @@
 import React from 'react';
 import { Card, CardContent, Typography, Box } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 
 interface StatsCardProps {
   title: string;
   value: string | number;
   icon: React.ReactNode;
-  color: string;
+  /**
+   * Accepts either a theme palette key (e.g. 'primary', 'success')
+   * or a hex color string like '#C9E4FF'.
+   */
+  color?: string;
   subtitle?: string;
 }
 
@@ -40,8 +45,28 @@ const StatsCard: React.FC<StatsCardProps> = ({ title, value, icon, color, subtit
             sx={{
               p: 1.5,
               borderRadius: 2,
-              backgroundColor: `${color}15`,
-              color: color,
+              backgroundColor: (theme) => {
+                const paletteKeys = ['primary', 'secondary', 'success', 'error', 'warning', 'info'];
+                if (color && paletteKeys.includes(color)) {
+                  // use theme palette with slight alpha for background
+                  // @ts-ignore - dynamic access on palette
+                  return alpha(theme.palette[color].main, 0.12);
+                }
+                if (color) {
+                  // assume hex string like '#C9E4FF'
+                  return `${color}15`;
+                }
+                return alpha(theme.palette.primary.main, 0.12);
+              },
+              color: (theme) => {
+                const paletteKeys = ['primary', 'secondary', 'success', 'error', 'warning', 'info'];
+                if (color && paletteKeys.includes(color)) {
+                  // @ts-ignore
+                  return theme.palette[color].main;
+                }
+                if (color) return color;
+                return theme.palette.primary.main;
+              },
             }}
           >
             {icon}

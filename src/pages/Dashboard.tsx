@@ -23,28 +23,28 @@ const Dashboard: React.FC = () => {
           title="Cấp độ"
           value={mockLevels.length}
           icon={<SchoolIcon sx={{ fontSize: 28 }} />}
-          color="#1976d2"
+          color="info"
           subtitle="N5 - N1"
         />
         <StatsCard
           title="Chủ đề"
           value={mockTopics.length}
           icon={<TopicIcon sx={{ fontSize: 28 }} />}
-          color="#4caf50"
+          color="success"
           subtitle="Đang hoạt động"
         />
         <StatsCard
           title="Từ vựng"
           value={mockVocabularies.length}
           icon={<TranslateIcon sx={{ fontSize: 28 }} />}
-          color="#ff9800"
+          color="warning"
           subtitle="Tổng số từ"
         />
         <StatsCard
           title="Học viên"
           value={mockLearners.filter((l) => l.status === 'active').length}
           icon={<PeopleIcon sx={{ fontSize: 28 }} />}
-          color="#9c27b0"
+          color="error"
           subtitle="Đang hoạt động"
         />
       </Box>

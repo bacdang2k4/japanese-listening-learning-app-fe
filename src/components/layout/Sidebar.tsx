@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Collapse, Typography, Divider } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 import { Dashboard as DashboardIcon, School as SchoolIcon, Topic as TopicIcon, Translate as TranslateIcon, Headphones as HeadphonesIcon, Quiz as QuizIcon, People as PeopleIcon, Assessment as AssessmentIcon, ExpandLess, ExpandMore, MenuBook as MenuBookIcon } from '@mui/icons-material';
 const drawerWidth = 280;
 interface MenuItem {
@@ -80,66 +81,69 @@ const Sidebar: React.FC = () => {
     const hasChildren = item.children && item.children.length > 0;
     if (hasChildren) {
       return <Box key={item.title}>
-          <ListItem disablePadding>
-            <ListItemButton onClick={() => handleToggle(item.title)} sx={{
-            pl: level * 2 + 2,
+        <ListItem disablePadding>
+          <ListItemButton onClick={() => handleToggle(item.title)} sx={{
+            px: 2,
             py: 1.5,
+            borderRadius: 3,
+            mb: 0.5,
             '&:hover': {
-              backgroundColor: 'rgba(255, 255, 255, 0.08)'
+              backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.12)
             }
           }}>
-              <ListItemIcon sx={{
-              color: 'rgba(255, 255, 255, 0.7)',
+            <ListItemIcon sx={{
+              color: '#4D4459',
               minWidth: 40
             }}>
-                {item.icon}
-              </ListItemIcon>
-              <ListItemText primary={item.title} sx={{
+              {item.icon}
+            </ListItemIcon>
+            <ListItemText primary={item.title} sx={{
               '& .MuiTypography-root': {
-                fontSize: '0.95rem',
-                fontWeight: 500,
-                color: 'rgba(255, 255, 255, 0.9)'
+                fontSize: '0.9rem',
+                fontWeight: 600,
+                color: '#1A0B2E'
               }
             }} />
-              {openMenus[item.title] ? <ExpandLess sx={{
+            {openMenus[item.title] ? <ExpandLess sx={{
               color: 'rgba(255, 255, 255, 0.7)'
             }} /> : <ExpandMore sx={{
               color: 'rgba(255, 255, 255, 0.7)'
             }} />}
-            </ListItemButton>
-          </ListItem>
-          <Collapse in={openMenus[item.title]} timeout="auto" unmountOnExit>
-            <List component="div" disablePadding>
-              {item.children!.map(child => renderMenuItem(child, level + 1))}
-            </List>
-          </Collapse>
-        </Box>;
+          </ListItemButton>
+        </ListItem>
+        <Collapse in={openMenus[item.title]} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            {item.children!.map(child => renderMenuItem(child, level + 1))}
+          </List>
+        </Collapse>
+      </Box>;
     }
     return <ListItem key={item.title} disablePadding>
-        <ListItemButton onClick={() => item.path && handleNavigate(item.path)} sx={{
-        pl: level * 2 + 2,
+          <ListItemButton onClick={() => item.path && handleNavigate(item.path)} sx={{
+        px: 2,
         py: 1.2,
-        backgroundColor: isActive(item.path) ? 'rgba(25, 118, 210, 0.3)' : 'transparent',
-        borderLeft: isActive(item.path) ? '3px solid #42a5f5' : '3px solid transparent',
+        borderRadius: 3,
+        mb: 0.5,
+        backgroundColor: (theme) => isActive(item.path) ? alpha(theme.palette.primary.main, 0.18) : 'transparent',
         '&:hover': {
-          backgroundColor: isActive(item.path) ? 'rgba(25, 118, 210, 0.4)' : 'rgba(255, 255, 255, 0.08)'
+          backgroundColor: (theme) => isActive(item.path) ? alpha(theme.palette.primary.main, 0.18) : alpha(theme.palette.primary.main, 0.06)
         }
       }}>
-          <ListItemIcon sx={{
-          color: isActive(item.path) ? '#42a5f5' : 'rgba(255, 255, 255, 0.7)',
+        <ListItemIcon sx={{
+          color: (theme) => isActive(item.path) ? theme.palette.primary.dark : '#4D4459',
           minWidth: 40
         }}>
-            {item.icon}
-          </ListItemIcon>
-          <ListItemText primary={item.title} sx={{
+          {item.icon}
+        </ListItemIcon>
+        <ListItemText primary={item.title} sx={{
           '& .MuiTypography-root': {
-            fontSize: '0.9rem',
-            fontWeight: isActive(item.path) ? 600 : 400,
-            color: isActive(item.path) ? '#fff' : 'rgba(255, 255, 255, 0.8)'
+            fontSize: '0.875rem',
+            fontWeight: isActive(item.path) ? 700 : 500,
+            color: (theme) => isActive(item.path) ? theme.palette.primary.dark : '#4D4459'
           }
         }} />
-        </ListItemButton>
-      </ListItem>;
+      </ListItemButton>
+    </ListItem>;
   };
   return <Drawer variant="permanent" sx={{
     width: drawerWidth,
@@ -147,41 +151,43 @@ const Sidebar: React.FC = () => {
     '& .MuiDrawer-paper': {
       width: drawerWidth,
       boxSizing: 'border-box',
-      backgroundColor: '#1a1a2e',
-      borderRight: 'none'
+      backgroundColor: (theme) => theme.palette.background.default,
+      borderRight: '1px solid rgba(0, 0, 0, 0.05)',
     }
   }}>
-      <Box sx={{
+    <Box sx={{
       p: 3,
-      borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
+      borderBottom: '1px solid rgba(0, 0, 0, 0.05)',
+      backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.08)
     }}>
-        <Typography variant="h5" sx={{
-        color: '#fff',
+      <Typography variant="h5" sx={{
+        color: '#1A0B2E',
         fontWeight: 700,
         display: 'flex',
         alignItems: 'center',
         gap: 1
-      }}>Luyện Nghe Tiếng Nhật<SchoolIcon sx={{
-          color: '#42a5f5',
-          fontSize: 32
-        }} />
-          日本語学習
-        </Typography>
-        <Typography variant="body2" sx={{
-        color: 'rgba(255, 255, 255, 0.5)',
-        mt: 0.5
+      }}>Luyện Nghe<SchoolIcon sx={{
+        color: (theme) => theme.palette.primary.main,
+        fontSize: 32
+      }} />
+      </Typography>
+      <Typography variant="body2" sx={{
+        color: '#4D4459',
+        mt: 0.5,
+        fontWeight: 500
       }}>
-          Hệ thống quản lý
-        </Typography>
-      </Box>
-      <Divider sx={{
-      borderColor: 'rgba(255, 255, 255, 0.1)'
+        Hệ thống quản lý
+      </Typography>
+    </Box>
+    <Divider sx={{
+      borderColor: 'rgba(0, 0, 0, 0.05)'
     }} />
-      <List sx={{
-      pt: 2
+    <List sx={{
+      pt: 2,
+      px: 1.5
     }}>
-        {menuItems.map(item => renderMenuItem(item))}
-      </List>
-    </Drawer>;
+      {menuItems.map(item => renderMenuItem(item))}
+    </List>
+  </Drawer>;
 };
 export default Sidebar;
