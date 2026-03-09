@@ -1,5 +1,5 @@
 import { ThemeProvider, CssBaseline } from '@mui/material';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import theme from './theme/theme';
 
 // Admin pages
@@ -12,7 +12,6 @@ import AudioTestsPage from './pages/AudioTestsPage';
 import LearnersPage from './pages/LearnersPage';
 import ProfilesPage from './pages/ProfilesPage';
 import TestResultsPage from './pages/TestResultsPage';
-import AdminLoginPage from './pages/AdminLoginPage';
 import NotFound from './pages/NotFound';
 
 // Admin auth guard
@@ -38,8 +37,8 @@ const App = () => (
         {/* Public Route */}
         <Route path="/" element={<Home />} />
 
-        {/* Admin Login (public) */}
-        <Route path="/admin/login" element={<AdminLoginPage />} />
+        {/* Admin Login redirects to unified login */}
+        <Route path="/admin/login" element={<Navigate to="/login" replace />} />
 
         {/* Admin Routes (protected) */}
         <Route path="/admin">

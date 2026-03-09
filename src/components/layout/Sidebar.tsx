@@ -190,7 +190,7 @@ const Sidebar: React.FC = () => {
           onClick={() => {
             localStorage.removeItem('admin');
             localStorage.removeItem('admin_token');
-            navigate('/admin/login');
+            navigate('/login');
           }}
           sx={{
             mx: 1,

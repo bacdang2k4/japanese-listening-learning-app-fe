@@ -10,17 +10,17 @@ const AdminRouteGuard: React.FC<AdminRouteGuardProps> = ({ children }) => {
     const adminToken = localStorage.getItem('admin_token');
 
     if (!adminData || !adminToken) {
-        return <Navigate to="/admin/login" replace />;
+        return <Navigate to="/login" replace />;
     }
 
     try {
         const admin = JSON.parse(adminData);
         // Backend returns role as "ROLE_ADMIN"
         if (admin.role !== 'ROLE_ADMIN' && admin.role !== 'ADMIN') {
-            return <Navigate to="/admin/login" replace />;
+            return <Navigate to="/login" replace />;
         }
     } catch {
-        return <Navigate to="/admin/login" replace />;
+        return <Navigate to="/login" replace />;
     }
 
     return <>{children}</>;

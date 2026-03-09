@@ -217,6 +217,36 @@ export interface LearnerResponse {
     createdAt: string;
 }
 
+// ─── Admin Profile / Test Result Types ────────────────────────
+
+export interface AdminProfileResponse {
+    profileId: number;
+    learnerId: number;
+    learnerName: string;
+    learnerEmail: string | null;
+    learnerUsername: string;
+    status: string;
+    completedLevels: number;
+    completedTopics: number;
+    totalScore: number;
+    startDate: string;
+}
+
+export interface AdminTestResultResponse {
+    resultId: number;
+    learnerId: number;
+    learnerName: string;
+    learnerEmail: string | null;
+    testName: string;
+    levelName: string | null;
+    topicName: string | null;
+    mode: string;
+    score: number;
+    isPassed: boolean;
+    totalTime: number;
+    completedAt: string | null;
+}
+
 // ─── AI Test Types ────────────────────────────────────────────
 
 export interface AiGenerateRequest {
@@ -585,6 +615,34 @@ export const adminVocabBankApi = {
             headers: getAdminHeaders(),
             body: JSON.stringify(items),
         }),
+};
+
+// ─── Admin Profile API (Learner Progress) ─────────────────────
+
+export const adminProfileApi = {
+    getAll: (page = 0, size = 10, keyword?: string, sort = 'startDate,desc') => {
+        const params = new URLSearchParams({ page: String(page), size: String(size), sort });
+        if (keyword) params.append('keyword', keyword);
+        return request<PaginationResponse<AdminProfileResponse>>(`${API_BASE}/admin/profiles?${params}`, {
+            method: 'GET',
+            headers: getAdminHeaders(),
+        });
+    },
+};
+
+// ─── Admin Test Result API ────────────────────────────────────
+
+export const adminTestResultApi = {
+    getAll: (page = 0, size = 10, keyword?: string, mode?: string, passed?: boolean, sort = 'createdAt,desc') => {
+        const params = new URLSearchParams({ page: String(page), size: String(size), sort });
+        if (keyword) params.append('keyword', keyword);
+        if (mode) params.append('mode', mode);
+        if (passed !== undefined) params.append('passed', String(passed));
+        return request<PaginationResponse<AdminTestResultResponse>>(`${API_BASE}/admin/test-results?${params}`, {
+            method: 'GET',
+            headers: getAdminHeaders(),
+        });
+    },
 };
 
 // ─── Admin Learner API ────────────────────────────────────────
