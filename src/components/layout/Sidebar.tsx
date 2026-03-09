@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Collapse, Typography, Divider } from '@mui/material';
-import { Dashboard as DashboardIcon, School as SchoolIcon, Topic as TopicIcon, Translate as TranslateIcon, Headphones as HeadphonesIcon, Quiz as QuizIcon, People as PeopleIcon, Assessment as AssessmentIcon, ExpandLess, ExpandMore, MenuBook as MenuBookIcon, Logout as LogoutIcon } from '@mui/icons-material';
+import { Dashboard as DashboardIcon, School as SchoolIcon, Topic as TopicIcon, Translate as TranslateIcon, Headphones as HeadphonesIcon, Quiz as QuizIcon, People as PeopleIcon, Assessment as AssessmentIcon, ExpandLess, ExpandMore, MenuBook as MenuBookIcon, Logout as LogoutIcon, LibraryBooks as LibraryBooksIcon } from '@mui/icons-material';
 const drawerWidth = 280;
 interface MenuItem {
   title: string;
@@ -28,6 +28,10 @@ const menuItems: MenuItem[] = [{
     title: 'Từ vựng',
     path: '/admin/vocabularies',
     icon: <TranslateIcon />
+  }, {
+    title: 'Ngân hàng từ vựng',
+    path: '/admin/vocab-banks',
+    icon: <LibraryBooksIcon />
   }, {
     title: 'Bài kiểm tra',
     path: '/admin/audio-tests',

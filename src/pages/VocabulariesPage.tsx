@@ -1,76 +1,73 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Button,
   TextField,
   IconButton,
   Tooltip,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Typography,
+  CircularProgress,
   Alert,
 } from '@mui/material';
 import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Upload as UploadIcon,
-  Download as DownloadIcon,
 } from '@mui/icons-material';
 import MainLayout from '../components/layout/MainLayout';
 import DataTable from '../components/common/DataTable';
 import FormDialog from '../components/common/FormDialog';
 import ConfirmDialog from '../components/common/ConfirmDialog';
-import { mockVocabularies, mockTopics, mockLevels } from '../data/mockData';
-import { Vocabulary } from '../types';
+import { adminVocabularyApi, VocabularyResponse } from '../services/api';
 
 const VocabulariesPage: React.FC = () => {
-  const [vocabularies, setVocabularies] = useState<Vocabulary[]>(mockVocabularies);
+  const [vocabularies, setVocabularies] = useState<VocabularyResponse[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterTopic, setFilterTopic] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedVocab, setSelectedVocab] = useState<Vocabulary | null>(null);
+  const [selectedVocab, setSelectedVocab] = useState<VocabularyResponse | null>(null);
   const [formData, setFormData] = useState({
-    topicId: '',
     word: '',
-    reading: '',
+    kana: '',
+    romaji: '',
     meaning: '',
-    example: '',
-    exampleMeaning: '',
+    exampleSentence: '',
   });
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [page, setPage] = useState(0);
 
-  const filteredVocabs = vocabularies.filter((vocab) => {
-    const matchesSearch =
-      vocab.word.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      vocab.meaning.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      vocab.reading.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesTopic = !filterTopic || vocab.topicId === filterTopic;
-    return matchesSearch && matchesTopic;
-  });
+  const fetchVocabularies = useCallback(async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const result = await adminVocabularyApi.getAll(
+        page, 10,
+        searchQuery || undefined
+      );
+      setVocabularies(result.data.content);
+    } catch (err: any) {
+      setError(err.message || 'Không thể tải danh sách từ vựng');
+    } finally {
+      setLoading(false);
+    }
+  }, [page, searchQuery]);
 
-  const getTopicName = (topicId: string) => {
-    const topic = mockTopics.find((t) => t.id === topicId);
-    return topic?.name || 'N/A';
-  };
+  useEffect(() => { fetchVocabularies(); }, [fetchVocabularies]);
 
-  const handleOpenDialog = (vocab?: Vocabulary) => {
+  const handleOpenDialog = (vocab?: VocabularyResponse) => {
     if (vocab) {
       setSelectedVocab(vocab);
       setFormData({
-        topicId: vocab.topicId,
         word: vocab.word,
-        reading: vocab.reading,
-        meaning: vocab.meaning,
-        example: vocab.example,
-        exampleMeaning: vocab.exampleMeaning,
+        kana: vocab.kana || '',
+        romaji: vocab.romaji || '',
+        meaning: vocab.meaning || '',
+        exampleSentence: vocab.exampleSentence || '',
       });
     } else {
       setSelectedVocab(null);
-      setFormData({ topicId: '', word: '', reading: '', meaning: '', example: '', exampleMeaning: '' });
+      setFormData({ word: '', kana: '', romaji: '', meaning: '', exampleSentence: '' });
     }
     setDialogOpen(true);
   };
@@ -78,84 +75,67 @@ const VocabulariesPage: React.FC = () => {
   const handleCloseDialog = () => {
     setDialogOpen(false);
     setSelectedVocab(null);
-    setFormData({ topicId: '', word: '', reading: '', meaning: '', example: '', exampleMeaning: '' });
+    setFormData({ word: '', kana: '', romaji: '', meaning: '', exampleSentence: '' });
   };
 
-  const handleSubmit = () => {
-    if (selectedVocab) {
-      setVocabularies(
-        vocabularies.map((v) =>
-          v.id === selectedVocab.id
-            ? { ...v, ...formData, updatedAt: new Date() }
-            : v
-        )
-      );
-    } else {
-      const newVocab: Vocabulary = {
-        id: String(Date.now()),
-        ...formData,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+  const handleSubmit = async () => {
+    setSubmitting(true);
+    try {
+      const payload = {
+        word: formData.word,
+        kana: formData.kana || undefined,
+        romaji: formData.romaji || undefined,
+        meaning: formData.meaning || undefined,
+        exampleSentence: formData.exampleSentence || undefined,
       };
-      setVocabularies([...vocabularies, newVocab]);
+      if (selectedVocab) {
+        await adminVocabularyApi.update(selectedVocab.id, payload);
+      } else {
+        await adminVocabularyApi.create(payload);
+      }
+      handleCloseDialog();
+      fetchVocabularies();
+    } catch (err: any) {
+      setError(err.message || 'Thao tác thất bại');
+    } finally {
+      setSubmitting(false);
     }
-    handleCloseDialog();
   };
 
-  const handleDelete = () => {
-    if (selectedVocab) {
-      setVocabularies(vocabularies.filter((v) => v.id !== selectedVocab.id));
+  const handleDelete = async () => {
+    if (!selectedVocab) return;
+    setSubmitting(true);
+    try {
+      await adminVocabularyApi.delete(selectedVocab.id);
       setDeleteDialogOpen(false);
       setSelectedVocab(null);
-    }
-  };
-
-  const handleExport = () => {
-    const data = filteredVocabs.map((v) => ({
-      Từ: v.word,
-      'Cách đọc': v.reading,
-      'Nghĩa': v.meaning,
-      'Ví dụ': v.example,
-      'Nghĩa ví dụ': v.exampleMeaning,
-      'Chủ đề': getTopicName(v.topicId),
-    }));
-    const csv = [Object.keys(data[0]).join(','), ...data.map((row) => Object.values(row).join(','))].join('\n');
-    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'vocabularies.csv';
-    link.click();
-  };
-
-  const handleImportClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      // Handle CSV import logic here
-      alert('Tính năng import sẽ được xử lý. File: ' + file.name);
+      fetchVocabularies();
+    } catch (err: any) {
+      setError(err.message || 'Xóa thất bại');
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const columns = [
+    { id: 'id', label: 'ID', minWidth: 60 },
     { id: 'word', label: 'Từ vựng', minWidth: 100 },
-    { id: 'reading', label: 'Cách đọc', minWidth: 100 },
+    { id: 'kana', label: 'Kana', minWidth: 100 },
+    { id: 'romaji', label: 'Romaji', minWidth: 100 },
     { id: 'meaning', label: 'Nghĩa', minWidth: 150 },
-    { id: 'example', label: 'Ví dụ', minWidth: 200 },
     {
-      id: 'topicId',
-      label: 'Chủ đề',
-      minWidth: 100,
-      format: (value: string) => getTopicName(value),
+      id: 'exampleSentence',
+      label: 'Ví dụ',
+      minWidth: 200,
+      format: (value: string | null) => value || '—',
     },
+    { id: 'createdAt', label: 'Ngày tạo', minWidth: 150 },
     {
       id: 'actions',
       label: 'Thao tác',
       minWidth: 100,
       align: 'center' as const,
-      format: (_: any, row: Vocabulary) => (
+      format: (_: any, row: VocabularyResponse) => (
         <Box>
           <Tooltip title="Chỉnh sửa">
             <IconButton size="small" onClick={() => handleOpenDialog(row)}>
@@ -181,64 +161,35 @@ const VocabulariesPage: React.FC = () => {
 
   return (
     <MainLayout title="Quản lý Từ vựng">
-      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
-        <FormControl size="small" sx={{ minWidth: 200 }}>
-          <InputLabel>Lọc theo Chủ đề</InputLabel>
-          <Select
-            value={filterTopic}
-            label="Lọc theo Chủ đề"
-            onChange={(e) => setFilterTopic(e.target.value)}
-          >
-            <MenuItem value="">Tất cả</MenuItem>
-            {mockTopics.map((topic) => {
-              const level = mockLevels.find((l) => l.id === topic.levelId);
-              return (
-                <MenuItem key={topic.id} value={topic.id}>
-                  [{level?.name}] {topic.name}
-                </MenuItem>
-              );
-            })}
-          </Select>
-        </FormControl>
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            accept=".csv,.xlsx,.xls"
-            style={{ display: 'none' }}
-          />
-          <Button
-            variant="outlined"
-            startIcon={<UploadIcon />}
-            onClick={handleImportClick}
-          >
-            Import
-          </Button>
-          <Button
-            variant="outlined"
-            startIcon={<DownloadIcon />}
-            onClick={handleExport}
-          >
-            Export CSV
-          </Button>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={() => handleOpenDialog()}
-          >
-            Thêm từ vựng
-          </Button>
-        </Box>
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>
+          {error}
+        </Alert>
+      )}
+
+      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={() => handleOpenDialog()}
+        >
+          Thêm từ vựng
+        </Button>
       </Box>
 
-      <DataTable
-        columns={columns}
-        rows={filteredVocabs}
-        searchPlaceholder="Tìm kiếm từ vựng..."
-        onSearch={setSearchQuery}
-        searchValue={searchQuery}
-      />
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        <DataTable
+          columns={columns}
+          rows={vocabularies}
+          searchPlaceholder="Tìm kiếm từ vựng (word, kana, romaji, meaning)..."
+          onSearch={setSearchQuery}
+          searchValue={searchQuery}
+        />
+      )}
 
       <FormDialog
         open={dialogOpen}
@@ -248,23 +199,6 @@ const VocabulariesPage: React.FC = () => {
         maxWidth="md"
       >
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
-          <FormControl fullWidth required>
-            <InputLabel>Chủ đề</InputLabel>
-            <Select
-              value={formData.topicId}
-              label="Chủ đề"
-              onChange={(e) => setFormData({ ...formData, topicId: e.target.value })}
-            >
-              {mockTopics.map((topic) => {
-                const level = mockLevels.find((l) => l.id === topic.levelId);
-                return (
-                  <MenuItem key={topic.id} value={topic.id}>
-                    [{level?.name}] {topic.name}
-                  </MenuItem>
-                );
-              })}
-            </Select>
-          </FormControl>
           <Box sx={{ display: 'flex', gap: 2 }}>
             <TextField
               label="Từ vựng (Kanji/Kana)"
@@ -273,41 +207,44 @@ const VocabulariesPage: React.FC = () => {
               fullWidth
               required
               placeholder="VD: 家族"
+              disabled={submitting}
             />
             <TextField
-              label="Cách đọc (Hiragana)"
-              value={formData.reading}
-              onChange={(e) => setFormData({ ...formData, reading: e.target.value })}
+              label="Kana (Hiragana)"
+              value={formData.kana}
+              onChange={(e) => setFormData({ ...formData, kana: e.target.value })}
               fullWidth
-              required
               placeholder="VD: かぞく"
+              disabled={submitting}
+            />
+          </Box>
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <TextField
+              label="Romaji"
+              value={formData.romaji}
+              onChange={(e) => setFormData({ ...formData, romaji: e.target.value })}
+              fullWidth
+              placeholder="VD: kazoku"
+              disabled={submitting}
+            />
+            <TextField
+              label="Nghĩa"
+              value={formData.meaning}
+              onChange={(e) => setFormData({ ...formData, meaning: e.target.value })}
+              fullWidth
+              placeholder="VD: Gia đình"
+              disabled={submitting}
             />
           </Box>
           <TextField
-            label="Nghĩa tiếng Việt"
-            value={formData.meaning}
-            onChange={(e) => setFormData({ ...formData, meaning: e.target.value })}
-            fullWidth
-            required
-            placeholder="VD: Gia đình"
-          />
-          <TextField
-            label="Ví dụ (tiếng Nhật)"
-            value={formData.example}
-            onChange={(e) => setFormData({ ...formData, example: e.target.value })}
+            label="Ví dụ"
+            value={formData.exampleSentence}
+            onChange={(e) => setFormData({ ...formData, exampleSentence: e.target.value })}
             fullWidth
             multiline
             rows={2}
             placeholder="VD: 私の家族は四人です。"
-          />
-          <TextField
-            label="Nghĩa ví dụ (tiếng Việt)"
-            value={formData.exampleMeaning}
-            onChange={(e) => setFormData({ ...formData, exampleMeaning: e.target.value })}
-            fullWidth
-            multiline
-            rows={2}
-            placeholder="VD: Gia đình tôi có 4 người."
+            disabled={submitting}
           />
         </Box>
       </FormDialog>

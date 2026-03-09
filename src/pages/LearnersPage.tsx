@@ -1,67 +1,88 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   IconButton,
   Tooltip,
   Chip,
   Avatar,
+  CircularProgress,
+  Alert,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material';
 import {
   Lock as LockIcon,
   LockOpen as UnlockIcon,
-  Delete as DeleteIcon,
-  Visibility as ViewIcon,
 } from '@mui/icons-material';
 import MainLayout from '../components/layout/MainLayout';
 import DataTable from '../components/common/DataTable';
 import ConfirmDialog from '../components/common/ConfirmDialog';
-import { mockLearners } from '../data/mockData';
-import { Learner } from '../types';
+import { adminLearnerApi, LearnerResponse } from '../services/api';
 
 const LearnersPage: React.FC = () => {
-  const [learners, setLearners] = useState<Learner[]>(mockLearners);
+  const [learners, setLearners] = useState<LearnerResponse[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('');
+  const [page] = useState(0);
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean;
-    type: 'lock' | 'unlock' | 'delete';
-    learner: Learner | null;
+    type: 'lock' | 'unlock';
+    learner: LearnerResponse | null;
   }>({ open: false, type: 'lock', learner: null });
+  const [actionLoading, setActionLoading] = useState(false);
 
-  const filteredLearners = learners.filter(
-    (learner) =>
-      learner.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      learner.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      learner.username.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const fetchLearners = useCallback(async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const result = await adminLearnerApi.getAll(
+        page, 10,
+        searchQuery || undefined,
+        statusFilter || undefined
+      );
+      setLearners(result.data.content);
+    } catch (err: any) {
+      setError(err.message || 'Không thể tải danh sách học viên');
+    } finally {
+      setLoading(false);
+    }
+  }, [page, searchQuery, statusFilter]);
 
-  const handleAction = (type: 'lock' | 'unlock' | 'delete', learner: Learner) => {
+  useEffect(() => { fetchLearners(); }, [fetchLearners]);
+
+  const handleAction = (type: 'lock' | 'unlock', learner: LearnerResponse) => {
     setConfirmDialog({ open: true, type, learner });
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!confirmDialog.learner) return;
-
-    if (confirmDialog.type === 'delete') {
-      setLearners(learners.filter((l) => l.id !== confirmDialog.learner!.id));
-    } else {
-      setLearners(
-        learners.map((l) =>
-          l.id === confirmDialog.learner!.id
-            ? { ...l, status: confirmDialog.type === 'lock' ? 'locked' : 'active' }
-            : l
-        )
-      );
+    setActionLoading(true);
+    try {
+      if (confirmDialog.type === 'lock') {
+        await adminLearnerApi.lock(confirmDialog.learner.id);
+      } else {
+        await adminLearnerApi.unlock(confirmDialog.learner.id);
+      }
+      await fetchLearners();
+    } catch (err: any) {
+      setError(err.message || 'Thao tác thất bại');
+    } finally {
+      setActionLoading(false);
+      setConfirmDialog({ open: false, type: 'lock', learner: null });
     }
-    setConfirmDialog({ open: false, type: 'lock', learner: null });
   };
 
-  const getStatusChip = (status: Learner['status']) => {
-    const config = {
-      active: { label: 'Hoạt động', color: 'success' as const },
-      locked: { label: 'Đã khóa', color: 'error' as const },
-      deleted: { label: 'Đã xóa', color: 'default' as const },
+  const getStatusChip = (status: string) => {
+    const config: Record<string, { label: string; color: 'success' | 'error' }> = {
+      ACTIVE: { label: 'Hoạt động', color: 'success' },
+      LOCKED: { label: 'Đã khóa', color: 'error' },
     };
-    return <Chip label={config[status].label} size="small" color={config[status].color} />;
+    const c = config[status] || { label: status, color: 'success' as const };
+    return <Chip label={c.label} size="small" color={c.color} />;
   };
 
   const columns = [
@@ -69,46 +90,43 @@ const LearnersPage: React.FC = () => {
       id: 'avatar',
       label: '',
       minWidth: 50,
-      format: (_: any, row: Learner) => (
-        <Avatar sx={{ bgcolor: '#1976d2', width: 36, height: 36 }}>
-          {row.fullName.charAt(0)}
+      format: (_: any, row: LearnerResponse) => (
+        <Avatar
+          src={row.avatarUrl || undefined}
+          sx={{ bgcolor: '#1976d2', width: 36, height: 36 }}
+        >
+          {row.firstName.charAt(0)}
         </Avatar>
       ),
     },
-    { id: 'fullName', label: 'Họ tên', minWidth: 150 },
+    {
+      id: 'fullName',
+      label: 'Họ tên',
+      minWidth: 150,
+      format: (_: any, row: LearnerResponse) => `${row.lastName} ${row.firstName}`,
+    },
     { id: 'username', label: 'Username', minWidth: 120 },
     { id: 'email', label: 'Email', minWidth: 200 },
     {
       id: 'status',
       label: 'Trạng thái',
       minWidth: 100,
-      format: (value: Learner['status']) => getStatusChip(value),
+      format: (value: string) => getStatusChip(value),
     },
     {
       id: 'createdAt',
       label: 'Ngày đăng ký',
       minWidth: 120,
-      format: (value: Date) => new Date(value).toLocaleDateString('vi-VN'),
-    },
-    {
-      id: 'lastLogin',
-      label: 'Đăng nhập gần đây',
-      minWidth: 140,
-      format: (value: Date) => new Date(value).toLocaleDateString('vi-VN'),
+      format: (value: string) => new Date(value).toLocaleDateString('vi-VN'),
     },
     {
       id: 'actions',
       label: 'Thao tác',
-      minWidth: 120,
+      minWidth: 100,
       align: 'center' as const,
-      format: (_: any, row: Learner) => (
+      format: (_: any, row: LearnerResponse) => (
         <Box>
-          <Tooltip title="Xem chi tiết">
-            <IconButton size="small" color="primary">
-              <ViewIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-          {row.status === 'active' ? (
+          {row.status === 'ACTIVE' ? (
             <Tooltip title="Khóa tài khoản">
               <IconButton
                 size="small"
@@ -129,15 +147,6 @@ const LearnersPage: React.FC = () => {
               </IconButton>
             </Tooltip>
           )}
-          <Tooltip title="Xóa tài khoản">
-            <IconButton
-              size="small"
-              color="error"
-              onClick={() => handleAction('delete', row)}
-            >
-              <DeleteIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
         </Box>
       ),
     },
@@ -146,46 +155,58 @@ const LearnersPage: React.FC = () => {
   const getDialogMessage = () => {
     const { type, learner } = confirmDialog;
     if (!learner) return '';
-    switch (type) {
-      case 'lock':
-        return `Bạn có chắc chắn muốn khóa tài khoản của "${learner.fullName}"?`;
-      case 'unlock':
-        return `Bạn có chắc chắn muốn mở khóa tài khoản của "${learner.fullName}"?`;
-      case 'delete':
-        return `Bạn có chắc chắn muốn xóa tài khoản của "${learner.fullName}"? Hành động này không thể hoàn tác.`;
+    const fullName = `${learner.lastName} ${learner.firstName}`;
+    if (type === 'lock') {
+      return `Bạn có chắc chắn muốn khóa tài khoản của "${fullName}"?`;
     }
+    return `Bạn có chắc chắn muốn mở khóa tài khoản của "${fullName}"?`;
   };
 
   return (
     <MainLayout title="Quản lý Học viên">
-      <DataTable
-        columns={columns}
-        rows={filteredLearners}
-        searchPlaceholder="Tìm theo tên, email hoặc username..."
-        onSearch={setSearchQuery}
-        searchValue={searchQuery}
-      />
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>
+          {error}
+        </Alert>
+      )}
+
+      <Box sx={{ mb: 2, display: 'flex', gap: 2 }}>
+        <FormControl size="small" sx={{ minWidth: 160 }}>
+          <InputLabel>Trạng thái</InputLabel>
+          <Select
+            value={statusFilter}
+            label="Trạng thái"
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <MenuItem value="">Tất cả</MenuItem>
+            <MenuItem value="ACTIVE">Hoạt động</MenuItem>
+            <MenuItem value="LOCKED">Đã khóa</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
+
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        <DataTable
+          columns={columns}
+          rows={learners}
+          searchPlaceholder="Tìm theo tên, email hoặc username..."
+          onSearch={setSearchQuery}
+          searchValue={searchQuery}
+        />
+      )}
 
       <ConfirmDialog
         open={confirmDialog.open}
-        title={
-          confirmDialog.type === 'lock'
-            ? 'Khóa tài khoản'
-            : confirmDialog.type === 'unlock'
-            ? 'Mở khóa tài khoản'
-            : 'Xóa tài khoản'
-        }
+        title={confirmDialog.type === 'lock' ? 'Khóa tài khoản' : 'Mở khóa tài khoản'}
         message={getDialogMessage()}
         onConfirm={handleConfirm}
         onCancel={() => setConfirmDialog({ open: false, type: 'lock', learner: null })}
-        confirmColor={confirmDialog.type === 'delete' ? 'error' : 'primary'}
-        confirmLabel={
-          confirmDialog.type === 'lock'
-            ? 'Khóa'
-            : confirmDialog.type === 'unlock'
-            ? 'Mở khóa'
-            : 'Xóa'
-        }
+        confirmColor={confirmDialog.type === 'lock' ? 'warning' : 'success'}
+        confirmLabel={confirmDialog.type === 'lock' ? 'Khóa' : 'Mở khóa'}
       />
     </MainLayout>
   );

@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import LevelsPage from './pages/LevelsPage';
 import TopicsPage from './pages/TopicsPage';
 import VocabulariesPage from './pages/VocabulariesPage';
+import VocabBanksPage from './pages/VocabBanksPage';
 import AudioTestsPage from './pages/AudioTestsPage';
 import LearnersPage from './pages/LearnersPage';
 import ProfilesPage from './pages/ProfilesPage';
@@ -46,6 +47,7 @@ const App = () => (
           <Route path="levels" element={<AdminRouteGuard><LevelsPage /></AdminRouteGuard>} />
           <Route path="topics" element={<AdminRouteGuard><TopicsPage /></AdminRouteGuard>} />
           <Route path="vocabularies" element={<AdminRouteGuard><VocabulariesPage /></AdminRouteGuard>} />
+          <Route path="vocab-banks" element={<AdminRouteGuard><VocabBanksPage /></AdminRouteGuard>} />
           <Route path="audio-tests" element={<AdminRouteGuard><AudioTestsPage /></AdminRouteGuard>} />
           <Route path="learners" element={<AdminRouteGuard><LearnersPage /></AdminRouteGuard>} />
           <Route path="profiles" element={<AdminRouteGuard><ProfilesPage /></AdminRouteGuard>} />

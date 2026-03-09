@@ -151,6 +151,72 @@ export interface QuestionResponse {
     answers: AnswerResponse[];
 }
 
+// ─── Vocabulary Types ─────────────────────────────────────────
+
+export interface VocabularyRequest {
+    word: string;
+    kana?: string;
+    romaji?: string;
+    meaning?: string;
+    exampleSentence?: string;
+}
+
+export interface VocabularyResponse {
+    id: number;
+    word: string;
+    kana: string | null;
+    romaji: string | null;
+    meaning: string | null;
+    exampleSentence: string | null;
+    createdAt: string;
+}
+
+// ─── VocabBank Types ──────────────────────────────────────────
+
+export interface VocabBankRequest {
+    title: string;
+    description?: string;
+    topicId: number;
+}
+
+export interface VocabBankVocabularyResponse {
+    vocabId: number;
+    word: string;
+    kana: string | null;
+    romaji: string | null;
+    meaning: string | null;
+    exampleSentence: string | null;
+    vocabOrder: number;
+}
+
+export interface VocabBankResponse {
+    id: number;
+    title: string;
+    description: string | null;
+    topicId: number;
+    topicName: string | null;
+    vocabularies: VocabBankVocabularyResponse[] | null;
+    createdAt: string;
+}
+
+export interface VocabBankVocabularyRequest {
+    vocabId: number;
+    vocabOrder: number;
+}
+
+// ─── Learner Types ───────────────────────────────────────────
+
+export interface LearnerResponse {
+    id: number;
+    username: string;
+    email: string | null;
+    firstName: string;
+    lastName: string;
+    avatarUrl: string | null;
+    status: 'ACTIVE' | 'LOCKED';
+    createdAt: string;
+}
+
 // ─── AI Test Types ────────────────────────────────────────────
 
 export interface AiGenerateRequest {
@@ -419,6 +485,137 @@ export const adminAiTestApi = {
             method: 'POST',
             headers: getAdminHeaders(),
             body: JSON.stringify(data),
+        }),
+};
+
+// ─── Admin Vocabulary API ──────────────────────────────────────
+
+export const adminVocabularyApi = {
+    getAll: (page = 0, size = 10, keyword?: string, sort = 'createdAt,desc') => {
+        const params = new URLSearchParams({ page: String(page), size: String(size), sort });
+        if (keyword) params.append('keyword', keyword);
+        return request<PaginationResponse<VocabularyResponse>>(`${API_BASE}/admin/vocabularies?${params}`, {
+            method: 'GET',
+            headers: getAdminHeaders(),
+        });
+    },
+
+    getById: (id: number) =>
+        request<VocabularyResponse>(`${API_BASE}/admin/vocabularies/${id}`, {
+            method: 'GET',
+            headers: getAdminHeaders(),
+        }),
+
+    create: (data: VocabularyRequest) =>
+        request<VocabularyResponse>(`${API_BASE}/admin/vocabularies`, {
+            method: 'POST',
+            headers: getAdminHeaders(),
+            body: JSON.stringify(data),
+        }),
+
+    update: (id: number, data: VocabularyRequest) =>
+        request<VocabularyResponse>(`${API_BASE}/admin/vocabularies/${id}`, {
+            method: 'PUT',
+            headers: getAdminHeaders(),
+            body: JSON.stringify(data),
+        }),
+
+    delete: (id: number) =>
+        request<void>(`${API_BASE}/admin/vocabularies/${id}`, {
+            method: 'DELETE',
+            headers: getAdminHeaders(),
+        }),
+};
+
+// ─── Admin VocabBank API ──────────────────────────────────────
+
+export const adminVocabBankApi = {
+    getAll: (page = 0, size = 10, topicId?: number, keyword?: string, sort = 'createdAt,desc') => {
+        const params = new URLSearchParams({ page: String(page), size: String(size), sort });
+        if (topicId) params.append('topicId', String(topicId));
+        if (keyword) params.append('keyword', keyword);
+        return request<PaginationResponse<VocabBankResponse>>(`${API_BASE}/admin/vocab-banks?${params}`, {
+            method: 'GET',
+            headers: getAdminHeaders(),
+        });
+    },
+
+    getById: (id: number) =>
+        request<VocabBankResponse>(`${API_BASE}/admin/vocab-banks/${id}`, {
+            method: 'GET',
+            headers: getAdminHeaders(),
+        }),
+
+    create: (data: VocabBankRequest) =>
+        request<VocabBankResponse>(`${API_BASE}/admin/vocab-banks`, {
+            method: 'POST',
+            headers: getAdminHeaders(),
+            body: JSON.stringify(data),
+        }),
+
+    update: (id: number, data: VocabBankRequest) =>
+        request<VocabBankResponse>(`${API_BASE}/admin/vocab-banks/${id}`, {
+            method: 'PUT',
+            headers: getAdminHeaders(),
+            body: JSON.stringify(data),
+        }),
+
+    delete: (id: number) =>
+        request<void>(`${API_BASE}/admin/vocab-banks/${id}`, {
+            method: 'DELETE',
+            headers: getAdminHeaders(),
+        }),
+
+    addVocabularies: (bankId: number, items: VocabBankVocabularyRequest[]) =>
+        request<VocabBankResponse>(`${API_BASE}/admin/vocab-banks/${bankId}/vocabularies`, {
+            method: 'POST',
+            headers: getAdminHeaders(),
+            body: JSON.stringify(items),
+        }),
+
+    removeVocabulary: (bankId: number, vocabId: number) =>
+        request<void>(`${API_BASE}/admin/vocab-banks/${bankId}/vocabularies/${vocabId}`, {
+            method: 'DELETE',
+            headers: getAdminHeaders(),
+        }),
+
+    reorderVocabularies: (bankId: number, items: VocabBankVocabularyRequest[]) =>
+        request<VocabBankResponse>(`${API_BASE}/admin/vocab-banks/${bankId}/vocabularies/reorder`, {
+            method: 'PUT',
+            headers: getAdminHeaders(),
+            body: JSON.stringify(items),
+        }),
+};
+
+// ─── Admin Learner API ────────────────────────────────────────
+
+export const adminLearnerApi = {
+    getAll: (page = 0, size = 10, keyword?: string, status?: string, sort = 'createdAt,desc') => {
+        const params = new URLSearchParams({ page: String(page), size: String(size), sort });
+        if (keyword) params.append('keyword', keyword);
+        if (status) params.append('status', status);
+        return request<PaginationResponse<LearnerResponse>>(`${API_BASE}/admin/learners?${params}`, {
+            method: 'GET',
+            headers: getAdminHeaders(),
+        });
+    },
+
+    getById: (id: number) =>
+        request<LearnerResponse>(`${API_BASE}/admin/learners/${id}`, {
+            method: 'GET',
+            headers: getAdminHeaders(),
+        }),
+
+    lock: (id: number) =>
+        request<LearnerResponse>(`${API_BASE}/admin/learners/${id}/lock`, {
+            method: 'PATCH',
+            headers: getAdminHeaders(),
+        }),
+
+    unlock: (id: number) =>
+        request<LearnerResponse>(`${API_BASE}/admin/learners/${id}/unlock`, {
+            method: 'PATCH',
+            headers: getAdminHeaders(),
         }),
 };
 
