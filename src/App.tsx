@@ -14,12 +14,14 @@ import ProfilesPage from './pages/ProfilesPage';
 import TestResultsPage from './pages/TestResultsPage';
 import NotFound from './pages/NotFound';
 
-// Admin auth guard
+// Auth guards
 import AdminRouteGuard from './components/auth/AdminRouteGuard';
+import LearnerRouteGuard from './components/auth/LearnerRouteGuard';
 
 // Learner pages
 import LoginPage from './pages/learner/LoginPage';
 import RegisterPage from './pages/learner/RegisterPage';
+import ProfileManagementPage from './pages/learner/ProfileManagementPage';
 import LevelSelectionPage from './pages/learner/LevelSelectionPage';
 import TopicSelectionPage from './pages/learner/TopicSelectionPage';
 import VocabularyLearningPage from './pages/learner/VocabularyLearningPage';
@@ -34,8 +36,10 @@ const App = () => (
     <CssBaseline />
     <BrowserRouter>
       <Routes>
-        {/* Public Route */}
+        {/* Public Routes */}
         <Route path="/" element={<Home />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
 
         {/* Admin Login redirects to unified login */}
         <Route path="/admin/login" element={<Navigate to="/login" replace />} />
@@ -53,16 +57,15 @@ const App = () => (
           <Route path="test-results" element={<AdminRouteGuard><TestResultsPage /></AdminRouteGuard>} />
         </Route>
 
-        {/* Learner Routes */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/learn" element={<LevelSelectionPage />} />
-        <Route path="/learn/level/:levelId/topics" element={<TopicSelectionPage />} />
-        <Route path="/learn/topic/:topicId" element={<VocabularyLearningPage />} />
-        <Route path="/learn/topic/:topicId/practice" element={<PracticeTestPage />} />
-        <Route path="/learn/topic/:topicId/exam" element={<ExamTestPage />} />
-        <Route path="/learn/profile" element={<ProfilePage />} />
-        <Route path="/learn/history" element={<TestHistoryPage />} />
+        {/* Learner Routes (protected) */}
+        <Route path="/learn/profiles" element={<LearnerRouteGuard><ProfileManagementPage /></LearnerRouteGuard>} />
+        <Route path="/learn" element={<LearnerRouteGuard><LevelSelectionPage /></LearnerRouteGuard>} />
+        <Route path="/learn/level/:levelId/topics" element={<LearnerRouteGuard><TopicSelectionPage /></LearnerRouteGuard>} />
+        <Route path="/learn/topic/:topicId" element={<LearnerRouteGuard><VocabularyLearningPage /></LearnerRouteGuard>} />
+        <Route path="/learn/topic/:topicId/practice" element={<LearnerRouteGuard><PracticeTestPage /></LearnerRouteGuard>} />
+        <Route path="/learn/topic/:topicId/exam" element={<LearnerRouteGuard><ExamTestPage /></LearnerRouteGuard>} />
+        <Route path="/learn/profile" element={<LearnerRouteGuard><ProfilePage /></LearnerRouteGuard>} />
+        <Route path="/learn/history" element={<LearnerRouteGuard><TestHistoryPage /></LearnerRouteGuard>} />
 
         <Route path="*" element={<NotFound />} />
       </Routes>

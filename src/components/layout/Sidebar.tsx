@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Collapse, Typography, Divider } from '@mui/material';
-import { Dashboard as DashboardIcon, School as SchoolIcon, Topic as TopicIcon, Translate as TranslateIcon, Headphones as HeadphonesIcon, Quiz as QuizIcon, People as PeopleIcon, Assessment as AssessmentIcon, ExpandLess, ExpandMore, MenuBook as MenuBookIcon, Logout as LogoutIcon, LibraryBooks as LibraryBooksIcon } from '@mui/icons-material';
+import { Dashboard as DashboardIcon, School as SchoolIcon, Topic as TopicIcon, Translate as TranslateIcon, Headphones as HeadphonesIcon, People as PeopleIcon, Assessment as AssessmentIcon, ExpandLess, ExpandMore, MenuBook as MenuBookIcon, LibraryBooks as LibraryBooksIcon } from '@mui/icons-material';
 const drawerWidth = 280;
 interface MenuItem {
   title: string;
@@ -181,35 +181,6 @@ const Sidebar: React.FC = () => {
       pt: 2
     }}>
       {menuItems.map(item => renderMenuItem(item))}
-    </List>
-    <Box sx={{ flexGrow: 1 }} />
-    <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
-    <List>
-      <ListItem disablePadding>
-        <ListItemButton
-          onClick={() => {
-            localStorage.removeItem('admin');
-            localStorage.removeItem('admin_token');
-            navigate('/login');
-          }}
-          sx={{
-            mx: 1,
-            borderRadius: 2,
-            py: 1.5,
-            '&:hover': {
-              backgroundColor: 'rgba(244, 67, 54, 0.15)',
-            },
-          }}
-        >
-          <ListItemIcon sx={{ color: '#ef5350', minWidth: 40 }}>
-            <LogoutIcon />
-          </ListItemIcon>
-          <ListItemText
-            primary="Đăng xuất"
-            sx={{ '& .MuiListItemText-primary': { color: '#ef5350', fontWeight: 500 } }}
-          />
-        </ListItemButton>
-      </ListItem>
     </List>
   </Drawer>;
 };

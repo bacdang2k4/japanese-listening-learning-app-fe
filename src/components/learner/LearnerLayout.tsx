@@ -7,9 +7,11 @@ import {
   History,
   LogOut,
   User,
+  SwitchCamera,
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { tokenStorage } from '@/services/api';
+import { getActiveProfileId } from '@/hooks/useActiveProfile';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -61,10 +63,18 @@ const LearnerLayout: React.FC<LearnerLayoutProps> = ({ children }) => {
     return currentPath === path || currentPath.startsWith(path + '/');
   };
 
+  const activeProfileId = getActiveProfileId();
+
   const handleLogout = () => {
     localStorage.removeItem('learner');
+    localStorage.removeItem('activeProfileId');
     tokenStorage.removeLearnerToken();
     navigate('/login');
+  };
+
+  const handleSwitchProfile = () => {
+    localStorage.removeItem('activeProfileId');
+    navigate('/learn/profiles');
   };
 
   return (
@@ -123,6 +133,10 @@ const LearnerLayout: React.FC<LearnerLayoutProps> = ({ children }) => {
                   <DropdownMenuItem onClick={() => navigate('/learn/history')} className="cursor-pointer">
                     <History className="mr-2 h-4 w-4" />
                     <span>Lịch sử học</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleSwitchProfile} className="cursor-pointer">
+                    <SwitchCamera className="mr-2 h-4 w-4" />
+                    <span>Đổi hồ sơ {activeProfileId ? `(#${activeProfileId})` : ''}</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600 cursor-pointer">

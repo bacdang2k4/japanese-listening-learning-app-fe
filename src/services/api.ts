@@ -271,6 +271,136 @@ export interface AiTestResponse {
     questions: QuestionResponse[];
 }
 
+export interface AiGenerationLogResponse {
+    id: number;
+    testId: number | null;
+    testName: string | null;
+    model: string | null;
+    status: string | null;
+    generatedAt: string;
+}
+
+// ─── Learner Test Flow Types ─────────────────────────────────
+
+export interface StartTestRequest {
+    profileId: number;
+    mode: string;
+}
+
+export interface StartTestResponse {
+    resultId: number;
+    profileId: number;
+    testId: number;
+    testName: string;
+    audioUrl: string | null;
+    duration: number | null;
+    passCondition: number | null;
+    totalQuestions: number | null;
+    mode: string;
+    status: string;
+    startedAt: string;
+}
+
+export interface LearnerAnswerRequest {
+    questionId: number;
+    selectedAnswerId: number | null;
+}
+
+export interface SubmitTestRequest {
+    profileId: number;
+    answers: LearnerAnswerRequest[];
+}
+
+export interface SubmitTestResponse {
+    resultId: number;
+    score: number;
+    isPassed: boolean;
+    status: string;
+}
+
+export interface TestSummaryResponse {
+    testId: number;
+    testName: string;
+    duration: number | null;
+    passCondition: number | null;
+}
+
+export interface LearnerAnswerOption {
+    answerId: number;
+    content: string;
+    answerOrder: number | null;
+    isCorrect: boolean | null;
+}
+
+export interface LearnerQuestionResponse {
+    questionId: number;
+    content: string;
+    questionOrder: number | null;
+    answers: LearnerAnswerOption[];
+}
+
+export interface TestHistoryResponse {
+    resultId: number;
+    testName: string;
+    mode: string;
+    score: number;
+    isPassed: boolean;
+    createdAt: string;
+}
+
+export interface QuestionResultResponse {
+    questionId: number;
+    questionContent: string;
+    selectedAnswer: string | null;
+    correctAnswer: string | null;
+    isCorrect: boolean;
+}
+
+export interface TestResultDetailResponse {
+    resultId: number;
+    testName: string;
+    score: number;
+    isPassed: boolean;
+    totalTime: number;
+    questionResults: QuestionResultResponse[];
+}
+
+// ─── Learner Profile Types ──────────────────────────────────
+
+export interface CreateProfileRequest {
+    levelId: number;
+}
+
+export interface ProfileResponse {
+    profileId: number;
+    status: string;
+    startDate: string;
+    currentLevelName: string | null;
+    currentLevelId: number | null;
+}
+
+export interface TopicProgressItem {
+    topicId: number;
+    topicName: string;
+    status: string;
+    testCount: number;
+    passedTestCount: number;
+}
+
+export interface LevelProgressItem {
+    levelId: number;
+    levelName: string;
+    levelOrder: number;
+    status: string;
+    topics: TopicProgressItem[];
+}
+
+export interface ProfileProgressResponse {
+    profileId: number;
+    profileStatus: string;
+    levels: LevelProgressItem[];
+}
+
 // ─── Helper ────────────────────────────────────────────────────
 
 function getAdminHeaders(): Record<string, string> {
@@ -516,6 +646,14 @@ export const adminAiTestApi = {
             headers: getAdminHeaders(),
             body: JSON.stringify(data),
         }),
+
+    getLogs: (page = 0, size = 20) => {
+        const params = new URLSearchParams({ page: String(page), size: String(size) });
+        return request<PaginationResponse<AiGenerationLogResponse>>(`${API_BASE}/admin/ai-tests/logs?${params}`, {
+            method: 'GET',
+            headers: getAdminHeaders(),
+        });
+    },
 };
 
 // ─── Admin Vocabulary API ──────────────────────────────────────
@@ -674,6 +812,109 @@ export const adminLearnerApi = {
         request<LearnerResponse>(`${API_BASE}/admin/learners/${id}/unlock`, {
             method: 'PATCH',
             headers: getAdminHeaders(),
+        }),
+};
+
+// ─── Learner API ──────────────────────────────────────────────
+
+export const learnerApi = {
+    // Levels & Topics & Vocabulary
+    getLevels: () =>
+        request<LevelResponse[]>(`${API_BASE}/levels`, {
+            method: 'GET',
+            headers: getLearnerHeaders(),
+        }),
+
+    getTopicsByLevel: (levelId: number) =>
+        request<TopicResponse[]>(`${API_BASE}/levels/${levelId}/topics`, {
+            method: 'GET',
+            headers: getLearnerHeaders(),
+        }),
+
+    getVocabulariesByTopic: (topicId: number) =>
+        request<VocabularyResponse[]>(`${API_BASE}/topics/${topicId}/vocabularies`, {
+            method: 'GET',
+            headers: getLearnerHeaders(),
+        }),
+
+    // Test flow
+    getTestsByTopic: (topicId: number, page = 0, size = 20) =>
+        request<PaginationResponse<TestSummaryResponse>>(`${API_BASE}/topics/${topicId}/tests?page=${page}&size=${size}`, {
+            method: 'GET',
+            headers: getLearnerHeaders(),
+        }),
+
+    startTest: (testId: number, data: StartTestRequest) =>
+        request<StartTestResponse>(`${API_BASE}/tests/${testId}/start`, {
+            method: 'POST',
+            headers: getLearnerHeaders(),
+            body: JSON.stringify(data),
+        }),
+
+    getTestQuestions: (testId: number, attemptId: number) =>
+        request<LearnerQuestionResponse[]>(`${API_BASE}/tests/${testId}/questions?attemptId=${attemptId}`, {
+            method: 'GET',
+            headers: getLearnerHeaders(),
+        }),
+
+    submitTest: (resultId: number, data: SubmitTestRequest) =>
+        request<SubmitTestResponse>(`${API_BASE}/test-results/${resultId}/submit`, {
+            method: 'POST',
+            headers: getLearnerHeaders(),
+            body: JSON.stringify(data),
+        }),
+
+    getTestResult: (resultId: number, profileId: number) =>
+        request<TestResultDetailResponse>(`${API_BASE}/test-results/${resultId}?profileId=${profileId}`, {
+            method: 'GET',
+            headers: getLearnerHeaders(),
+        }),
+
+    getTestHistory: (profileId: number, page = 0, size = 20) =>
+        request<PaginationResponse<TestHistoryResponse>>(`${API_BASE}/profiles/${profileId}/test-results?page=${page}&size=${size}`, {
+            method: 'GET',
+            headers: getLearnerHeaders(),
+        }),
+
+    // Profile management
+    getMyProfiles: () =>
+        request<ProfileResponse[]>(`${API_BASE}/learners/me/profiles`, {
+            method: 'GET',
+            headers: getLearnerHeaders(),
+        }),
+
+    createProfile: (data: CreateProfileRequest) =>
+        request<ProfileResponse>(`${API_BASE}/learners/me/profiles`, {
+            method: 'POST',
+            headers: getLearnerHeaders(),
+            body: JSON.stringify(data),
+        }),
+
+    getProfileProgress: (profileId: number) =>
+        request<ProfileProgressResponse>(`${API_BASE}/learners/me/profiles/${profileId}/progress`, {
+            method: 'GET',
+            headers: getLearnerHeaders(),
+        }),
+
+    // Avatar
+    uploadAvatar: async (file: File) => {
+        const token = tokenStorage.getLearnerToken();
+        const formData = new FormData();
+        formData.append('file', file);
+        const res = await fetch(`${API_BASE}/learners/me/avatar`, {
+            method: 'POST',
+            headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+            body: formData,
+        });
+        const body = await res.json();
+        if (!res.ok) throw new Error(body.message || 'Upload failed');
+        return body as ApiResponse<string>;
+    },
+
+    deleteAvatar: () =>
+        request<void>(`${API_BASE}/learners/me/avatar`, {
+            method: 'DELETE',
+            headers: getLearnerHeaders(),
         }),
 };
 

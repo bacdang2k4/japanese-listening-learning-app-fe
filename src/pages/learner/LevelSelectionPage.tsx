@@ -1,39 +1,76 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { School, CheckCircle2, Lock } from 'lucide-react';
+import { School, CheckCircle2, Lock, Loader2 } from 'lucide-react';
 import LearnerLayout from '../../components/learner/LearnerLayout';
-import { mockLevels } from '../../data/mockData';
+import { learnerApi, LevelResponse, ProfileProgressResponse, LevelProgressItem } from '@/services/api';
+import { getActiveProfileId } from '@/hooks/useActiveProfile';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 
 const LevelSelectionPage: React.FC = () => {
   const navigate = useNavigate();
+  const profileId = getActiveProfileId();
 
-  // Mock progress data
-  const levelProgress: Record<string, { completed: boolean; progress: number }> = {
-    '1': { completed: true, progress: 100 },
-    '2': { completed: false, progress: 60 },
-    '3': { completed: false, progress: 0 },
-    '4': { completed: false, progress: 0 },
-    '5': { completed: false, progress: 0 },
+  const [levels, setLevels] = useState<LevelResponse[]>([]);
+  const [progress, setProgress] = useState<ProfileProgressResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!profileId) {
+      navigate('/learn/profiles', { replace: true });
+      return;
+    }
+  }, [profileId, navigate]);
+
+  const fetchData = useCallback(async () => {
+    if (!profileId) return;
+    setLoading(true);
+    try {
+      const [levelsRes, progressRes] = await Promise.all([
+        learnerApi.getLevels(),
+        learnerApi.getProfileProgress(profileId),
+      ]);
+      setLevels(levelsRes.data);
+      setProgress(progressRes.data);
+    } catch (err) {
+      console.error('Failed to load data', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [profileId]);
+
+  useEffect(() => { fetchData(); }, [fetchData]);
+
+  const getLevelProgress = (levelId: number): LevelProgressItem | undefined => {
+    return progress?.levels.find(l => l.levelId === levelId);
   };
 
-  // Use theme-consistent shades of the primary color instead of jarring colored badges
+  const isLevelUnlocked = (levelId: number): boolean => {
+    if (!progress) return false;
+    return progress.levels.some(l => l.levelId === levelId);
+  };
+
+  const computeProgress = (lp: LevelProgressItem | undefined): number => {
+    if (!lp || !lp.topics.length) return 0;
+    const passed = lp.topics.filter(t => t.status === 'PASS').length;
+    return Math.round((passed / lp.topics.length) * 100);
+  };
+
   const getLevelOpacity = (index: number) => {
-    // Gradually darker tint to distinguish levels visually
     const opacities = [10, 15, 20, 30, 40];
     return opacities[index] || 10;
   };
 
-  const isLevelUnlocked = (order: number) => {
-    if (order === 1) return true;
-    const prevLevel = mockLevels.find(l => l.order === order - 1);
-    if (prevLevel) {
-      return levelProgress[prevLevel.id]?.completed;
-    }
-    return false;
-  };
+  if (loading) {
+    return (
+      <LearnerLayout>
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </LearnerLayout>
+    );
+  }
 
   return (
     <LearnerLayout>
@@ -49,10 +86,13 @@ const LevelSelectionPage: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mockLevels.map((level, index) => {
-            const progress = levelProgress[level.id];
-            const unlocked = isLevelUnlocked(level.order);
+          {levels.map((level, index) => {
+            const lp = getLevelProgress(level.id);
+            const unlocked = isLevelUnlocked(level.id);
+            const pct = computeProgress(lp);
+            const isCompleted = lp?.status === 'PASS';
             const opacity = getLevelOpacity(index);
+            const topicCount = lp?.topics.length ?? 0;
 
             return (
               <div
@@ -67,42 +107,36 @@ const LevelSelectionPage: React.FC = () => {
                     }`}
                   onClick={() => unlocked && navigate(`/learn/level/${level.id}/topics`)}
                 >
-                  {/* Subtle top accent using primary color */}
                   <div className="h-1.5 w-full bg-primary" style={{ opacity: opacity / 100 + 0.4 }} />
 
                   <CardContent className="p-6">
                     <div className="flex justify-between items-center mb-4">
                       <h3 className="text-4xl font-extrabold tracking-tight text-primary">
-                        {level.name}
+                        {level.levelName}
                       </h3>
-                      {progress?.completed ? (
+                      {isCompleted ? (
                         <CheckCircle2 className="h-7 w-7 text-primary" />
                       ) : !unlocked ? (
                         <Lock className="h-7 w-7 text-muted-foreground" />
                       ) : null}
                     </div>
 
-                    <p className="text-muted-foreground min-h-[48px] mb-6">
-                      {level.description}
-                    </p>
-
                     {unlocked && (
                       <div className="space-y-2 mb-6">
                         <div className="flex justify-between text-sm">
                           <span className="text-muted-foreground font-medium">Tiến độ</span>
-                          <span className="font-bold">{progress?.progress || 0}%</span>
+                          <span className="font-bold">{pct}%</span>
                         </div>
-                        <Progress value={progress?.progress || 0} className="h-2" />
+                        <Progress value={pct} className="h-2" />
                       </div>
                     )}
 
                     <div className="flex flex-wrap gap-2 mt-auto pt-4">
-                      <Badge variant="secondary" className="bg-primary/10 text-primary hover:bg-primary/20">
-                        4 chủ đề
-                      </Badge>
-                      <Badge variant="secondary" className="bg-primary/10 text-primary hover:bg-primary/20">
-                        20 từ vựng
-                      </Badge>
+                      {topicCount > 0 && (
+                        <Badge variant="secondary" className="bg-primary/10 text-primary hover:bg-primary/20">
+                          {topicCount} chủ đề
+                        </Badge>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
