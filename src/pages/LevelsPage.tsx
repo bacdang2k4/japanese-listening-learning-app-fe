@@ -35,13 +35,6 @@ const LevelsPage: React.FC = () => {
   const [totalElements, setTotalElements] = useState(0);
   const [pageSize] = useState(10);
 
-  const getAdminId = (): number => {
-    try {
-      const admin = JSON.parse(localStorage.getItem('admin') || '{}');
-      return admin.id || 1;
-    } catch { return 1; }
-  };
-
   const fetchLevels = useCallback(async () => {
     setLoading(true);
     setError('');
@@ -84,7 +77,7 @@ const LevelsPage: React.FC = () => {
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
-      const payload = { levelName: formData.levelName, adminId: getAdminId() };
+      const payload = { levelName: formData.levelName };
       if (selectedLevel) {
         await adminLevelApi.update(selectedLevel.id, payload);
       } else {

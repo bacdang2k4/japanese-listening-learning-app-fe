@@ -74,7 +74,6 @@ export interface AdminAuthResponse {
 
 export interface LevelRequest {
     levelName: string;
-    adminId: number;
 }
 
 export interface LevelResponse {
@@ -393,6 +392,23 @@ export interface LevelProgressItem {
     levelOrder: number;
     status: string;
     topics: TopicProgressItem[];
+}
+
+export interface LearnerAccountResponse {
+    id: number;
+    username: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    avatarUrl: string | null;
+    status: string | null;
+    createdAt: string;
+}
+
+export interface UpdateLearnerInfoRequest {
+    firstName: string;
+    lastName: string;
+    email: string;
 }
 
 export interface ProfileProgressResponse {
@@ -874,6 +890,20 @@ export const learnerApi = {
         request<PaginationResponse<TestHistoryResponse>>(`${API_BASE}/profiles/${profileId}/test-results?page=${page}&size=${size}`, {
             method: 'GET',
             headers: getLearnerHeaders(),
+        }),
+
+    // Account
+    getMyAccount: () =>
+        request<LearnerAccountResponse>(`${API_BASE}/learners/me`, {
+            method: 'GET',
+            headers: getLearnerHeaders(),
+        }),
+
+    updateMyInfo: (data: UpdateLearnerInfoRequest) =>
+        request<LearnerAccountResponse>(`${API_BASE}/learners/me`, {
+            method: 'PUT',
+            headers: getLearnerHeaders(),
+            body: JSON.stringify(data),
         }),
 
     // Profile management

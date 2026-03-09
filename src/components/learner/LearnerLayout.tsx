@@ -51,7 +51,7 @@ const LearnerLayout: React.FC<LearnerLayoutProps> = ({ children }) => {
   // Desktop nav items (top bar center)
   const navItems = [
     { text: 'Cấp độ', icon: School, path: '/learn' },
-    { text: 'Hồ sơ', icon: User, path: '/learn/profile' },
+    { text: 'Tài khoản', icon: User, path: '/learn/profile' },
     { text: 'Lịch sử', icon: History, path: '/learn/history' },
   ];
 
@@ -128,7 +128,7 @@ const LearnerLayout: React.FC<LearnerLayoutProps> = ({ children }) => {
                 <DropdownMenuContent className="w-56" align="end" forceMount>
                   <DropdownMenuItem onClick={() => navigate('/learn/profile')} className="cursor-pointer">
                     <User className="mr-2 h-4 w-4" />
-                    <span>Hồ sơ cá nhân</span>
+                    <span>Tài khoản</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate('/learn/history')} className="cursor-pointer">
                     <History className="mr-2 h-4 w-4" />
