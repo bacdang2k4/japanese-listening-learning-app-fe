@@ -40,12 +40,15 @@ export interface LearnerAuthResponse {
     accessToken: string;
     tokenType: string;
     learnerId: number;
-    profileId: number;
+    /** First profile ID if exists; null nếu chưa có profile (cần onboarding) */
+    profileId: number | null;
     username: string;
     role: string;
     firstName: string;
     lastName: string;
     avatarUrl: string | null;
+    /** Danh sách profiles - FE: empty → onboarding, có data → chọn profile */
+    profiles?: ProfileResponse[];
 }
 
 export interface RegisterResponse {
@@ -98,6 +101,7 @@ export interface TopicResponse {
     levelId: number;
     levelName: string;
     topicOrder: number;
+    isUnlocked?: boolean | null;
     createdAt: string;
 }
 
@@ -378,6 +382,7 @@ export interface ProfileResponse {
     startDate: string;
     currentLevelName: string | null;
     currentLevelId: number | null;
+    avatarUrl?: string | null;
 }
 
 export interface TopicProgressItem {
@@ -843,8 +848,8 @@ export const learnerApi = {
             headers: getLearnerHeaders(),
         }),
 
-    getTopicsByLevel: (levelId: number) =>
-        request<TopicResponse[]>(`${API_BASE}/levels/${levelId}/topics`, {
+    getTopicsByLevel: (levelId: number, profileId?: number | null) =>
+        request<TopicResponse[]>(`${API_BASE}/levels/${levelId}/topics${profileId ? `?profileId=${profileId}` : ''}`, {
             method: 'GET',
             headers: getLearnerHeaders(),
         }),

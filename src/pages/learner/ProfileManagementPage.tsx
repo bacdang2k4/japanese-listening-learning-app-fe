@@ -44,12 +44,16 @@ const ProfileManagementPage: React.FC = () => {
       ]);
       setProfiles(profilesRes.data);
       setLevels(levelsRes.data);
+      // Chưa có profile → redirect đến onboarding
+      if (profilesRes.data.length === 0) {
+        navigate('/learn/onboarding', { replace: true });
+      }
     } catch (err: any) {
       setError(err.message || 'Lỗi khi tải dữ liệu');
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [navigate]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
@@ -132,11 +136,20 @@ const ProfileManagementPage: React.FC = () => {
               <Card className="h-full border shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-background">
                 <CardContent className="p-6">
                   <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="text-2xl font-bold text-primary mb-1">
-                        {profile.currentLevelName || 'N/A'}
-                      </h3>
-                      <p className="text-sm text-muted-foreground">Hồ sơ #{profile.profileId}</p>
+                    <div className="flex items-center gap-3">
+                      {profile.avatarUrl ? (
+                        <img src={profile.avatarUrl} alt="" className="w-12 h-12 rounded-full object-cover border-2 border-primary/20" />
+                      ) : (
+                        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                          <GraduationCap className="w-6 h-6 text-primary" />
+                        </div>
+                      )}
+                      <div>
+                        <h3 className="text-2xl font-bold text-primary mb-1">
+                          {profile.currentLevelName || 'N/A'}
+                        </h3>
+                        <p className="text-sm text-muted-foreground">Hồ sơ #{profile.profileId}</p>
+                      </div>
                     </div>
                     {getStatusBadge(profile.status)}
                   </div>

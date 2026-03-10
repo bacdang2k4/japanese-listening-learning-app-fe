@@ -24,7 +24,7 @@ const TopicSelectionPage: React.FC = () => {
     setLoading(true);
     try {
       const [topicsRes, progressRes] = await Promise.all([
-        learnerApi.getTopicsByLevel(Number(levelId)),
+        learnerApi.getTopicsByLevel(Number(levelId), profileId),
         learnerApi.getProfileProgress(profileId),
       ]);
       setTopics(topicsRes.data);
@@ -143,23 +143,14 @@ const TopicSelectionPage: React.FC = () => {
                           <Play className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
                           Học từ vựng
                         </Button>
-                        <div className="grid grid-cols-2 gap-2">
-                          <Button
-                            variant="outline"
-                            onClick={() => navigate(`/learn/topic/${topic.id}/practice`)}
-                            className="font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                          >
-                            Luyện tập
-                          </Button>
-                          <Button
-                            variant="secondary"
-                            onClick={() => navigate(`/learn/topic/${topic.id}/exam`)}
-                            className="font-medium bg-secondary/80 hover:bg-secondary text-secondary-foreground"
-                          >
-                            <Focus className="w-4 h-4 mr-1.5" />
-                            Thi thật
-                          </Button>
-                        </div>
+                        <Button
+                          variant="outline"
+                          onClick={() => navigate(`/learn/topic/${topic.id}/practice`)}
+                          className="w-full font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                        >
+                          <Focus className="w-4 h-4 mr-1.5" />
+                          Luyện tập
+                        </Button>
                       </div>
                     </CardContent>
                   </Card>

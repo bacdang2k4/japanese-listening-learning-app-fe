@@ -43,9 +43,11 @@ const LoginPage: React.FC = () => {
         });
 
         tokenStorage.setLearnerToken(result.data.accessToken);
+        const profiles = result.data.profiles ?? [];
+        const profileId = result.data.profileId;
         localStorage.setItem('learner', JSON.stringify({
           id: result.data.learnerId,
-          profileId: result.data.profileId,
+          profileId: profileId,
           username: result.data.username,
           firstName: result.data.firstName,
           lastName: result.data.lastName,
@@ -53,7 +55,13 @@ const LoginPage: React.FC = () => {
           role: result.data.role,
         }));
 
-        navigate('/learn');
+        // Flow: Chưa có profile → Onboarding | Có profile → Bắt buộc chọn profile
+        if (profiles.length === 0) {
+          navigate('/learn/onboarding');
+        } else {
+          // Luôn redirect đến chọn profile (bắt buộc chọn trước khi vào học)
+          navigate('/learn/profiles');
+        }
       } else {
         const result = await authApi.adminLogin({
           username: formData.username,

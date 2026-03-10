@@ -22,19 +22,18 @@ import LearnerRouteGuard from './components/auth/LearnerRouteGuard';
 import LoginPage from './pages/learner/LoginPage';
 import RegisterPage from './pages/learner/RegisterPage';
 import ProfileManagementPage from './pages/learner/ProfileManagementPage';
-import LevelSelectionPage from './pages/learner/LevelSelectionPage';
-import TopicSelectionPage from './pages/learner/TopicSelectionPage';
+import OnboardingPage from './pages/learner/OnboardingPage';
+import RoadmapPage from './pages/learner/RoadmapPage';
 import VocabularyLearningPage from './pages/learner/VocabularyLearningPage';
 import ProfilePage from './pages/learner/ProfilePage';
 import TestHistoryPage from './pages/learner/TestHistoryPage';
 import PracticeTestPage from './pages/learner/PracticeTestPage';
-import ExamTestPage from './pages/learner/ExamTestPage';
 import Home from './pages/learner/Home';
 
 const App = () => (
   <ThemeProvider theme={theme}>
     <CssBaseline />
-    <BrowserRouter>
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<Home />} />
@@ -58,12 +57,11 @@ const App = () => (
         </Route>
 
         {/* Learner Routes (protected) */}
+        <Route path="/learn/onboarding" element={<LearnerRouteGuard><OnboardingPage /></LearnerRouteGuard>} />
         <Route path="/learn/profiles" element={<LearnerRouteGuard><ProfileManagementPage /></LearnerRouteGuard>} />
-        <Route path="/learn" element={<LearnerRouteGuard><LevelSelectionPage /></LearnerRouteGuard>} />
-        <Route path="/learn/level/:levelId/topics" element={<LearnerRouteGuard><TopicSelectionPage /></LearnerRouteGuard>} />
+        <Route path="/learn" element={<LearnerRouteGuard><RoadmapPage /></LearnerRouteGuard>} />
         <Route path="/learn/topic/:topicId" element={<LearnerRouteGuard><VocabularyLearningPage /></LearnerRouteGuard>} />
         <Route path="/learn/topic/:topicId/practice" element={<LearnerRouteGuard><PracticeTestPage /></LearnerRouteGuard>} />
-        <Route path="/learn/topic/:topicId/exam" element={<LearnerRouteGuard><ExamTestPage /></LearnerRouteGuard>} />
         <Route path="/learn/profile" element={<LearnerRouteGuard><ProfilePage /></LearnerRouteGuard>} />
         <Route path="/learn/history" element={<LearnerRouteGuard><TestHistoryPage /></LearnerRouteGuard>} />
 

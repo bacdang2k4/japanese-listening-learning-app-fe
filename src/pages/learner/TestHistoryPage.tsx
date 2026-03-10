@@ -168,8 +168,8 @@ const TestHistoryPage: React.FC = () => {
                       <TableRow key={result.resultId} className="cursor-default hover:bg-muted/30">
                         <TableCell className="font-medium">{result.testName}</TableCell>
                         <TableCell className="text-center">
-                          <Badge variant="outline" className={`font-medium ${result.mode === 'PRACTICE' ? 'text-blue-600 border-blue-200 bg-blue-50' : 'text-orange-600 border-orange-200 bg-orange-50'}`}>
-                            {result.mode === 'PRACTICE' ? 'Luyện tập' : 'Thi thật'}
+                          <Badge variant="outline" className="font-medium text-blue-600 border-blue-200 bg-blue-50">
+                            Luyện tập
                           </Badge>
                         </TableCell>
                         <TableCell className="text-center">

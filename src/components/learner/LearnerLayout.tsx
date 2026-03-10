@@ -4,7 +4,6 @@ import {
   X,
   Headphones,
   School,
-  History,
   LogOut,
   User,
   SwitchCamera,
@@ -48,11 +47,10 @@ const LearnerLayout: React.FC<LearnerLayoutProps> = ({ children }) => {
     return 'L';
   };
 
-  // Desktop nav items (top bar center)
+  // Desktop nav items (top bar center) - bỏ Lịch sử
   const navItems = [
-    { text: 'Cấp độ', icon: School, path: '/learn' },
+    { text: 'Lộ trình', icon: School, path: '/learn' },
     { text: 'Tài khoản', icon: User, path: '/learn/profile' },
-    { text: 'Lịch sử', icon: History, path: '/learn/history' },
   ];
 
   const isNavActive = (path: string) => {
@@ -129,10 +127,6 @@ const LearnerLayout: React.FC<LearnerLayoutProps> = ({ children }) => {
                   <DropdownMenuItem onClick={() => navigate('/learn/profile')} className="cursor-pointer">
                     <User className="mr-2 h-4 w-4" />
                     <span>Tài khoản</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/learn/history')} className="cursor-pointer">
-                    <History className="mr-2 h-4 w-4" />
-                    <span>Lịch sử học</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleSwitchProfile} className="cursor-pointer">
                     <SwitchCamera className="mr-2 h-4 w-4" />
