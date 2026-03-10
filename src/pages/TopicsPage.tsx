@@ -34,7 +34,7 @@ const TopicsPage: React.FC = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedTopic, setSelectedTopic] = useState<TopicResponse | null>(null);
-  const [formData, setFormData] = useState({ topicName: '', levelId: '' as string });
+  const [formData, setFormData] = useState({ topicName: '', levelId: '' as string, topicOrder: '0' });
   const [submitting, setSubmitting] = useState(false);
   const [page, setPage] = useState(0);
 
@@ -68,10 +68,10 @@ const TopicsPage: React.FC = () => {
   const handleOpenDialog = (topic?: TopicResponse) => {
     if (topic) {
       setSelectedTopic(topic);
-      setFormData({ topicName: topic.topicName, levelId: String(topic.levelId) });
+      setFormData({ topicName: topic.topicName, levelId: String(topic.levelId), topicOrder: String(topic.topicOrder || 0) });
     } else {
       setSelectedTopic(null);
-      setFormData({ topicName: '', levelId: '' });
+      setFormData({ topicName: '', levelId: '', topicOrder: '0' });
     }
     setDialogOpen(true);
   };
@@ -79,13 +79,17 @@ const TopicsPage: React.FC = () => {
   const handleCloseDialog = () => {
     setDialogOpen(false);
     setSelectedTopic(null);
-    setFormData({ topicName: '', levelId: '' });
+    setFormData({ topicName: '', levelId: '', topicOrder: '0' });
   };
 
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
-      const payload = { topicName: formData.topicName, levelId: Number(formData.levelId) };
+      const payload = {
+        topicName: formData.topicName,
+        levelId: Number(formData.levelId),
+        topicOrder: Number(formData.topicOrder)
+      };
       if (selectedTopic) {
         await adminTopicApi.update(selectedTopic.id, payload);
       } else {
@@ -125,6 +129,7 @@ const TopicsPage: React.FC = () => {
         <Chip label={value || 'N/A'} size="small" color="primary" variant="outlined" />
       ),
     },
+    { id: 'topicOrder', label: 'Thứ tự', minWidth: 80, align: 'center' as const },
     { id: 'topicName', label: 'Tên chủ đề', minWidth: 150 },
     {
       id: 'createdAt',
@@ -237,6 +242,16 @@ const TopicsPage: React.FC = () => {
             required
             placeholder="VD: Gia đình, Số đếm..."
             disabled={submitting}
+          />
+          <TextField
+            label="Thứ tự (topicOrder)"
+            type="number"
+            value={formData.topicOrder}
+            onChange={(e) => setFormData({ ...formData, topicOrder: e.target.value })}
+            fullWidth
+            required
+            disabled={submitting}
+            helperText="Thứ tự hiển thị và học (1, 2, 3...)"
           />
         </Box>
       </FormDialog>

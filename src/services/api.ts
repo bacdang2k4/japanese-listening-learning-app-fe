@@ -89,6 +89,7 @@ export interface LevelResponse {
 export interface TopicRequest {
     topicName: string;
     levelId: number;
+    topicOrder?: number;
 }
 
 export interface TopicResponse {
@@ -96,6 +97,7 @@ export interface TopicResponse {
     topicName: string;
     levelId: number;
     levelName: string;
+    topicOrder: number;
     createdAt: string;
 }
 
