@@ -250,23 +250,26 @@ const ExamTestPage: React.FC = () => {
       <LearnerLayout>
         <div className="max-w-2xl mx-auto py-12">
           {error && <div className="mb-4 p-4 bg-red-50 text-red-700 rounded-xl border border-red-200">{error}</div>}
-          <Card className="border-none shadow-2xl animate-in zoom-in-95 duration-500 overflow-hidden">
-            <div className="h-2 bg-warning/80 w-full" />
+          <Card className="border-none shadow-3xl animate-in zoom-in-95 duration-500 overflow-hidden bg-white/80 backdrop-blur-2xl rounded-[3rem]">
+            <div className="h-2 bg-amber-400 w-full" />
             <CardContent className="p-8 text-center pt-10">
-              <AlertTriangle className="w-20 h-20 text-warning mx-auto mb-6" />
-              <h1 className="text-3xl font-bold mb-2">Thi thật - {selectedTest.testName}</h1>
-              <p className="text-muted-foreground mb-8">Bạn chuẩn bị bắt đầu bài thi chính thức</p>
+              <div className="w-24 h-24 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm border border-amber-100">
+                <AlertTriangle className="w-12 h-12" />
+              </div>
+              <h1 className="text-3xl font-black mb-2 text-slate-700">Thi thật - {selectedTest.testName}</h1>
+              <p className="text-slate-400 font-black text-[10px] uppercase tracking-[0.2em] mb-8">Bạn chuẩn bị bắt đầu bài thi chính thức</p>
 
-              <Alert variant="warning" className="text-left bg-orange-50 border-orange-200 text-orange-900 mb-8">
-                <AlertTitle className="font-bold flex items-center mb-2 text-orange-800">
-                  <AlertTriangle className="h-4 w-4 mr-2" /> Lưu ý quan trọng
+              <Alert className="text-left bg-amber-50 text-amber-700 border border-amber-200 mb-8 rounded-[2.5rem] shadow-sm">
+                <AlertTitle className="font-black flex items-center mb-2 text-amber-800 uppercase tracking-widest text-[11px]">
+                  <AlertTriangle className="h-4 w-4 mr-3 text-amber-500" />
+                  LƯU Ý QUAN TRỌNG
                 </AlertTitle>
-                <AlertDescription className="text-orange-900/90 text-sm">
-                  <ul className="list-disc pl-5 space-y-1.5 mt-2 font-medium">
-                    <li>Thời gian làm bài: {selectedTest.duration ? `${Math.floor(selectedTest.duration / 60)} phút` : '30 phút'}.</li>
-                    <li>Mỗi phần nghe <span className="underline decoration-orange-400 font-bold">chỉ được phát 1 lần</span> duy nhất.</li>
-                    <li>Điểm tối thiểu để đỗ: <span className="font-bold">{selectedTest.passCondition || 80}%</span>.</li>
-                    <li>Kết quả sẽ được lưu vào lịch sử và ảnh hưởng đến tiến độ.</li>
+                <AlertDescription className="text-amber-700/80 font-bold">
+                  <ul className="list-disc pl-5 space-y-2 mt-3 decoration-amber-100">
+                    <li className="font-bold">Thời gian làm bài: {selectedTest.duration ? `${Math.floor(selectedTest.duration / 60)} phút` : '30 phút'}.</li>
+                    <li className="font-bold underline">Mỗi phần nghe chỉ được phát 1 lần duy nhất.</li>
+                    <li className="font-bold">Điểm tối thiểu để đỗ: {selectedTest.passCondition || 80}%.</li>
+                    <li className="font-bold opacity-90">Kết quả sẽ được lưu vào lịch sử học tập.</li>
                   </ul>
                 </AlertDescription>
               </Alert>
@@ -311,78 +314,87 @@ const ExamTestPage: React.FC = () => {
           />
         )}
 
-        <div className="sticky top-[64px] z-40 bg-background/95 backdrop-blur-sm pt-4 pb-2 -mt-4 border-b mb-6 animate-in slide-in-from-top-4">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="sticky top-[72px] z-40 bg-white/95 backdrop-blur-md py-3 px-6 mt-2 mx-auto max-w-5xl animate-in slide-in-from-top-4 rounded-[2rem] shadow-xl border border-slate-100 mb-8">
+          <div className="flex flex-row justify-between items-center gap-4">
             <div>
-              <div className="flex items-center gap-3 mb-1">
-                <Badge variant="destructive" className="bg-orange-500 uppercase tracking-widest text-[10px] px-2 py-0.5">Thi thật</Badge>
-                <h1 className="text-xl font-bold">{testInfo?.testName}</h1>
+              <div className="flex items-center gap-3 mb-0.5">
+                <Badge className="bg-rose-50 text-rose-500 border border-rose-100 uppercase tracking-[0.1em] text-[8px] px-3 py-1.5 rounded-full font-black shadow-sm">THI THẬT</Badge>
+                <h1 className="text-lg font-black text-slate-700 tracking-tighter truncate max-w-[200px] md:max-w-md">{testInfo?.testName}</h1>
               </div>
-              <p className="text-sm text-muted-foreground">Câu {currentQuestionIndex + 1} / {questions.length}</p>
+              <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] px-1 leading-none">Câu {currentQuestionIndex + 1} / {questions.length}</p>
             </div>
-            <div className={`flex items-center gap-2 px-4 py-2 rounded-xl font-mono text-xl font-bold tracking-tight shadow-sm transition-colors ${isTimeLow ? 'bg-destructive text-destructive-foreground animate-pulse' : 'bg-primary text-primary-foreground'}`}>
-              <TimerIcon className="h-5 w-5" />
-              {formatTime(timeRemaining)}
+            <div className={`flex items-center gap-2.5 px-6 py-2.5 rounded-full font-black text-base tracking-tight shadow-sm border transition-all duration-500 ${isTimeLow ? 'bg-rose-50 border-rose-200 text-rose-600 animate-pulse ring-4 ring-rose-50' : 'bg-white border-slate-100 text-slate-600'}`}>
+              <TimerIcon className={`h-5 w-5 ${isTimeLow ? 'text-rose-500' : 'text-sky-400'}`} />
+              <span className="font-mono">{formatTime(timeRemaining)}</span>
             </div>
           </div>
-          <Progress value={((currentQuestionIndex + 1) / questions.length) * 100} className="h-1 mt-4" />
+          <Progress value={((currentQuestionIndex + 1) / questions.length) * 100} className="h-1 mt-3 bg-slate-100" />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           <div className="lg:col-span-8 space-y-6">
             {testInfo?.audioUrl && (
-              <Card className={`border-none shadow-md transition-colors ${audioPlayed[currentQuestionIndex] ? 'bg-muted' : 'bg-primary text-primary-foreground'}`}>
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-2 mb-4 opacity-90">
-                    <Volume2 className="h-5 w-5" />
-                    <span className="font-semibold tracking-wide">PHẦN NGHE</span>
+              <Card className={`border-none shadow-3xl transition-all duration-700 rounded-[3.5rem] overflow-hidden relative group ${audioPlayed[currentQuestionIndex] ? 'bg-slate-50 shadow-slate-200/50' : 'bg-gradient-to-br from-sky-400 via-sky-500 to-indigo-500 text-white shadow-sky-400/20'}`}>
+                {/* Decorative blob */}
+                {!audioPlayed[currentQuestionIndex] && <div className="absolute top-[-20%] right-[-10%] w-64 h-64 bg-white/20 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-1000" />}
+
+                <CardContent className="p-8 relative z-10">
+                  <div className="flex items-center gap-3 mb-6 opacity-90">
+                    <div className={`w-8 h-8 rounded-[1rem] flex items-center justify-center shadow-inner ${audioPlayed[currentQuestionIndex] ? 'bg-white text-slate-400' : 'bg-white/20 text-white'}`}>
+                      <Volume2 className="h-5 w-5" />
+                    </div>
+                    <span className="font-black text-[9px] uppercase tracking-[0.2em]">PHẦN NGHE</span>
                     {audioPlayed[currentQuestionIndex] && (
-                      <Badge variant="outline" className="ml-auto bg-background/50 text-foreground border-border/50">Đã phát</Badge>
+                      <Badge className="ml-auto bg-slate-900/10 text-slate-500 border-none px-4 py-1.5 text-[9px] font-black rounded-full">ĐÃ PHÁT</Badge>
                     )}
                   </div>
-                  <div className={`flex items-center gap-4 p-4 rounded-xl backdrop-blur-sm ${audioPlayed[currentQuestionIndex] ? 'bg-background/40' : 'bg-primary-foreground/10'}`}>
+                  <div className={`flex items-center gap-5 p-6 rounded-[2.8rem] backdrop-blur-xl border-2 ${audioPlayed[currentQuestionIndex] ? 'bg-white/40 border-slate-200/50' : 'bg-white/10 border-white/20 shadow-2xl'}`}>
                     <Button
                       variant={audioPlayed[currentQuestionIndex] ? 'outline' : 'secondary'}
                       size="icon"
-                      className="h-12 w-12 rounded-full shrink-0 shadow-sm"
+                      className={`h-16 w-16 rounded-full shrink-0 shadow-2xl transition-all duration-300 ${audioPlayed[currentQuestionIndex] ? 'border-slate-200 text-slate-300' : 'bg-white text-sky-500 hover:scale-110 active:scale-95'}`}
                       onClick={handlePlayAudio}
                       disabled={audioPlayed[currentQuestionIndex]}
                     >
-                      {isPlaying ? <Pause className="h-6 w-6" /> : <Play className={`h-6 w-6 ml-1 ${audioPlayed[currentQuestionIndex] ? 'text-muted-foreground' : 'text-primary'}`} />}
+                      {isPlaying ? <Pause className="h-8 w-8" /> : <Play className={`h-8 w-8 ml-1 ${audioPlayed[currentQuestionIndex] ? '' : ''}`} />}
                     </Button>
-                    <div className="flex-grow mx-2">
-                      <Slider value={[audioDuration ? (audioProgress / audioDuration) * 100 : 0]} max={100} disabled className={audioPlayed[currentQuestionIndex] ? 'opacity-50' : ''} />
+                    <div className="flex-grow mx-4">
+                      <Slider value={[audioDuration ? (audioProgress / audioDuration) * 100 : 0]} max={100} disabled className={audioPlayed[currentQuestionIndex] ? 'opacity-30' : ''} />
                     </div>
                   </div>
                   {!audioPlayed[currentQuestionIndex] && (
-                    <p className="text-primary-foreground/80 text-sm mt-3 flex items-center">
-                      <AlertTriangle className="w-4 h-4 mr-1.5 shrink-0" /> Lưu ý: Chỉ được nghe duy nhất 1 lần.
-                    </p>
+                    <div className="bg-white/10 mt-6 py-2.5 px-6 rounded-full border border-white/10 flex items-center justify-center gap-2">
+                      <AlertTriangle className="w-4 h-4 text-amber-300" />
+                      <p className="text-white font-black text-[9px] uppercase tracking-widest">
+                        Lưu ý: Chỉ được nghe duy nhất 1 lần.
+                      </p>
+                    </div>
                   )}
                 </CardContent>
               </Card>
             )}
 
-            <Card className="border-none shadow-md">
-              <CardContent className="p-6 md:p-8">
-                <h2 className="text-xl font-bold mb-6 text-foreground leading-relaxed">
-                  {currentQuestionIndex + 1}. {currentQuestion?.content}
+            <Card className="border-none shadow-3xl shadow-slate-200/50 rounded-[3.5rem] bg-white/90 backdrop-blur-2xl overflow-hidden ring-1 ring-black/5">
+              <CardContent className="p-10 md:p-12">
+                <h2 className="text-xl font-black mb-8 text-slate-700 leading-tight tracking-tight">
+                  <span className="text-sky-500 mr-3 font-black bg-sky-50 px-4 py-1.5 rounded-xl border border-sky-100 shadow-sm inline-block mb-3">{currentQuestionIndex + 1}</span>
+                  {currentQuestion?.content}
                 </h2>
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {currentQuestion?.answers.map(option => {
                     const isSelected = currentAnswer?.selectedAnswerId === option.answerId;
                     return (
                       <div
                         key={option.answerId}
-                        className={`relative flex items-center p-4 rounded-xl border-2 transition-all duration-200 cursor-pointer ${isSelected ? 'border-primary bg-primary/5 shadow-sm' : 'border-muted bg-background hover:border-primary/50 hover:bg-muted/50'}`}
+                        className={`relative flex items-center p-6 rounded-[2rem] border-2 transition-all duration-300 cursor-pointer shadow-sm hover:shadow-md ${isSelected ? 'border-indigo-500 bg-indigo-50 shadow-indigo-100/50' : 'border-slate-50 bg-white/70 hover:border-indigo-200 hover:bg-white'}`}
                         onClick={() => handleAnswerSelect(option.answerId)}
                       >
-                        <div className="flex-grow flex items-center pr-8">
-                          <span className={`${isSelected ? 'font-semibold text-primary' : 'font-medium'} text-lg`}>{option.content}</span>
+                        <div className="flex-grow flex items-center pr-10">
+                          <span className={`text-base transition-colors duration-300 ${isSelected ? 'font-black text-sky-600' : 'font-bold text-slate-600'}`}>{option.content}</span>
                         </div>
-                        <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${isSelected ? 'border-primary bg-primary' : 'border-muted-foreground/30'}`}>
-                            {isSelected && <div className="w-2 h-2 rounded-full bg-primary-foreground" />}
+                        <div className="absolute right-6 top-1/2 -translate-y-1/2">
+                          <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${isSelected ? 'border-sky-400 bg-sky-400 scale-110 shadow-lg shadow-sky-400/20' : 'border-slate-200 bg-white'}`}>
+                            {isSelected && <div className="w-2 h-2 rounded-full bg-white" />}
                           </div>
                         </div>
                       </div>
@@ -392,25 +404,25 @@ const ExamTestPage: React.FC = () => {
               </CardContent>
             </Card>
 
-            <div className="flex justify-between items-center gap-2 lg:hidden mt-6 mb-8">
-              <div className="flex gap-2">
-                <Button variant="outline" size="lg" className="h-14 px-4" onClick={handlePrevious} disabled={currentQuestionIndex === 0}><ChevronLeft className="h-5 w-5" /></Button>
-                <Button variant="outline" size="lg" className="h-14 px-4" onClick={handleNext} disabled={currentQuestionIndex === questions.length - 1}><ChevronRight className="h-5 w-5" /></Button>
+            <div className="flex justify-between items-center gap-4 lg:hidden mt-10 mb-12">
+              <div className="flex gap-4">
+                <Button variant="outline" size="lg" className="h-16 w-16 p-0 rounded-full border-2 bg-white/60 shadow-xl" onClick={handlePrevious} disabled={currentQuestionIndex === 0}><ChevronLeft className="h-6 w-6" /></Button>
+                <Button variant="outline" size="lg" className="h-16 w-16 p-0 rounded-full border-2 bg-white/60 shadow-xl" onClick={handleNext} disabled={currentQuestionIndex === questions.length - 1}><ChevronRight className="h-6 w-6" /></Button>
               </div>
-              <Button variant="destructive" size="lg" className="h-14 px-8 font-bold" onClick={() => setConfirmSubmitOpen(true)}>Nộp bài</Button>
+              <Button size="lg" className="h-16 px-10 rounded-full font-black text-base tracking-widest shadow-2xl bg-rose-500 text-white hover:bg-rose-600 active:scale-95 transition-all" onClick={() => setConfirmSubmitOpen(true)}>NỘP BÀI</Button>
             </div>
           </div>
 
           <div className="hidden lg:block lg:col-span-4 sticky top-[160px]">
-            <Card className="border-none shadow-md">
-              <CardHeader className="pb-3 px-5">
-                <CardTitle className="text-sm uppercase tracking-wider text-muted-foreground flex justify-between items-center">
-                  <span>Mục lục</span>
-                  <span className="text-xs">{answers.filter(a => a.selectedAnswerId !== null).length}/{questions.length}</span>
+            <Card className="border-none shadow-3xl shadow-slate-200/50 rounded-[3rem] bg-white/80 backdrop-blur-xl border-2 border-white/60 overflow-hidden">
+              <CardHeader className="pb-4 px-8 pt-8 border-b border-slate-100">
+                <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex justify-between items-center">
+                  <span>DANH SÁCH CÂU HỎI</span>
+                  <span className="text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">{answers.filter(a => a.selectedAnswerId !== null).length}/{questions.length}</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="px-5 pb-5">
-                <div className="grid grid-cols-5 gap-2">
+              <CardContent className="p-8">
+                <div className="grid grid-cols-5 gap-3">
                   {questions.map((_, index) => {
                     const isAnswered = answers[index]?.selectedAnswerId !== null;
                     const isCurrent = currentQuestionIndex === index;
@@ -418,7 +430,12 @@ const ExamTestPage: React.FC = () => {
                       <Button
                         key={index}
                         variant={isCurrent ? 'default' : isAnswered ? 'secondary' : 'outline'}
-                        className={`h-10 w-full p-0 font-medium ${isAnswered && !isCurrent ? 'bg-primary/10 text-primary border-primary/20' : ''}`}
+                        className={`h-11 w-full p-0 font-black rounded-2xl transition-all duration-300 ${isCurrent
+                          ? 'bg-slate-900 text-white shadow-xl scale-110'
+                          : isAnswered
+                            ? 'bg-emerald-500 text-white border-none shadow-lg'
+                            : 'bg-white text-slate-400 border-2 border-slate-100 hover:border-indigo-200 hover:text-indigo-600'
+                          }`}
                         onClick={() => { setCurrentQuestionIndex(index); setAudioProgress(0); setIsPlaying(false); }}
                       >
                         {index + 1}
@@ -426,13 +443,13 @@ const ExamTestPage: React.FC = () => {
                     );
                   })}
                 </div>
-                <div className="mt-6 space-y-3">
-                  <div className="grid grid-cols-2 gap-3">
-                    <Button variant="outline" onClick={handlePrevious} disabled={currentQuestionIndex === 0}>Trước</Button>
-                    <Button variant="outline" onClick={handleNext} disabled={currentQuestionIndex === questions.length - 1}>Tiếp</Button>
+                <div className="mt-10 space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <Button variant="ghost" className="rounded-full font-black text-[10px] tracking-widest bg-slate-100 hover:bg-slate-200" onClick={handlePrevious} disabled={currentQuestionIndex === 0}>TRƯỚC</Button>
+                    <Button variant="ghost" className="rounded-full font-black text-[10px] tracking-widest bg-slate-100 hover:bg-slate-200" onClick={handleNext} disabled={currentQuestionIndex === questions.length - 1}>TIẾP</Button>
                   </div>
-                  <Button variant="destructive" className="w-full text-base font-bold shadow-md h-12" onClick={() => setConfirmSubmitOpen(true)}>
-                    Nộp bài
+                  <Button className="w-full text-xs font-black tracking-[0.2em] shadow-2xl h-14 rounded-full bg-rose-500 hover:bg-rose-600 text-white transition-all transform hover:scale-[1.02] active:scale-95" onClick={() => setConfirmSubmitOpen(true)}>
+                    NỘP BÀI THI
                   </Button>
                 </div>
               </CardContent>
@@ -447,22 +464,22 @@ const ExamTestPage: React.FC = () => {
               <DialogTitle className="text-xl">Xác nhận nộp bài</DialogTitle>
               <DialogDescription>Bạn có chắc chắn muốn nộp bài?</DialogDescription>
             </DialogHeader>
-            <div className="py-4">
-              <div className="flex justify-between items-center mb-4 text-sm font-medium border-b pb-4">
-                <span className="text-muted-foreground">Thời gian còn lại:</span>
-                <span className="text-foreground text-lg">{formatTime(timeRemaining)}</span>
+            <div className="py-6">
+              <div className="flex justify-between items-center mb-6 text-base font-black border-b border-slate-100 pb-5">
+                <span className="text-slate-400 uppercase tracking-widest text-[10px]">Thời gian còn lại:</span>
+                <span className="text-rose-600 text-2xl font-mono">{formatTime(timeRemaining)}</span>
               </div>
               {getUnansweredCount() > 0 ? (
-                <Alert variant="destructive" className="bg-red-50 text-red-900 border-red-200">
-                  <AlertTriangle className="h-4 w-4" />
-                  <AlertTitle>Cảnh báo</AlertTitle>
-                  <AlertDescription>Bạn còn <span className="font-bold">{getUnansweredCount()}</span> câu chưa trả lời!</AlertDescription>
+                <Alert variant="destructive" className="bg-rose-600 text-white border-none rounded-[2rem] shadow-xl shadow-rose-500/20 py-6">
+                  <AlertTriangle className="h-6 w-6 text-white" />
+                  <AlertTitle className="font-black text-lg mb-1">CHƯA HOÀN THÀNH!</AlertTitle>
+                  <AlertDescription className="font-bold opacity-90">Bạn còn <span className="text-white underline decoration-rose-300 decoration-2 underline-offset-4 font-black">{getUnansweredCount()} câu</span> chưa trả lời. Bạn vẫn muốn nộp bài?</AlertDescription>
                 </Alert>
               ) : (
-                <Alert className="bg-green-50 text-green-900 border-green-200">
-                  <CheckCircle2 className="h-4 w-4" />
-                  <AlertTitle>Tuyệt vời</AlertTitle>
-                  <AlertDescription>Bạn đã trả lời tất cả các câu hỏi.</AlertDescription>
+                <Alert className="bg-emerald-500 text-white border-none rounded-[2rem] shadow-xl shadow-emerald-500/20 py-6">
+                  <CheckCircle2 className="h-6 w-6 text-white" />
+                  <AlertTitle className="font-black text-lg mb-1">TUYỆT VỜI!</AlertTitle>
+                  <AlertDescription className="font-bold opacity-90">Bạn đã hoàn thành tất cả các câu hỏi. Sẵn sàng nộp bài?</AlertDescription>
                 </Alert>
               )}
             </div>
@@ -474,18 +491,18 @@ const ExamTestPage: React.FC = () => {
         </Dialog>
 
         {/* Result */}
-        <Dialog open={resultDialogOpen} onOpenChange={() => {}}>
+        <Dialog open={resultDialogOpen} onOpenChange={() => { }}>
           <DialogContent className="sm:max-w-md text-center p-8 [&>button]:hidden">
             <DialogHeader>
               <DialogTitle className="text-2xl font-bold mb-2">Kết quả bài thi</DialogTitle>
               <DialogDescription className="text-base">Chủ đề: {testInfo?.testName}</DialogDescription>
             </DialogHeader>
-            <div className="py-8">
-              <div className={`text-7xl font-black tracking-tighter mb-4 ${(submitResult?.isPassed) ? 'text-green-500' : 'text-red-500'}`}>
+            <div className="py-6">
+              <div className={`text-5xl font-black tracking-tighter mb-4 ${(submitResult?.isPassed) ? 'text-emerald-400' : 'text-rose-400'}`}>
                 {submitResult?.score ?? 0}%
               </div>
-              <Badge className={`text-base px-6 py-2 shadow-sm ${submitResult?.isPassed ? 'bg-green-500' : 'bg-red-500'}`}>
-                {submitResult?.isPassed ? 'TRÚNG TUYỂN (ĐẠT)' : 'TRƯỢT (CHƯA ĐẠT)'}
+              <Badge className={`text-[10px] px-5 py-2 shadow-sm uppercase tracking-widest font-black ${submitResult?.isPassed ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-rose-50 text-rose-600 border-rose-100'}`}>
+                {submitResult?.isPassed ? 'HOÀN THÀNH (ĐẠT)' : 'CHƯA ĐẠT KẾT QUẢ'}
               </Badge>
               <div className="bg-muted/50 rounded-xl p-4 mt-8 text-sm">
                 <div className="flex justify-between items-center mb-2">

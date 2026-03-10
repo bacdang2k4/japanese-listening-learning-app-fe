@@ -236,48 +236,52 @@ const PracticeTestPage: React.FC = () => {
           />
         )}
 
-        <div className="mb-8 text-center animate-in fade-in slide-in-from-top-4">
-          <Badge variant="outline" className="mb-4 bg-primary/5 text-primary border-primary/20 px-4 py-1 text-sm font-medium">
-            Chế độ luyện tập
+        <div className="mb-10 text-center animate-in fade-in slide-in-from-top-4">
+          <Badge className="mb-4 bg-sky-50 text-sky-600 border-sky-100 px-5 py-2 rounded-full font-black text-[9px] uppercase tracking-widest shadow-sm">
+            CHẾ ĐỘ LUYỆN TẬP
           </Badge>
-          <h1 className="text-3xl font-bold tracking-tight mb-2">{testInfo?.testName || 'Luyện nghe'}</h1>
-          <p className="text-muted-foreground font-medium">Câu {currentQuestionIndex + 1} / {questions.length}</p>
-          <Progress value={((currentQuestionIndex + 1) / questions.length) * 100} className="h-2 w-full max-w-md mx-auto mt-6" />
+          <h1 className="text-4xl font-black tracking-tighter text-slate-700 mb-3">{testInfo?.testName || 'Luyện nghe'}</h1>
+          <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mb-6">Câu {currentQuestionIndex + 1} / {questions.length}</p>
+          <Progress value={((currentQuestionIndex + 1) / questions.length) * 100} className="h-2 w-full max-w-sm mx-auto bg-slate-100 rounded-full overflow-hidden shadow-inner" />
         </div>
 
         {testInfo?.audioUrl && (
-          <Card className="mb-6 bg-primary text-primary-foreground border-none shadow-xl animate-in zoom-in-95 duration-500">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-2 mb-4 opacity-90">
-                <Volume2 className="h-5 w-5" />
-                <span className="font-semibold tracking-wide">PHẦN NGHE</span>
+          <Card className="mb-8 bg-gradient-to-br from-sky-400 via-sky-500 to-indigo-500 text-white border-none shadow-3xl shadow-sky-400/20 animate-in zoom-in-95 duration-700 rounded-[3.5rem] overflow-hidden relative group">
+            <div className="absolute top-[-20%] right-[-10%] w-64 h-64 bg-white/20 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-1000" />
+            <CardContent className="p-8 relative z-10">
+              <div className="flex items-center gap-3 mb-4 opacity-90">
+                <div className="w-8 h-8 bg-white/20 rounded-[1.2rem] flex items-center justify-center shadow-inner">
+                  <Volume2 className="h-5 w-5" />
+                </div>
+                <span className="font-black text-[10px] uppercase tracking-[0.2em]">PHẦN NGHE</span>
               </div>
-              <div className="flex items-center gap-4 bg-primary-foreground/10 p-4 rounded-xl backdrop-blur-sm">
-                <Button variant="secondary" size="icon" className="h-12 w-12 rounded-full shrink-0 shadow-sm" onClick={handlePlayAudio}>
-                  {isPlaying ? <Pause className="h-6 w-6 text-primary" /> : <Play className="h-6 w-6 text-primary ml-1" />}
+              <div className="flex items-center gap-4 bg-white/15 p-4 rounded-[2.5rem] backdrop-blur-xl border border-white/10 shadow-2xl">
+                <Button variant="secondary" size="icon" className="h-12 w-12 rounded-full shrink-0 shadow-2xl bg-white text-indigo-500 hover:bg-white hover:scale-110 active:scale-90 transition-all" onClick={handlePlayAudio}>
+                  {isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6 ml-0.5" />}
                 </Button>
-                <Button variant="ghost" size="icon" className="h-10 w-10 text-primary-foreground hover:bg-primary-foreground/20 rounded-full shrink-0" onClick={handleReplayAudio}>
+                <Button variant="ghost" size="icon" className="h-10 w-10 text-white hover:bg-white/20 rounded-full shrink-0 transition-transform active:rotate-[-45deg]" onClick={handleReplayAudio}>
                   <RotateCcw className="h-5 w-5" />
                 </Button>
                 <div className="flex-grow mx-2">
                   <Slider value={[audioDuration ? (audioProgress / audioDuration) * 100 : 0]} max={100} step={1} className="w-full" />
                 </div>
-                <div className="text-sm font-medium font-mono min-w-[60px] text-right">
+                <div className="text-xs font-black font-mono min-w-[60px] text-right opacity-80 text-white/90">
                   {Math.floor(audioProgress)}s/{Math.floor(audioDuration)}s
                 </div>
               </div>
-              <p className="text-primary-foreground/70 text-sm mt-4 text-center">
+              <p className="text-white/60 text-[9px] font-black uppercase tracking-[0.15em] mt-6 text-center bg-white/5 py-2 rounded-full border border-white/5">
                 Bạn có thể nghe lại nhiều lần trong chế độ luyện tập
               </p>
             </CardContent>
           </Card>
         )}
 
-        <div className="animate-in slide-in-from-bottom-8 duration-700">
-          <Card className="mb-6 border-none shadow-lg">
-            <CardContent className="p-6 md:p-8">
-              <h2 className="text-xl font-bold mb-6 text-foreground leading-relaxed">
-                {currentQuestionIndex + 1}. {currentQuestion?.content}
+        <div className="animate-in slide-in-from-bottom-8 duration-800">
+          <Card className="mb-6 border-none shadow-3xl shadow-slate-200/50 rounded-[3.5rem] bg-white/90 backdrop-blur-2xl overflow-hidden ring-1 ring-black/5">
+            <CardContent className="p-8 md:p-10">
+              <h2 className="text-xl font-black mb-8 text-slate-800 leading-tight tracking-tight">
+                <span className="text-indigo-500 mr-3 font-black bg-indigo-50 px-4 py-1.5 rounded-[1.2rem] shadow-inner inline-block mb-3">{currentQuestionIndex + 1}</span>
+                {currentQuestion?.content}
               </h2>
               <div className="space-y-3">
                 {currentQuestion?.answers.map(option => {
@@ -285,21 +289,21 @@ const PracticeTestPage: React.FC = () => {
                   const isCorrect = option.isCorrect === true;
                   const showStatus = showExplanation && (isSelected || isCorrect);
 
-                  let cls = 'relative flex items-center p-4 rounded-xl border-2 transition-all duration-200 cursor-pointer ';
+                  let cls = 'relative flex items-center p-5 rounded-[2rem] border-2 transition-all duration-300 cursor-pointer shadow-sm hover:shadow-md ';
                   if (showStatus) {
-                    cls += isCorrect ? 'border-green-500 bg-green-500/10' : isSelected ? 'border-red-500 bg-red-500/10' : '';
+                    cls += isCorrect ? 'border-emerald-400 bg-emerald-50 text-white' : isSelected ? 'border-rose-400 bg-rose-50 text-rose-700' : 'border-slate-100 bg-slate-50 opacity-60';
                   } else {
-                    cls += isSelected ? 'border-primary bg-primary/5' : 'border-muted bg-background hover:border-primary/50 hover:bg-muted/50';
+                    cls += isSelected ? 'border-indigo-500 bg-indigo-50 shadow-indigo-100/50' : 'border-slate-50 bg-white/70 hover:border-indigo-200 hover:bg-white';
                   }
 
                   return (
                     <div key={option.answerId} className={cls} onClick={() => handleAnswerSelect(option.answerId)}>
-                      <div className="flex-grow flex items-center pr-8">
-                        <span className="font-medium text-lg text-foreground">{option.content}</span>
+                      <div className="flex-grow flex items-center pr-10">
+                        <span className={`font-black text-base ${showStatus && isCorrect ? 'text-white' : 'text-slate-700'}`}>{option.content}</span>
                       </div>
-                      <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                        {showStatus && isCorrect && <CheckCircle2 className="h-6 w-6 text-green-500 animate-in zoom-in" />}
-                        {showStatus && isSelected && !isCorrect && <XCircle className="h-6 w-6 text-red-500 animate-in zoom-in" />}
+                      <div className="absolute right-6 top-1/2 -translate-y-1/2">
+                        {showStatus && isCorrect && <CheckCircle2 className="h-8 w-8 text-emerald-500 animate-in zoom-in" />}
+                        {showStatus && isSelected && !isCorrect && <XCircle className="h-8 w-8 text-rose-500 animate-in zoom-in" />}
                       </div>
                     </div>
                   );
@@ -309,13 +313,13 @@ const PracticeTestPage: React.FC = () => {
           </Card>
         </div>
 
-        <div className="flex justify-between items-center animate-in fade-in">
-          <Button variant="outline" size="lg" className="h-14 px-6 rounded-xl" onClick={handlePrevious} disabled={currentQuestionIndex === 0}>
-            <ChevronLeft className="mr-2 h-5 w-5" /> Câu trước
+        <div className="flex justify-between items-center animate-in fade-in duration-1000">
+          <Button variant="outline" size="lg" className="h-14 px-6 rounded-full font-black text-[9px] tracking-[0.2em] border-2 bg-white/60 hover:bg-white" onClick={handlePrevious} disabled={currentQuestionIndex === 0}>
+            <ChevronLeft className="mr-2 h-4 w-4" /> CÂU TRƯỚC
           </Button>
-          <Button size="lg" className="h-14 px-8 rounded-xl font-bold shadow-md" onClick={handleNext} disabled={!isAnswered}>
-            {currentQuestionIndex === questions.length - 1 ? 'Hoàn thành' : 'Câu tiếp'}
-            {currentQuestionIndex !== questions.length - 1 && <ChevronRight className="ml-2 h-5 w-5" />}
+          <Button size="lg" className="h-14 px-8 rounded-full font-black text-sm tracking-widest shadow-2xl bg-slate-900 text-white hover:scale-105 active:scale-95 transition-all" onClick={handleNext} disabled={!isAnswered}>
+            {currentQuestionIndex === questions.length - 1 ? 'HOÀN THÀNH' : 'CÂU TIẾP'}
+            {currentQuestionIndex !== questions.length - 1 && <ChevronRight className="ml-2 h-4 w-4" />}
           </Button>
         </div>
 
@@ -328,17 +332,17 @@ const PracticeTestPage: React.FC = () => {
               </DialogDescription>
             </DialogHeader>
             <div className="py-8">
-              <div className={`text-7xl font-black tracking-tighter mb-4 ${calculateScore() >= 60 ? 'text-green-500' : 'text-red-500'}`}>
+              <div className={`text-7xl font-black tracking-tighter mb-4 ${calculateScore() >= 60 ? 'text-emerald-500' : 'text-rose-600'}`}>
                 {calculateScore()}%
               </div>
-              <div className="text-lg font-medium text-muted-foreground mb-6">
+              <div className="text-lg font-black text-slate-800 mb-6">
                 {getCorrectCount()}/{questions.length} câu đúng
               </div>
-              <Badge className={`text-base px-4 py-1.5 ${calculateScore() >= 60 ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600'}`}>
-                {calculateScore() >= 60 ? 'Đạt yêu cầu' : 'Chưa đạt'}
+              <Badge className={`text-base px-6 py-2 rounded-full font-black border-none shadow-lg ${calculateScore() >= 60 ? 'bg-emerald-500 text-white shadow-emerald-500/20' : 'bg-rose-600 text-white shadow-rose-500/20'}`}>
+                {calculateScore() >= 60 ? 'ĐẠT YÊU CẦU' : 'CHƯA ĐẠT'}
               </Badge>
-              <p className="text-sm text-muted-foreground mt-8">
-                Đây là chế độ luyện tập, kết quả sẽ không ảnh hưởng đến tiến độ.
+              <p className="text-xs font-bold text-slate-400 mt-10 uppercase tracking-widest leading-relaxed">
+                Đây là chế độ luyện tập,<br />kết quả không ảnh hưởng đến tiến độ.
               </p>
             </div>
             <DialogFooter className="flex-col sm:flex-row gap-3">

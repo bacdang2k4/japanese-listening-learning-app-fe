@@ -53,7 +53,7 @@ const LoginPage: React.FC = () => {
           role: result.data.role,
         }));
 
-        navigate('/learn');
+        navigate('/');
       } else {
         const result = await authApi.adminLogin({
           username: formData.username,

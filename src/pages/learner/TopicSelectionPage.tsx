@@ -54,109 +54,147 @@ const TopicSelectionPage: React.FC = () => {
     return Math.min(Math.round((tp.passedTestCount / Math.max(tp.testCount, 1)) * 100), 99);
   };
 
+  const getLevelColor = (name: string) => {
+    const n = name.toUpperCase();
+    if (n.includes('N5')) return { primary: '#10b981', bg: 'bg-emerald-50', text: 'text-emerald-600' };
+    if (n.includes('N4')) return { primary: '#0ea5e9', bg: 'bg-sky-50', text: 'text-sky-600' };
+    if (n.includes('N3')) return { primary: '#f59e0b', bg: 'bg-amber-50', text: 'text-amber-600' };
+    if (n.includes('N2')) return { primary: '#f97316', bg: 'bg-orange-50', text: 'text-orange-600' };
+    if (n.includes('N1')) return { primary: '#f43f5e', bg: 'bg-rose-50', text: 'text-rose-600' };
+    return { primary: '#6366f1', bg: 'bg-indigo-50', text: 'text-indigo-600' };
+  };
+
   if (loading) {
     return (
       <LearnerLayout>
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <div className="flex items-center justify-center py-32">
+          <Loader2 className="h-10 w-10 animate-spin text-slate-300" />
         </div>
       </LearnerLayout>
     );
   }
 
+  const colors = getLevelColor(levelName);
+
   return (
     <LearnerLayout>
       <div className="max-w-6xl mx-auto py-8">
-        <nav className="flex items-center text-sm font-medium text-muted-foreground mb-8">
-          <Link to="/learn" className="hover:text-primary transition-colors">
-            Cấp độ
-          </Link>
-          <ChevronRight className="h-4 w-4 mx-2" />
-          <span className="text-foreground">{levelName}</span>
+        <nav className="flex items-center text-xs font-bold text-slate-400 mb-8 px-4 uppercase tracking-widest">
+          <Link to="/learn" className="hover:text-slate-800 transition-colors">Cấp độ</Link>
+          <ChevronRight className="h-3 w-3 mx-2 opacity-50" />
+          <span className="text-slate-800">{levelName}</span>
         </nav>
 
-        <div className="text-center mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <div className="inline-flex h-20 w-20 items-center justify-center rounded-3xl bg-primary/10 text-primary mb-6 shadow-sm">
-            <BookOpen className="h-10 w-10" />
+        <div className="max-w-6xl mx-auto py-12 px-4 text-center">
+          <div className="inline-flex h-16 w-16 items-center justify-center rounded-[2rem] bg-slate-100 text-slate-600 mb-6 shadow-sm border-2 border-white">
+            <BookOpen className="h-8 w-8" />
           </div>
-          <h1 className="text-4xl font-bold tracking-tight mb-4 text-foreground">
-            Chọn chủ đề - <span className="text-primary">{levelName}</span>
+          <h1 className="text-4xl lg:text-6xl font-black tracking-tighter mb-4 text-slate-800 uppercase">
+            {levelName}
           </h1>
+          <p className="text-lg text-slate-500 max-w-xl mx-auto font-bold opacity-80">
+            Hãy chọn chủ đề bạn muốn rèn luyện hôm nay.
+          </p>
         </div>
 
         {topics.length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground">
-            Chưa có chủ đề nào trong cấp độ này.
+          <div className="text-center py-20 bg-white/50 backdrop-blur-xl rounded-[1.5rem] border border-dashed border-slate-200 mx-4">
+            <p className="text-slate-400 font-bold">Chưa có chủ đề nào trong cấp độ này.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-4 pb-20">
             {topics.map((topic, index) => {
               const tp = getTopicProgress(topic.id);
               const pct = computeTopicPct(tp);
               const isCompleted = tp?.status === 'PASS';
 
+              // Varied cute palettes for diversity
+              const palettes = [
+                { primary: '#6366f1', shadow: 'shadow-indigo-500/20', bg: 'bg-indigo-50/50' },
+                { primary: '#0ea5e9', shadow: 'shadow-sky-500/20', bg: 'bg-sky-50/50' },
+                { primary: '#f43f5e', shadow: 'shadow-rose-500/20', bg: 'bg-rose-50/50' },
+                { primary: '#10b981', shadow: 'shadow-emerald-500/20', bg: 'bg-emerald-50/50' },
+                { primary: '#f59e0b', shadow: 'shadow-amber-500/20', bg: 'bg-amber-50/50' },
+                { primary: '#8b5cf6', shadow: 'shadow-violet-500/20', bg: 'bg-violet-50/50' },
+              ];
+              const p = palettes[index % palettes.length];
+
               return (
                 <div
                   key={topic.id}
-                  className="animate-in fade-in slide-in-from-bottom-8 duration-700"
+                  className="animate-in fade-in slide-in-from-bottom-8 duration-600"
                   style={{ animationFillMode: 'both', animationDelay: `${(index + 1) * 100}ms` }}
                 >
-                  <Card className="h-full border-none shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-2 bg-background/80 flex flex-col">
-                    <CardContent className="p-6 flex flex-col h-full">
-                      <div className="flex justify-between items-start mb-4">
-                        <div>
-                          <Badge variant="outline" className="mb-2 text-primary border-primary/30 bg-primary/5">
-                            Chủ đề {index + 1}
-                          </Badge>
-                          <h3 className="text-2xl font-bold tracking-tight line-clamp-1">{topic.topicName}</h3>
+                  <Card className="group h-full border border-slate-100/30 transition-all duration-300 rounded-[3rem] shadow-xl hover:-translate-y-1 hover:shadow-2xl bg-white/95 backdrop-blur-xl flex flex-col relative overflow-hidden">
+                    <CardContent className="p-6 flex flex-col h-full relative z-10">
+                      <div className="flex justify-between items-start mb-6">
+                        <div className="space-y-1">
+                          <div className="h-1 w-8 rounded-full mb-2.5" style={{ backgroundColor: p.primary }} />
+                          <h3 className="text-2xl font-black tracking-tight text-slate-800 leading-tight">
+                            {topic.topicName}
+                          </h3>
                         </div>
-                        {isCompleted && (
-                          <div className="bg-green-500/10 text-green-500 rounded-full p-1 animate-in zoom-in">
-                            <CheckCircle2 className="h-6 w-6" />
+                        {isCompleted ? (
+                          <div className="bg-emerald-500 text-white rounded-[1.2rem] p-2.5 shadow-lg shadow-emerald-500/20">
+                            <CheckCircle2 className="h-5 w-5" />
+                          </div>
+                        ) : (
+                          <div className="w-10 h-10 rounded-[1.2rem] bg-slate-50 flex items-center justify-center text-slate-300 group-hover:bg-slate-100 transition-colors">
+                            <div className="text-[10px] font-black" style={{ color: p.primary }}>#{index + 1}</div>
                           </div>
                         )}
                       </div>
 
-                      <div className="space-y-2 mb-6">
-                        <div className="flex justify-between items-center text-sm">
-                          <span className="text-muted-foreground font-medium">Tiến độ học</span>
-                          <span className={`font-bold ${isCompleted ? 'text-green-500' : 'text-primary'}`}>
+                      <div className="space-y-3 mb-8">
+                        <div className="flex justify-between items-end">
+                          <span className="text-slate-400 font-bold uppercase tracking-widest text-[8px]">Tiến độ</span>
+                          <span className="font-black text-xl" style={{ color: isCompleted ? '#10b981' : p.primary }}>
                             {pct}%
                           </span>
                         </div>
-                        <Progress value={pct} className="h-2" />
+                        <div className="h-2 w-full bg-slate-100/50 rounded-full overflow-hidden shadow-inner p-0.5 border border-slate-100">
+                          <div
+                            className="h-full transition-all duration-1000 ease-out rounded-full shadow-sm"
+                            style={{
+                              width: `${pct}%`,
+                              backgroundColor: isCompleted ? '#10b981' : p.primary
+                            }}
+                          />
+                        </div>
                       </div>
 
-                      <div className="flex flex-wrap gap-2 mb-6">
+                      <div className="flex flex-wrap gap-2 mb-8 pt-4 border-t border-slate-50">
                         {tp && (
-                          <Badge variant="secondary" className="font-normal text-xs bg-muted">
-                            <PenTool className="w-3 h-3 mr-1" /> {tp.testCount} bài test
-                          </Badge>
+                          <div className={`flex items-center px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-widest ${p.bg}`}>
+                            <PenTool className="w-3.5 h-3.5 mr-2 opacity-50" style={{ color: p.primary }} />
+                            <span style={{ color: p.primary }}>{tp.testCount} bài test</span>
+                          </div>
                         )}
                       </div>
 
                       <div className="mt-auto space-y-3">
                         <Button
-                          className="w-full h-11 group"
+                          className="w-full h-12 rounded-[1.2rem] text-xs font-black uppercase tracking-widest shadow-lg transition-all hover:scale-[1.02] active:scale-95"
+                          style={{ backgroundColor: p.primary, boxShadow: `0 8px 20px -6px ${p.primary}60` }}
                           onClick={() => navigate(`/learn/topic/${topic.id}`)}
                         >
-                          <Play className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
-                          Học từ vựng
+                          <Play className="w-4 h-4 mr-2 fill-white" />
+                          Học kiến thức
                         </Button>
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-2 gap-3">
                           <Button
                             variant="outline"
                             onClick={() => navigate(`/learn/topic/${topic.id}/practice`)}
-                            className="font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                            className="h-11 rounded-[1.2rem] border-slate-100 bg-white/50 hover:bg-white text-[9px] font-black uppercase tracking-widest text-slate-600 transition-all shadow-sm"
                           >
                             Luyện tập
                           </Button>
                           <Button
                             variant="secondary"
                             onClick={() => navigate(`/learn/topic/${topic.id}/exam`)}
-                            className="font-medium bg-secondary/80 hover:bg-secondary text-secondary-foreground"
+                            className="h-11 rounded-[1.2rem] bg-slate-100 hover:bg-slate-200 text-[9px] font-black uppercase tracking-widest text-slate-600 transition-all shadow-sm border border-slate-200/50"
                           >
-                            <Focus className="w-4 h-4 mr-1.5" />
+                            <Focus className="w-3.5 h-3.5 mr-1.5" />
                             Thi thật
                           </Button>
                         </div>

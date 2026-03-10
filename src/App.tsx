@@ -1,6 +1,7 @@
 import { ThemeProvider, CssBaseline } from '@mui/material';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import theme from './theme/theme';
+import { Footer } from './components/layout/Footer';
 
 // Admin pages
 import Dashboard from './pages/Dashboard';
@@ -35,40 +36,45 @@ const App = () => (
   <ThemeProvider theme={theme}>
     <CssBaseline />
     <BrowserRouter>
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+      <div className="min-h-screen flex flex-col">
+        <div className="flex-1">
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
 
-        {/* Admin Login redirects to unified login */}
-        <Route path="/admin/login" element={<Navigate to="/login" replace />} />
+            {/* Admin Login redirects to unified login */}
+            <Route path="/admin/login" element={<Navigate to="/login" replace />} />
 
-        {/* Admin Routes (protected) */}
-        <Route path="/admin">
-          <Route index element={<AdminRouteGuard><Dashboard /></AdminRouteGuard>} />
-          <Route path="levels" element={<AdminRouteGuard><LevelsPage /></AdminRouteGuard>} />
-          <Route path="topics" element={<AdminRouteGuard><TopicsPage /></AdminRouteGuard>} />
-          <Route path="vocabularies" element={<AdminRouteGuard><VocabulariesPage /></AdminRouteGuard>} />
-          <Route path="vocab-banks" element={<AdminRouteGuard><VocabBanksPage /></AdminRouteGuard>} />
-          <Route path="audio-tests" element={<AdminRouteGuard><AudioTestsPage /></AdminRouteGuard>} />
-          <Route path="learners" element={<AdminRouteGuard><LearnersPage /></AdminRouteGuard>} />
-          <Route path="profiles" element={<AdminRouteGuard><ProfilesPage /></AdminRouteGuard>} />
-          <Route path="test-results" element={<AdminRouteGuard><TestResultsPage /></AdminRouteGuard>} />
-        </Route>
+            {/* Admin Routes (protected) */}
+            <Route path="/admin">
+              <Route index element={<AdminRouteGuard><Dashboard /></AdminRouteGuard>} />
+              <Route path="levels" element={<AdminRouteGuard><LevelsPage /></AdminRouteGuard>} />
+              <Route path="topics" element={<AdminRouteGuard><TopicsPage /></AdminRouteGuard>} />
+              <Route path="vocabularies" element={<AdminRouteGuard><VocabulariesPage /></AdminRouteGuard>} />
+              <Route path="vocab-banks" element={<AdminRouteGuard><VocabBanksPage /></AdminRouteGuard>} />
+              <Route path="audio-tests" element={<AdminRouteGuard><AudioTestsPage /></AdminRouteGuard>} />
+              <Route path="learners" element={<AdminRouteGuard><LearnersPage /></AdminRouteGuard>} />
+              <Route path="profiles" element={<AdminRouteGuard><ProfilesPage /></AdminRouteGuard>} />
+              <Route path="test-results" element={<AdminRouteGuard><TestResultsPage /></AdminRouteGuard>} />
+            </Route>
 
-        {/* Learner Routes (protected) */}
-        <Route path="/learn/profiles" element={<LearnerRouteGuard><ProfileManagementPage /></LearnerRouteGuard>} />
-        <Route path="/learn" element={<LearnerRouteGuard><LevelSelectionPage /></LearnerRouteGuard>} />
-        <Route path="/learn/level/:levelId/topics" element={<LearnerRouteGuard><TopicSelectionPage /></LearnerRouteGuard>} />
-        <Route path="/learn/topic/:topicId" element={<LearnerRouteGuard><VocabularyLearningPage /></LearnerRouteGuard>} />
-        <Route path="/learn/topic/:topicId/practice" element={<LearnerRouteGuard><PracticeTestPage /></LearnerRouteGuard>} />
-        <Route path="/learn/topic/:topicId/exam" element={<LearnerRouteGuard><ExamTestPage /></LearnerRouteGuard>} />
-        <Route path="/learn/profile" element={<LearnerRouteGuard><ProfilePage /></LearnerRouteGuard>} />
-        <Route path="/learn/history" element={<LearnerRouteGuard><TestHistoryPage /></LearnerRouteGuard>} />
+            {/* Learner Routes (protected) */}
+            <Route path="/learn/profiles" element={<LearnerRouteGuard><ProfileManagementPage /></LearnerRouteGuard>} />
+            <Route path="/learn" element={<LearnerRouteGuard><LevelSelectionPage /></LearnerRouteGuard>} />
+            <Route path="/learn/level/:levelId/topics" element={<LearnerRouteGuard><TopicSelectionPage /></LearnerRouteGuard>} />
+            <Route path="/learn/topic/:topicId" element={<LearnerRouteGuard><VocabularyLearningPage /></LearnerRouteGuard>} />
+            <Route path="/learn/topic/:topicId/practice" element={<LearnerRouteGuard><PracticeTestPage /></LearnerRouteGuard>} />
+            <Route path="/learn/topic/:topicId/exam" element={<LearnerRouteGuard><ExamTestPage /></LearnerRouteGuard>} />
+            <Route path="/learn/profile" element={<LearnerRouteGuard><ProfilePage /></LearnerRouteGuard>} />
+            <Route path="/learn/history" element={<LearnerRouteGuard><TestHistoryPage /></LearnerRouteGuard>} />
 
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </div>
+        <Footer />
+      </div>
     </BrowserRouter>
   </ThemeProvider>
 );
