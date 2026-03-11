@@ -67,7 +67,14 @@ const ProfilePage: React.FC = () => {
 
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [selectedLevelId, setSelectedLevelId] = useState('');
+  const [profileName, setProfileName] = useState('');
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
+  const createAvatarInputRef = useRef<HTMLInputElement>(null);
+  const [editingProfileId, setEditingProfileId] = useState<number | null>(null);
+  const [editProfileName, setEditProfileName] = useState('');
+  const [savingProfileName, setSavingProfileName] = useState(false);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -157,20 +164,79 @@ const ProfilePage: React.FC = () => {
     navigate('/learn');
   };
 
+  const handleCreateAvatarSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { setError('Kích thước ảnh không được vượt quá 5MB'); return; }
+    if (!file.type.startsWith('image/')) { setError('Chỉ chấp nhận file ảnh'); return; }
+    setError('');
+    setAvatarFile(file);
+    setAvatarPreview(URL.createObjectURL(file));
+  };
+
+  const handleRemoveCreateAvatar = () => {
+    setAvatarFile(null);
+    if (avatarPreview) URL.revokeObjectURL(avatarPreview);
+    setAvatarPreview(null);
+    if (createAvatarInputRef.current) createAvatarInputRef.current.value = '';
+  };
+
   const handleCreateProfile = async () => {
     if (!selectedLevelId) return;
     setCreating(true);
     setError('');
     try {
-      const res = await learnerApi.createProfile({ levelId: Number(selectedLevelId) });
-      setProfiles(prev => [...prev, res.data]);
+      const res = await learnerApi.createProfile({
+        levelId: Number(selectedLevelId),
+        name: profileName.trim() || undefined,
+      });
+      const profileId = res.data.profileId;
+      let finalProfile = res.data;
+      if (avatarFile) {
+        try {
+          const uploadRes = await learnerApi.uploadProfileAvatar(profileId, avatarFile);
+          finalProfile = { ...res.data, avatarUrl: uploadRes.data?.avatarUrl ?? res.data.avatarUrl };
+        } catch {
+          // Không chặn flow
+        }
+      }
+      setProfiles(prev => [...prev, finalProfile]);
       setCreateDialogOpen(false);
       setSelectedLevelId('');
+      setProfileName('');
+      handleRemoveCreateAvatar();
       showSuccess('Tạo hồ sơ học tập mới thành công!');
     } catch (err: any) {
       setError(err.message || 'Lỗi khi tạo profile');
     } finally {
       setCreating(false);
+    }
+  };
+
+  const startEditProfileName = (profile: ProfileResponse) => {
+    setEditingProfileId(profile.profileId);
+    setEditProfileName(profile.name || '');
+  };
+
+  const cancelEditProfileName = () => {
+    setEditingProfileId(null);
+    setEditProfileName('');
+  };
+
+  const handleSaveProfileName = async () => {
+    if (editingProfileId == null) return;
+    setSavingProfileName(true);
+    setError('');
+    try {
+      const res = await learnerApi.updateProfile(editingProfileId, { name: editProfileName.trim() || null });
+      setProfiles(prev => prev.map(p => p.profileId === editingProfileId ? res.data : p));
+      setEditingProfileId(null);
+      setEditProfileName('');
+      showSuccess('Cập nhật tên hồ sơ thành công!');
+    } catch (err: any) {
+      setError(err.message || 'Lỗi khi cập nhật tên');
+    } finally {
+      setSavingProfileName(false);
     }
   };
 
@@ -390,12 +456,50 @@ const ProfilePage: React.FC = () => {
                   >
                     <CardContent className="p-5">
                       <div className="flex items-start justify-between mb-3">
-                        <div>
+                        <div className="flex items-start gap-3">
+                          {profile.avatarUrl ? (
+                            <img src={profile.avatarUrl} alt="" className="w-12 h-12 rounded-full object-cover border-2 border-primary/20 shrink-0" />
+                          ) : (
+                            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                              <GraduationCap className="w-6 h-6 text-primary" />
+                            </div>
+                          )}
+                          <div>
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="text-xl font-bold text-primary">{profile.currentLevelName || 'N/A'}</span>
+                            <span className="text-xl font-bold text-primary">
+                              {profile.name || profile.currentLevelName || 'N/A'}
+                            </span>
                             {isActive && <Badge className="bg-primary text-xs px-1.5 py-0">Đang dùng</Badge>}
                           </div>
-                          <p className="text-xs text-muted-foreground">Hồ sơ #{profile.profileId}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {profile.name ? (profile.currentLevelName || 'N/A') : `Hồ sơ #${profile.profileId}`}
+                          </p>
+                          {editingProfileId === profile.profileId ? (
+                            <div className="flex gap-2 mt-2 flex-wrap">
+                              <Input
+                                value={editProfileName}
+                                onChange={(e) => setEditProfileName(e.target.value)}
+                                placeholder="Tên hồ sơ"
+                                className="h-9 text-sm flex-1 min-w-[120px]"
+                              />
+                              <Button size="sm" onClick={handleSaveProfileName} disabled={savingProfileName}>
+                                {savingProfileName ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Lưu'}
+                              </Button>
+                              <Button variant="ghost" size="sm" onClick={cancelEditProfileName} disabled={savingProfileName}>
+                                <X className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          ) : (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 px-1 text-xs text-muted-foreground hover:text-foreground -ml-1"
+                              onClick={() => startEditProfileName(profile)}
+                            >
+                              <Pencil className="w-3 h-3 mr-1" /> Đổi tên
+                            </Button>
+                          )}
+                          </div>
                         </div>
                         <Badge variant={profile.status === 'PASS' ? 'default' : 'secondary'}
                           className={profile.status === 'PASS' ? 'bg-green-500' : 'bg-blue-500/10 text-blue-600'}>
@@ -426,7 +530,13 @@ const ProfilePage: React.FC = () => {
         </div>
 
         {/* Create Profile Dialog */}
-        <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+        <Dialog open={createDialogOpen} onOpenChange={(open) => {
+          setCreateDialogOpen(open);
+          if (!open) {
+            setProfileName('');
+            handleRemoveCreateAvatar();
+          }
+        }}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle className="text-xl font-bold">Tạo hồ sơ học tập mới</DialogTitle>
@@ -434,20 +544,63 @@ const ProfilePage: React.FC = () => {
                 Chọn cấp độ bắt đầu. Bạn sẽ tiến lên các cấp độ tiếp theo khi hoàn thành.
               </DialogDescription>
             </DialogHeader>
-            <div className="py-4">
-              <Label className="mb-2 block">Cấp độ bắt đầu</Label>
-              <Select value={selectedLevelId} onValueChange={setSelectedLevelId}>
-                <SelectTrigger className="h-11">
-                  <SelectValue placeholder="Chọn cấp độ..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {levels.map(level => (
-                    <SelectItem key={level.id} value={String(level.id)}>
-                      {level.levelName}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="py-4 space-y-4">
+              <div className="space-y-2">
+                <Label>Ảnh đại diện (tùy chọn)</Label>
+                <div className="flex items-center gap-3">
+                  <div
+                    onClick={() => createAvatarInputRef.current?.click()}
+                    className="w-14 h-14 rounded-full border-2 border-dashed border-muted-foreground/30 flex items-center justify-center cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors shrink-0"
+                  >
+                    {avatarPreview ? (
+                      <img src={avatarPreview} alt="" className="w-full h-full rounded-full object-cover" />
+                    ) : (
+                      <Camera className="w-5 h-5 text-muted-foreground" />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <Button type="button" variant="outline" size="sm" onClick={() => createAvatarInputRef.current?.click()}>
+                      Chọn ảnh
+                    </Button>
+                    {avatarPreview && (
+                      <Button type="button" variant="ghost" size="sm" className="ml-2" onClick={handleRemoveCreateAvatar}>
+                        <X className="w-4 h-4" />
+                      </Button>
+                    )}
+                    <p className="text-xs text-muted-foreground mt-1">Bỏ qua nếu không muốn đặt</p>
+                  </div>
+                  <input
+                    ref={createAvatarInputRef}
+                    type="file"
+                    className="hidden"
+                    accept="image/png,image/jpeg,image/jpg,image/webp"
+                    onChange={handleCreateAvatarSelect}
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Tên hồ sơ (tùy chọn)</Label>
+                <Input
+                  placeholder="VD: Học N5, Ôn thi JLPT..."
+                  value={profileName}
+                  onChange={(e) => setProfileName(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Cấp độ bắt đầu</Label>
+                <Select value={selectedLevelId} onValueChange={setSelectedLevelId}>
+                  <SelectTrigger className="h-11">
+                    <SelectValue placeholder="Chọn cấp độ..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {levels.map(level => (
+                      <SelectItem key={level.id} value={String(level.id)}>
+                        {level.levelName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             <DialogFooter className="flex-col sm:flex-row gap-2">
               <Button variant="outline" className="w-full" onClick={() => setCreateDialogOpen(false)}>Hủy</Button>

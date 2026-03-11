@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Play, Loader2, GraduationCap, Calendar, CheckCircle2, BookOpen } from 'lucide-react';
+import { Plus, Play, Loader2, GraduationCap, Calendar, CheckCircle2, BookOpen, Camera, X } from 'lucide-react';
 import LearnerLayout from '../../components/learner/LearnerLayout';
 import { learnerApi, LevelResponse, ProfileResponse } from '@/services/api';
 import { useActiveProfile } from '@/hooks/useActiveProfile';
@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 import {
   Dialog,
   DialogContent,
@@ -33,7 +34,11 @@ const ProfileManagementPage: React.FC = () => {
   const [creating, setCreating] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [selectedLevelId, setSelectedLevelId] = useState<string>('');
+  const [profileName, setProfileName] = useState('');
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [error, setError] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -62,14 +67,44 @@ const ProfileManagementPage: React.FC = () => {
     navigate('/learn');
   };
 
+  const handleAvatarSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { setError('Kích thước ảnh không được vượt quá 5MB'); return; }
+    if (!file.type.startsWith('image/')) { setError('Chỉ chấp nhận file ảnh'); return; }
+    setError('');
+    setAvatarFile(file);
+    setAvatarPreview(URL.createObjectURL(file));
+  };
+
+  const handleRemoveAvatar = () => {
+    setAvatarFile(null);
+    if (avatarPreview) URL.revokeObjectURL(avatarPreview);
+    setAvatarPreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
   const handleCreateProfile = async () => {
     if (!selectedLevelId) return;
     setCreating(true);
     setError('');
     try {
-      const res = await learnerApi.createProfile({ levelId: Number(selectedLevelId) });
-      setProfileId(res.data.profileId);
+      const res = await learnerApi.createProfile({
+        levelId: Number(selectedLevelId),
+        name: profileName.trim() || undefined,
+      });
+      const profileId = res.data.profileId;
+      setProfileId(profileId);
+      if (avatarFile) {
+        try {
+          await learnerApi.uploadProfileAvatar(profileId, avatarFile);
+        } catch {
+          // Không chặn flow
+        }
+      }
       setCreateDialogOpen(false);
+      setProfileName('');
+      handleRemoveAvatar();
       navigate('/learn');
     } catch (err: any) {
       setError(err.message || 'Lỗi khi tạo profile');
@@ -146,9 +181,11 @@ const ProfileManagementPage: React.FC = () => {
                       )}
                       <div>
                         <h3 className="text-2xl font-bold text-primary mb-1">
-                          {profile.currentLevelName || 'N/A'}
+                          {profile.name || profile.currentLevelName || 'N/A'}
                         </h3>
-                        <p className="text-sm text-muted-foreground">Hồ sơ #{profile.profileId}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {profile.name ? (profile.currentLevelName || 'N/A') : `Hồ sơ #${profile.profileId}`}
+                        </p>
                       </div>
                     </div>
                     {getStatusBadge(profile.status)}
@@ -192,7 +229,13 @@ const ProfileManagementPage: React.FC = () => {
         </div>
 
         {/* Create Profile Dialog */}
-        <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+        <Dialog open={createDialogOpen} onOpenChange={(open) => {
+          setCreateDialogOpen(open);
+          if (!open) {
+            setProfileName('');
+            handleRemoveAvatar();
+          }
+        }}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle className="text-2xl font-bold">Tạo hồ sơ học tập</DialogTitle>
@@ -202,6 +245,48 @@ const ProfileManagementPage: React.FC = () => {
             </DialogHeader>
 
             <div className="py-4 space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Ảnh đại diện (tùy chọn)</label>
+                <div className="flex items-center gap-3">
+                  <div
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-14 h-14 rounded-full border-2 border-dashed border-muted-foreground/30 flex items-center justify-center cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors shrink-0"
+                  >
+                    {avatarPreview ? (
+                      <img src={avatarPreview} alt="" className="w-full h-full rounded-full object-cover" />
+                    ) : (
+                      <Camera className="w-5 h-5 text-muted-foreground" />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
+                      Chọn ảnh
+                    </Button>
+                    {avatarPreview && (
+                      <Button type="button" variant="ghost" size="sm" className="ml-2" onClick={handleRemoveAvatar}>
+                        <X className="w-4 h-4" />
+                      </Button>
+                    )}
+                    <p className="text-xs text-muted-foreground mt-1">Bỏ qua nếu không muốn đặt</p>
+                  </div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    className="hidden"
+                    accept="image/png,image/jpeg,image/jpg,image/webp"
+                    onChange={handleAvatarSelect}
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Tên hồ sơ (tùy chọn)</label>
+                <Input
+                  placeholder="VD: Học N5, Ôn thi JLPT..."
+                  className="h-12"
+                  value={profileName}
+                  onChange={(e) => setProfileName(e.target.value)}
+                />
+              </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium">Cấp độ bắt đầu</label>
                 <Select value={selectedLevelId} onValueChange={setSelectedLevelId}>

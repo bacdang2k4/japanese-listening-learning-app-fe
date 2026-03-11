@@ -374,6 +374,7 @@ export interface TestResultDetailResponse {
 
 export interface CreateProfileRequest {
     levelId: number;
+    name?: string | null;
 }
 
 export interface ProfileResponse {
@@ -383,6 +384,12 @@ export interface ProfileResponse {
     currentLevelName: string | null;
     currentLevelId: number | null;
     avatarUrl?: string | null;
+    name?: string | null;
+}
+
+export interface UpdateProfileRequest {
+    avatarUrl?: string | null;
+    name?: string | null;
 }
 
 export interface TopicProgressItem {
@@ -932,6 +939,27 @@ export const learnerApi = {
             method: 'GET',
             headers: getLearnerHeaders(),
         }),
+
+    updateProfile: (profileId: number, data: UpdateProfileRequest) =>
+        request<ProfileResponse>(`${API_BASE}/learners/me/profiles/${profileId}`, {
+            method: 'PATCH',
+            headers: getLearnerHeaders(),
+            body: JSON.stringify(data),
+        }),
+
+    uploadProfileAvatar: async (profileId: number, file: File) => {
+        const token = tokenStorage.getLearnerToken();
+        const formData = new FormData();
+        formData.append('file', file);
+        const res = await fetch(`${API_BASE}/learners/me/profiles/${profileId}/avatar`, {
+            method: 'POST',
+            headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+            body: formData,
+        });
+        const body = await res.json();
+        if (!res.ok) throw new Error(body.message || 'Upload failed');
+        return body as ApiResponse<{ avatarUrl: string }>;
+    },
 
     // Avatar
     uploadAvatar: async (file: File) => {

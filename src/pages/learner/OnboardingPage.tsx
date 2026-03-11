@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { GraduationCap, Loader2, BookOpen } from 'lucide-react';
+import { GraduationCap, Loader2, BookOpen, Camera, X } from 'lucide-react';
 import { learnerApi, LevelResponse } from '@/services/api';
 import { useActiveProfile } from '@/hooks/useActiveProfile';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
@@ -23,9 +24,13 @@ const OnboardingPage: React.FC = () => {
   const { setProfileId } = useActiveProfile();
   const [levels, setLevels] = useState<LevelResponse[]>([]);
   const [selectedLevelId, setSelectedLevelId] = useState<string>('');
+  const [profileName, setProfileName] = useState('');
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchLevels = useCallback(async () => {
     setLoading(true);
@@ -44,13 +49,47 @@ const OnboardingPage: React.FC = () => {
 
   useEffect(() => { fetchLevels(); }, [fetchLevels]);
 
+  const handleAvatarSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Kích thước ảnh không được vượt quá 5MB');
+      return;
+    }
+    if (!file.type.startsWith('image/')) {
+      setError('Chỉ chấp nhận file ảnh');
+      return;
+    }
+    setError('');
+    setAvatarFile(file);
+    setAvatarPreview(URL.createObjectURL(file));
+  };
+
+  const handleRemoveAvatar = () => {
+    setAvatarFile(null);
+    if (avatarPreview) URL.revokeObjectURL(avatarPreview);
+    setAvatarPreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
   const handleCreateProfile = async () => {
     if (!selectedLevelId) return;
     setCreating(true);
     setError('');
     try {
-      const res = await learnerApi.createProfile({ levelId: Number(selectedLevelId) });
-      setProfileId(res.data.profileId);
+      const res = await learnerApi.createProfile({
+        levelId: Number(selectedLevelId),
+        name: profileName.trim() || undefined,
+      });
+      const profileId = res.data.profileId;
+      setProfileId(profileId);
+      if (avatarFile) {
+        try {
+          await learnerApi.uploadProfileAvatar(profileId, avatarFile);
+        } catch {
+          // Không chặn flow nếu upload avatar lỗi
+        }
+      }
       navigate('/learn');
     } catch (err: any) {
       setError(err.message || 'Lỗi khi tạo hồ sơ');
@@ -92,6 +131,50 @@ const OnboardingPage: React.FC = () => {
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Ảnh đại diện (tùy chọn)</label>
+            <div className="flex items-center gap-3">
+              <div
+                onClick={() => fileInputRef.current?.click()}
+                className="w-16 h-16 rounded-full border-2 border-dashed border-muted-foreground/30 flex items-center justify-center cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors"
+              >
+                {avatarPreview ? (
+                  <img src={avatarPreview} alt="" className="w-full h-full rounded-full object-cover" />
+                ) : (
+                  <Camera className="w-6 h-6 text-muted-foreground" />
+                )}
+              </div>
+              <div className="flex-1">
+                <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
+                  Chọn ảnh
+                </Button>
+                {avatarPreview && (
+                  <Button type="button" variant="ghost" size="sm" className="ml-2" onClick={handleRemoveAvatar}>
+                    <X className="w-4 h-4" />
+                  </Button>
+                )}
+                <p className="text-xs text-muted-foreground mt-1">Bỏ qua nếu không muốn đặt</p>
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                className="hidden"
+                accept="image/png,image/jpeg,image/jpg,image/webp"
+                onChange={handleAvatarSelect}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Tên hồ sơ (tùy chọn)</label>
+            <Input
+              placeholder="VD: Học N5, Ôn thi JLPT..."
+              className="h-12"
+              value={profileName}
+              onChange={(e) => setProfileName(e.target.value)}
+            />
+          </div>
 
           <div className="space-y-2">
             <label className="text-sm font-medium">Chọn cấp độ bắt đầu</label>
