@@ -95,7 +95,7 @@ const ExamTestPage: React.FC = () => {
     if (!selectedTest || !profileId) return;
     setPhase('loading');
     try {
-      const startRes = await learnerApi.startTest(selectedTest.testId, { profileId, mode: 'EXAM' });
+      const startRes = await learnerApi.startTest(selectedTest.testId, { profileId });
       setTestInfo(startRes.data);
       setTimeRemaining((startRes.data.duration || 30 * 60));
 

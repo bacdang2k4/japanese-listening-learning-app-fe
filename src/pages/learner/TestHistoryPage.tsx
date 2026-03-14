@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { History, Search, Eye, CheckCircle2, XCircle, Filter, CalendarCheck, HelpCircle, BarChart3, Loader2 } from 'lucide-react';
+import { History, Search, Eye, CheckCircle2, XCircle, CalendarCheck, HelpCircle, BarChart3, Loader2 } from 'lucide-react';
 import LearnerLayout from '../../components/learner/LearnerLayout';
 import { learnerApi, TestHistoryResponse, TestResultDetailResponse, QuestionResultResponse } from '@/services/api';
 import { getActiveProfileId } from '@/hooks/useActiveProfile';
@@ -7,13 +7,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import {
   Table,
   TableBody,
@@ -34,7 +27,6 @@ const TestHistoryPage: React.FC = () => {
 
   const [results, setResults] = useState<TestHistoryResponse[]>([]);
   const [loading, setLoading] = useState(true);
-  const [modeFilter, setModeFilter] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -60,11 +52,9 @@ const TestHistoryPage: React.FC = () => {
 
   useEffect(() => { fetchHistory(); }, [fetchHistory]);
 
-  const filteredResults = results.filter(r => {
-    const matchesMode = modeFilter === 'all' || r.mode === modeFilter;
-    const matchesSearch = r.testName.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesMode && matchesSearch;
-  });
+  const filteredResults = results.filter(r =>
+    r.testName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleViewDetail = async (result: TestHistoryResponse) => {
     if (!profileId) return;
@@ -103,23 +93,12 @@ const TestHistoryPage: React.FC = () => {
         <Card className="mb-6 border-none shadow-elsa-sm rounded-2xl animate-in slide-in-from-bottom-4 duration-500">
           <CardContent className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
-              <div className="md:col-span-4 space-y-2">
+              <div className="md:col-span-7 space-y-2">
                 <label className="text-sm font-medium leading-none">Tìm kiếm</label>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input placeholder="Tên bài thi..." className="pl-9 h-11" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
                 </div>
-              </div>
-              <div className="md:col-span-3 space-y-2">
-                <label className="text-sm font-medium leading-none flex items-center gap-1.5"><Filter className="w-3.5 h-3.5" /> Chế độ</label>
-                <Select value={modeFilter} onValueChange={setModeFilter}>
-                  <SelectTrigger className="h-11"><SelectValue placeholder="Tất cả" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Tất cả</SelectItem>
-                    <SelectItem value="PRACTICE">Luyện tập</SelectItem>
-                    <SelectItem value="EXAM">Thi thật</SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
               <div className="md:col-span-5 pb-0.5">
                 <div className="flex flex-wrap gap-2 md:justify-end">
@@ -149,7 +128,6 @@ const TestHistoryPage: React.FC = () => {
                 <TableHeader className="bg-elsa-indigo-50/50">
                   <TableRow className="hover:bg-transparent border-elsa-indigo-100">
                     <TableHead className="font-bold">Tên bài thi</TableHead>
-                    <TableHead className="font-bold text-center">Chế độ</TableHead>
                     <TableHead className="font-bold text-center">Điểm</TableHead>
                     <TableHead className="font-bold text-center">Kết quả</TableHead>
                     <TableHead className="font-bold text-center">Thời gian</TableHead>
@@ -159,7 +137,7 @@ const TestHistoryPage: React.FC = () => {
                 <TableBody>
                   {filteredResults.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
+                      <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">
                         Không tìm thấy kết quả nào.
                       </TableCell>
                     </TableRow>
@@ -167,11 +145,6 @@ const TestHistoryPage: React.FC = () => {
                     filteredResults.map(result => (
                       <TableRow key={result.resultId} className="cursor-default hover:bg-elsa-indigo-50/30 transition-colors">
                         <TableCell className="font-medium">{result.testName}</TableCell>
-                        <TableCell className="text-center">
-                          <Badge variant="outline" className="font-medium text-blue-600 border-blue-200 bg-blue-50">
-                            Luyện tập
-                          </Badge>
-                        </TableCell>
                         <TableCell className="text-center">
                           <span className={`text-lg font-bold ${result.isPassed ? 'text-green-500' : 'text-red-500'}`}>{result.score}%</span>
                         </TableCell>

@@ -20,7 +20,6 @@ const TestResultsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterMode, setFilterMode] = useState<string>('');
   const [filterResult, setFilterResult] = useState<string>('');
   const [page] = useState(0);
 
@@ -32,7 +31,6 @@ const TestResultsPage: React.FC = () => {
       const result = await adminTestResultApi.getAll(
         page, 10,
         searchQuery || undefined,
-        filterMode || undefined,
         passed,
       );
       setResults(result.data.content);
@@ -41,7 +39,7 @@ const TestResultsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [page, searchQuery, filterMode, filterResult]);
+  }, [page, searchQuery, filterResult]);
 
   useEffect(() => { fetchResults(); }, [fetchResults]);
 
@@ -66,18 +64,6 @@ const TestResultsPage: React.FC = () => {
       ),
     },
     { id: 'testName', label: 'Bài test', minWidth: 180 },
-    {
-      id: 'mode',
-      label: 'Chế độ',
-      minWidth: 100,
-      format: (value: string) => (
-        <Chip
-          label={value === 'PRACTICE' ? 'Luyện tập' : 'Thi thật'}
-          size="small"
-          color={value === 'PRACTICE' ? 'default' : 'warning'}
-        />
-      ),
-    },
     {
       id: 'score',
       label: 'Điểm',
@@ -126,18 +112,6 @@ const TestResultsPage: React.FC = () => {
       )}
 
       <Box sx={{ mb: 3, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-        <FormControl size="small" sx={{ minWidth: 150 }}>
-          <InputLabel>Chế độ thi</InputLabel>
-          <Select
-            value={filterMode}
-            label="Chế độ thi"
-            onChange={(e) => setFilterMode(e.target.value)}
-          >
-            <MenuItem value="">Tất cả</MenuItem>
-            <MenuItem value="PRACTICE">Luyện tập</MenuItem>
-            <MenuItem value="EXAM">Thi thật</MenuItem>
-          </Select>
-        </FormControl>
         <FormControl size="small" sx={{ minWidth: 150 }}>
           <InputLabel>Kết quả</InputLabel>
           <Select

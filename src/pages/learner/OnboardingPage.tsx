@@ -28,22 +28,29 @@ const OnboardingPage: React.FC = () => {
   const [creating, setCreating] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const fetchLevels = useCallback(async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await learnerApi.getLevels();
-      setLevels(res.data);
-      if (res.data.length > 0 && !selectedLevelId) {
-        setSelectedLevelId(String(res.data[0].id));
+      const [profilesRes, levelsRes] = await Promise.all([
+        learnerApi.getMyProfiles(),
+        learnerApi.getLevels(),
+      ]);
+      if (profilesRes.data.length > 0) {
+        navigate('/learn/profiles', { replace: true });
+        return;
+      }
+      setLevels(levelsRes.data);
+      if (levelsRes.data.length > 0 && !selectedLevelId) {
+        setSelectedLevelId(String(levelsRes.data[0].id));
       }
     } catch (err: any) {
-      setError(err.message || 'Lỗi khi tải cấp độ');
+      setError(err.message || 'Lỗi khi tải dữ liệu');
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [navigate]);
 
-  useEffect(() => { fetchLevels(); }, [fetchLevels]);
+  useEffect(() => { fetchData(); }, [fetchData]);
 
   const handleAvatarSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

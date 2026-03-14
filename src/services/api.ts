@@ -245,7 +245,6 @@ export interface AdminTestResultResponse {
     testName: string;
     levelName: string | null;
     topicName: string | null;
-    mode: string;
     score: number;
     isPassed: boolean;
     totalTime: number;
@@ -289,7 +288,6 @@ export interface AiGenerationLogResponse {
 
 export interface StartTestRequest {
     profileId: number;
-    mode: string;
 }
 
 export interface StartTestResponse {
@@ -301,7 +299,6 @@ export interface StartTestResponse {
     duration: number | null;
     passCondition: number | null;
     totalQuestions: number | null;
-    mode: string;
     status: string;
     startedAt: string;
 }
@@ -347,7 +344,6 @@ export interface LearnerQuestionResponse {
 export interface TestHistoryResponse {
     resultId: number;
     testName: string;
-    mode: string;
     score: number;
     isPassed: boolean;
     createdAt: string;
@@ -801,10 +797,9 @@ export const adminProfileApi = {
 // ─── Admin Test Result API ────────────────────────────────────
 
 export const adminTestResultApi = {
-    getAll: (page = 0, size = 10, keyword?: string, mode?: string, passed?: boolean, sort = 'createdAt,desc') => {
+    getAll: (page = 0, size = 10, keyword?: string, passed?: boolean, sort = 'createdAt,desc') => {
         const params = new URLSearchParams({ page: String(page), size: String(size), sort });
         if (keyword) params.append('keyword', keyword);
-        if (mode) params.append('mode', mode);
         if (passed !== undefined) params.append('passed', String(passed));
         return request<PaginationResponse<AdminTestResultResponse>>(`${API_BASE}/admin/test-results?${params}`, {
             method: 'GET',

@@ -87,7 +87,7 @@ const PracticeTestPage: React.FC = () => {
     if (!profileId) return;
     setPhase('loading');
     try {
-      const startRes = await learnerApi.startTest(testId, { profileId, mode: 'PRACTICE' });
+      const startRes = await learnerApi.startTest(testId, { profileId });
       setTestInfo(startRes.data);
 
       const qRes = await learnerApi.getTestQuestions(testId, startRes.data.resultId);
