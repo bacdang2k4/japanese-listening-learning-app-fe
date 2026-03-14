@@ -8,6 +8,8 @@ import {
   User,
   SwitchCamera,
   Bell,
+  BookOpen,
+  History,
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { tokenStorage } from '@/services/api';
@@ -50,12 +52,17 @@ const LearnerLayout: React.FC<LearnerLayoutProps> = ({ children }) => {
 
   const navItems = [
     { text: 'Lộ trình', icon: School, path: '/learn' },
+    { text: 'Từ vựng', icon: BookOpen, path: '/learn/vocabulary' },
+    { text: 'Lịch sử', icon: History, path: '/learn/history' },
     { text: 'Tài khoản', icon: User, path: '/learn/profile' },
   ];
 
   const isNavActive = (path: string) => {
     if (path === '/learn') {
-      return currentPath === '/learn' || currentPath.startsWith('/learn/level') || currentPath.startsWith('/learn/topic');
+      return currentPath === '/learn' || currentPath.startsWith('/learn/level') || currentPath.startsWith('/learn/topic') && currentPath.includes('/practice');
+    }
+    if (path === '/learn/vocabulary') {
+      return currentPath === '/learn/vocabulary' || (currentPath.startsWith('/learn/topic') && !currentPath.includes('/practice'));
     }
     return currentPath === path || currentPath.startsWith(path + '/');
   };

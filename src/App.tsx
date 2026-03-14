@@ -25,9 +25,11 @@ import ProfileManagementPage from './pages/learner/ProfileManagementPage';
 import OnboardingPage from './pages/learner/OnboardingPage';
 import RoadmapPage from './pages/learner/RoadmapPage';
 import VocabularyLearningPage from './pages/learner/VocabularyLearningPage';
+import VocabularyPage from './pages/learner/VocabularyPage';
 import ProfilePage from './pages/learner/ProfilePage';
 import TestHistoryPage from './pages/learner/TestHistoryPage';
 import PracticeTestPage from './pages/learner/PracticeTestPage';
+import ExamTestPage from './pages/learner/ExamTestPage';
 import Home from './pages/learner/Home';
 
 const App = () => (
@@ -60,8 +62,10 @@ const App = () => (
         <Route path="/learn/onboarding" element={<LearnerRouteGuard><OnboardingPage /></LearnerRouteGuard>} />
         <Route path="/learn/profiles" element={<LearnerRouteGuard><ProfileManagementPage /></LearnerRouteGuard>} />
         <Route path="/learn" element={<LearnerRouteGuard><RoadmapPage /></LearnerRouteGuard>} />
+        <Route path="/learn/vocabulary" element={<LearnerRouteGuard><VocabularyPage /></LearnerRouteGuard>} />
         <Route path="/learn/topic/:topicId" element={<LearnerRouteGuard><VocabularyLearningPage /></LearnerRouteGuard>} />
         <Route path="/learn/topic/:topicId/practice" element={<LearnerRouteGuard><PracticeTestPage /></LearnerRouteGuard>} />
+        <Route path="/learn/topic/:topicId/exam" element={<LearnerRouteGuard><ExamTestPage /></LearnerRouteGuard>} />
         <Route path="/learn/profile" element={<LearnerRouteGuard><ProfilePage /></LearnerRouteGuard>} />
         <Route path="/learn/history" element={<LearnerRouteGuard><TestHistoryPage /></LearnerRouteGuard>} />
 

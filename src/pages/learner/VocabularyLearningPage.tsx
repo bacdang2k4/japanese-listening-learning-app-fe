@@ -8,8 +8,6 @@ import {
   EyeOff,
   CheckCircle2,
   Shuffle,
-  Play,
-  Focus,
   Loader2,
 } from 'lucide-react';
 import LearnerLayout from '../../components/learner/LearnerLayout';
@@ -106,9 +104,9 @@ const VocabularyLearningPage: React.FC = () => {
     <LearnerLayout>
       <div className="max-w-4xl mx-auto py-8">
         <nav className="flex items-center text-sm font-medium text-muted-foreground mb-8">
-          <Link to="/learn" className="hover:text-elsa-indigo-600 transition-colors">Cấp độ</Link>
+          <Link to="/learn/vocabulary" className="hover:text-elsa-indigo-600 transition-colors">Từ vựng</Link>
           <ChevronRight className="h-4 w-4 mx-2" />
-          <span className="text-foreground font-semibold">Từ vựng</span>
+          <span className="text-foreground font-semibold">Học từ vựng</span>
         </nav>
 
         <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 animate-in fade-in slide-in-from-top-4">
@@ -223,18 +221,10 @@ const VocabularyLearningPage: React.FC = () => {
           </Button>
         </div>
 
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4 border-t border-elsa-indigo-100 pt-8">
-          <Button variant="ghost" className="text-muted-foreground hover:text-elsa-indigo-600 hover:bg-elsa-indigo-50" onClick={handleShuffle}>
-            <Shuffle className="mr-2 h-4 w-4" /> Xáo trộn thứ tự
+        <div className="flex justify-center items-center border-t border-elsa-indigo-100 pt-8">
+          <Button variant="ghost" className="text-muted-foreground hover:text-elsa-indigo-600 hover:bg-elsa-indigo-50" onClick={() => navigate('/learn/vocabulary')}>
+            ← Quay lại danh sách chủ đề
           </Button>
-          <div className="flex gap-3">
-            <Button variant="outline" onClick={() => navigate(`/learn/topic/${topicId}/practice`)} className="font-medium h-11 rounded-xl border-elsa-indigo-200 hover:bg-elsa-indigo-50">
-              Luyện tập nghe
-            </Button>
-            <Button variant="secondary" onClick={() => navigate(`/learn/topic/${topicId}/exam`)} className="font-medium h-11 rounded-xl bg-elsa-indigo-50 text-elsa-indigo-600 hover:bg-elsa-indigo-100">
-              <Focus className="w-4 h-4 mr-2" /> Thi thật
-            </Button>
-          </div>
         </div>
       </div>
     </LearnerLayout>
