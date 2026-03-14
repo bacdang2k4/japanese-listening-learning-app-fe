@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { GraduationCap, Loader2, BookOpen, Camera, X } from 'lucide-react';
+import { GraduationCap, Loader2, BookOpen, Camera, X, Sparkles } from 'lucide-react';
 import { learnerApi, LevelResponse } from '@/services/api';
 import { useActiveProfile } from '@/hooks/useActiveProfile';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,10 +15,6 @@ import {
 } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
-/**
- * Onboarding cho learner chưa có profile.
- * Hiển thị onboarding và form tạo profile đầu tiên.
- */
 const OnboardingPage: React.FC = () => {
   const navigate = useNavigate();
   const { setProfileId } = useActiveProfile();
@@ -100,53 +96,59 @@ const OnboardingPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#F8F7FF] via-[#F3F1FF] to-[#EEF2FF]">
+        <Loader2 className="h-10 w-10 animate-spin text-elsa-indigo-500" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-primary/20 rounded-full blur-[120px] mix-blend-multiply opacity-70" />
-        <div className="absolute bottom-0 left-0 w-1/2 h-1/2 bg-secondary/20 rounded-full blur-[120px] mix-blend-multiply opacity-70" />
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-[#F8F7FF] via-[#F3F1FF] to-[#EEF2FF]">
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-elsa-indigo-300/15 rounded-full blur-[150px]" />
+        <div className="absolute bottom-0 left-0 w-1/2 h-1/2 bg-elsa-purple-300/10 rounded-full blur-[150px]" />
       </div>
 
-      <Card className="w-full max-w-md relative z-10 border-none shadow-2xl bg-background/80 backdrop-blur-xl">
+      <Card className="w-full max-w-md relative z-10 border-none shadow-elsa-lg bg-white/90 backdrop-blur-xl rounded-3xl">
         <CardHeader className="space-y-4 text-center pb-8 pt-10">
-          <div className="mx-auto w-20 h-20 rounded-3xl bg-primary/10 flex items-center justify-center text-primary mb-2">
-            <GraduationCap className="h-10 w-10" />
+          <div className="mx-auto w-20 h-20 rounded-3xl bg-gradient-to-br from-elsa-indigo-500 to-elsa-purple-500 flex items-center justify-center mb-2 shadow-lg shadow-elsa-indigo-500/25">
+            <GraduationCap className="h-10 w-10 text-white" />
           </div>
-          <CardTitle className="text-3xl font-bold">Chào mừng đến với JPLearning</CardTitle>
-          <CardDescription className="text-base">
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-elsa-indigo-50 text-elsa-indigo-600 text-xs font-semibold mb-3 border border-elsa-indigo-100">
+              <Sparkles className="w-3 h-3" />
+              Chào mừng
+            </div>
+            <CardTitle className="text-3xl font-bold text-foreground">Chào mừng đến với JPLearning</CardTitle>
+          </div>
+          <CardDescription className="text-base leading-relaxed">
             Tạo hồ sơ học tập đầu tiên để bắt đầu hành trình chinh phục tiếng Nhật.
             Học theo thứ tự, pass bài quiz để mở bài tiếp theo!
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 pb-8">
           {error && (
-            <Alert variant="destructive">
+            <Alert variant="destructive" className="rounded-xl">
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Ảnh đại diện (tùy chọn)</label>
+            <label className="text-sm font-semibold text-foreground">Ảnh đại diện (tùy chọn)</label>
             <div className="flex items-center gap-3">
               <div
                 onClick={() => fileInputRef.current?.click()}
-                className="w-16 h-16 rounded-full border-2 border-dashed border-muted-foreground/30 flex items-center justify-center cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors"
+                className="w-16 h-16 rounded-2xl border-2 border-dashed border-elsa-indigo-200 flex items-center justify-center cursor-pointer hover:border-elsa-indigo-400 hover:bg-elsa-indigo-50 transition-all duration-200"
               >
                 {avatarPreview ? (
-                  <img src={avatarPreview} alt="" className="w-full h-full rounded-full object-cover" />
+                  <img src={avatarPreview} alt="" className="w-full h-full rounded-2xl object-cover" />
                 ) : (
-                  <Camera className="w-6 h-6 text-muted-foreground" />
+                  <Camera className="w-6 h-6 text-elsa-indigo-400" />
                 )}
               </div>
               <div className="flex-1">
-                <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
+                <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} className="rounded-xl border-elsa-indigo-200 hover:bg-elsa-indigo-50">
                   Chọn ảnh
                 </Button>
                 {avatarPreview && (
@@ -167,26 +169,26 @@ const OnboardingPage: React.FC = () => {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Tên hồ sơ (tùy chọn)</label>
+            <label className="text-sm font-semibold text-foreground">Tên hồ sơ (tùy chọn)</label>
             <Input
               placeholder="VD: Học N5, Ôn thi JLPT..."
-              className="h-12"
+              className="h-12 rounded-xl border-elsa-indigo-100 focus:border-elsa-indigo-300"
               value={profileName}
               onChange={(e) => setProfileName(e.target.value)}
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Chọn cấp độ bắt đầu</label>
+            <label className="text-sm font-semibold text-foreground">Chọn cấp độ bắt đầu</label>
             <Select value={selectedLevelId} onValueChange={setSelectedLevelId}>
-              <SelectTrigger className="h-12">
+              <SelectTrigger className="h-12 rounded-xl border-elsa-indigo-100">
                 <SelectValue placeholder="Chọn cấp độ..." />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="rounded-xl">
                 {levels.map(level => (
-                  <SelectItem key={level.id} value={String(level.id)}>
+                  <SelectItem key={level.id} value={String(level.id)} className="rounded-lg">
                     <span className="flex items-center gap-2">
-                      <BookOpen className="w-4 h-4" />
+                      <BookOpen className="w-4 h-4 text-elsa-indigo-500" />
                       {level.levelName}
                     </span>
                   </SelectItem>
@@ -196,7 +198,7 @@ const OnboardingPage: React.FC = () => {
           </div>
 
           <Button
-            className="w-full h-12 text-base font-semibold"
+            className="w-full h-12 text-base font-semibold rounded-xl bg-gradient-to-r from-elsa-indigo-600 to-elsa-indigo-500 hover:from-elsa-indigo-700 hover:to-elsa-indigo-600 shadow-lg hover:shadow-xl hover:shadow-elsa-indigo-500/25 transition-all duration-200 hover:-translate-y-0.5"
             onClick={handleCreateProfile}
             disabled={!selectedLevelId || creating}
           >

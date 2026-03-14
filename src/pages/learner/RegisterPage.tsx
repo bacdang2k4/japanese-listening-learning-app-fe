@@ -1,11 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Headphones, Eye, EyeOff, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Headphones, Eye, EyeOff, Loader2, CheckCircle2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { authApi } from '@/services/api';
+
+const getPasswordStrength = (password: string): { level: number; label: string; color: string } => {
+  if (!password) return { level: 0, label: '', color: '' };
+  let score = 0;
+  if (password.length >= 6) score++;
+  if (password.length >= 10) score++;
+  if (/[A-Z]/.test(password)) score++;
+  if (/[0-9]/.test(password)) score++;
+  if (/[^A-Za-z0-9]/.test(password)) score++;
+
+  if (score <= 1) return { level: 1, label: 'Weak', color: 'bg-red-400' };
+  if (score <= 2) return { level: 2, label: 'Fair', color: 'bg-orange-400' };
+  if (score <= 3) return { level: 3, label: 'Good', color: 'bg-yellow-400' };
+  if (score <= 4) return { level: 4, label: 'Strong', color: 'bg-emerald-400' };
+  return { level: 5, label: 'Very Strong', color: 'bg-green-500' };
+};
 
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
@@ -18,9 +31,12 @@ const RegisterPage: React.FC = () => {
     confirmPassword: '',
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const passwordStrength = useMemo(() => getPasswordStrength(formData.password), [formData.password]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -64,167 +80,211 @@ const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-background">
-      {/* Dynamic Background */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-primary/20 rounded-full blur-[120px] mix-blend-multiply opacity-70 animate-pulse" />
-        <div className="absolute bottom-0 left-0 w-1/2 h-1/2 bg-secondary/20 rounded-full blur-[120px] mix-blend-multiply opacity-70 animate-pulse delay-700" />
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
+      {/* Dark navy-purple gradient background */}
+      <div className="absolute inset-0 auth-gradient-bg" />
+
+      {/* Subtle warm glow blobs */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-[10%] right-[15%] w-[350px] h-[350px] bg-purple-500/8 rounded-full blur-[100px]" />
+        <div className="absolute bottom-[15%] left-[20%] w-[400px] h-[400px] bg-indigo-400/6 rounded-full blur-[100px]" />
       </div>
 
-      <Card className="w-full max-w-md my-8 relative z-10 border-none shadow-2xl bg-background/80 backdrop-blur-xl animate-in zoom-in-95 duration-500">
-        <CardHeader className="space-y-4 text-center pb-6 pt-8">
-          <div className="mx-auto w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mb-2">
-            <Headphones className="w-8 h-8" />
+      {/* Content */}
+      <div className="w-full max-w-[420px] relative z-10 my-4 animate-scale-in">
+        {/* Logo icon */}
+        <div className="flex justify-center mb-6 animate-fade-in-up">
+          <div className="w-14 h-14 rounded-2xl flex items-center justify-center animate-float bg-cyan-400/15 border border-cyan-400/25">
+            <Headphones className="w-7 h-7 text-cyan-400" />
           </div>
-          <div className="space-y-2">
-            <CardTitle className="text-3xl font-bold tracking-tight text-primary">Tạo tài khoản</CardTitle>
-            <CardDescription className="text-base">
-              Bắt đầu hành trình học tiếng Nhật của bạn
-            </CardDescription>
+        </div>
+
+        {/* Title */}
+        <div className="text-center mb-7 animate-fade-in-up animation-delay-100" style={{ opacity: 0 }}>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">
+            Create your account
+          </h1>
+          <p className="text-white/50 text-sm sm:text-base">
+            Start improving your Japanese listening today
+          </p>
+        </div>
+
+        {/* Error / Success Alerts */}
+        {error && (
+          <Alert variant="destructive" className="mb-5 rounded-xl bg-red-500/15 border-red-500/30 text-red-300 animate-fade-in-up">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+        {success && (
+          <Alert className="mb-5 rounded-xl bg-emerald-500/15 border-emerald-500/30 text-emerald-300 animate-fade-in-up">
+            <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+            <AlertDescription>{success}</AlertDescription>
+          </Alert>
+        )}
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Username */}
+          <div className="animate-fade-in-up animation-delay-200" style={{ opacity: 0 }}>
+            <input
+              id="username"
+              name="username"
+              placeholder="Choose a username"
+              required
+              value={formData.username}
+              onChange={handleChange}
+              className="auth-input-dark w-full h-[50px] px-4 rounded-xl text-base outline-none"
+            />
           </div>
-        </CardHeader>
 
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {error && (
-              <Alert variant="destructive" className="animate-in fade-in slide-in-from-top-2">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
+          {/* First Name + Last Name */}
+          <div className="grid grid-cols-2 gap-3 animate-fade-in-up animation-delay-200" style={{ opacity: 0 }}>
+            <input
+              id="firstName"
+              name="firstName"
+              placeholder="First name"
+              required
+              value={formData.firstName}
+              onChange={handleChange}
+              className="auth-input-dark w-full h-[50px] px-4 rounded-xl text-base outline-none"
+            />
+            <input
+              id="lastName"
+              name="lastName"
+              placeholder="Last name"
+              required
+              value={formData.lastName}
+              onChange={handleChange}
+              className="auth-input-dark w-full h-[50px] px-4 rounded-xl text-base outline-none"
+            />
+          </div>
 
-            {success && (
-              <Alert className="bg-green-50 text-green-700 border-green-200 animate-in fade-in slide-in-from-top-2">
-                <AlertDescription>{success}</AlertDescription>
-              </Alert>
-            )}
+          {/* Email */}
+          <div className="animate-fade-in-up animation-delay-300" style={{ opacity: 0 }}>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="Email address"
+              required
+              value={formData.email}
+              onChange={handleChange}
+              className="auth-input-dark w-full h-[50px] px-4 rounded-xl text-base outline-none"
+            />
+          </div>
 
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium leading-none" htmlFor="username">
-                  Tên đăng nhập
-                </label>
-                <Input
-                  id="username"
-                  name="username"
-                  placeholder="username"
-                  required
-                  value={formData.username}
-                  onChange={handleChange}
-                  className="h-11"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium leading-none" htmlFor="firstName">
-                    Họ
-                  </label>
-                  <Input
-                    id="firstName"
-                    name="firstName"
-                    placeholder="Nguyễn"
-                    required
-                    value={formData.firstName}
-                    onChange={handleChange}
-                    className="h-11"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium leading-none" htmlFor="lastName">
-                    Tên
-                  </label>
-                  <Input
-                    id="lastName"
-                    name="lastName"
-                    placeholder="Văn A"
-                    required
-                    value={formData.lastName}
-                    onChange={handleChange}
-                    className="h-11"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium leading-none" htmlFor="email">
-                  Email
-                </label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="name@example.com"
-                  required
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="h-11"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium leading-none" htmlFor="password">
-                  Mật khẩu
-                </label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    required
-                    value={formData.password}
-                    onChange={handleChange}
-                    className="h-11 pr-10"
-                    placeholder="••••••••"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                  </button>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium leading-none" htmlFor="confirmPassword">
-                  Xác nhận mật khẩu
-                </label>
-                <Input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type={showPassword ? "text" : "password"}
-                  required
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  className="h-11"
-                  placeholder="••••••••"
-                />
-              </div>
+          {/* Password */}
+          <div className="animate-fade-in-up animation-delay-300" style={{ opacity: 0 }}>
+            <div className="relative">
+              <input
+                id="password"
+                name="password"
+                type={showPassword ? 'text' : 'password'}
+                required
+                value={formData.password}
+                onChange={handleChange}
+                className="auth-input-dark w-full h-[50px] px-4 pr-12 rounded-xl text-base outline-none"
+                placeholder="Password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70 transition-colors"
+              >
+                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+              </button>
             </div>
 
-            <Button className="w-full h-12 text-base font-medium mt-6" type="submit" disabled={loading}>
+            {/* Password Strength Indicator */}
+            {formData.password && (
+              <div className="pt-2 px-0.5">
+                <div className="flex items-center gap-1.5">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div
+                      key={i}
+                      className={`h-1 flex-1 rounded-full transition-all duration-300 ${
+                        i <= passwordStrength.level ? passwordStrength.color : 'bg-white/10'
+                      }`}
+                    />
+                  ))}
+                </div>
+                <p className={`text-xs mt-1 font-medium ${
+                  passwordStrength.level <= 1 ? 'text-red-400'
+                  : passwordStrength.level <= 2 ? 'text-orange-400'
+                  : passwordStrength.level <= 3 ? 'text-yellow-400'
+                  : 'text-emerald-400'
+                }`}>
+                  {passwordStrength.label}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Confirm Password */}
+          <div className="animate-fade-in-up animation-delay-400" style={{ opacity: 0 }}>
+            <div className="relative">
+              <input
+                id="confirmPassword"
+                name="confirmPassword"
+                type={showConfirmPassword ? 'text' : 'password'}
+                required
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                className="auth-input-dark w-full h-[50px] px-4 pr-12 rounded-xl text-base outline-none"
+                placeholder="Confirm password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70 transition-colors"
+              >
+                {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+              </button>
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <div className="animate-fade-in-up animation-delay-400 pt-2" style={{ opacity: 0 }}>
+            <button
+              type="submit"
+              disabled={loading}
+              className="auth-cta-btn w-full h-[52px] rounded-xl text-white text-base font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            >
               {loading ? (
                 <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Đang đăng ký...
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  Creating account...
                 </>
               ) : (
-                'Đăng ký'
+                'Create Account'
               )}
-            </Button>
-          </form>
-        </CardContent>
-
-        <CardFooter className="flex justify-center pb-8 border-t pt-6">
-          <div className="text-sm text-center text-muted-foreground">
-            Đã có tài khoản?{" "}
-            <Link to="/login" className="text-primary hover:underline font-medium">
-              Đăng nhập
-            </Link>
+            </button>
           </div>
-        </CardFooter>
-      </Card>
+        </form>
+
+        {/* Footer Link */}
+        <div className="mt-7 text-center animate-fade-in-up animation-delay-500" style={{ opacity: 0 }}>
+          <p className="text-sm text-white/45">
+            Already have an account?{' '}
+            <Link
+              to="/login"
+              className="text-cyan-400 hover:text-cyan-300 font-semibold transition-colors"
+            >
+              Log In
+            </Link>
+          </p>
+        </div>
+
+        {/* Agreement text */}
+        <div className="mt-8 text-center animate-fade-in-up animation-delay-500" style={{ opacity: 0 }}>
+          <p className="text-xs text-white/30 leading-relaxed">
+            By creating an account, you agree to our{' '}
+            <span className="text-white/50 cursor-pointer hover:underline">Terms & Conditions</span>
+            {' '}and{' '}
+            <span className="text-white/50 cursor-pointer hover:underline">Privacy Policy</span>
+          </p>
+        </div>
+      </div>
     </div>
   );
 };

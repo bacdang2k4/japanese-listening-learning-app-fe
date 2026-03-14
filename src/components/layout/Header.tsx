@@ -96,19 +96,36 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
     <AppBar
       position="static"
       elevation={0}
-      sx={{ backgroundColor: '#fff', borderBottom: '1px solid #e0e0e0' }}
+      sx={{
+        background: 'linear-gradient(135deg, #F8F7FF 0%, #F1F0FF 100%)',
+        borderBottom: '1px solid rgba(99, 102, 241, 0.1)',
+      }}
     >
-      <Toolbar sx={{ justifyContent: 'space-between' }}>
-        <Typography variant="h5" sx={{ color: '#1a1a2e', fontWeight: 600 }}>
+      <Toolbar sx={{ justifyContent: 'space-between', minHeight: '64px !important' }}>
+        <Typography
+          variant="h5"
+          sx={{
+            color: '#1E1B4B',
+            fontWeight: 700,
+            fontSize: '1.3rem',
+            letterSpacing: '-0.01em',
+          }}
+        >
           {title}
         </Typography>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           {/* Notifications */}
           <Tooltip title="AI Generation Logs">
-            <IconButton onClick={handleNotifOpen}>
+            <IconButton
+              onClick={handleNotifOpen}
+              sx={{
+                borderRadius: '12px',
+                '&:hover': { backgroundColor: 'rgba(99, 102, 241, 0.08)' },
+              }}
+            >
               <Badge badgeContent={unreadCount} color="error">
-                <NotificationsIcon sx={{ color: '#666' }} />
+                <NotificationsIcon sx={{ color: '#6366F1' }} />
               </Badge>
             </IconButton>
           </Tooltip>
@@ -121,20 +138,37 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
             transformOrigin={{ vertical: 'top', horizontal: 'right' }}
             slotProps={{
               paper: {
-                sx: { width: 380, maxHeight: 480, mt: 1 },
+                sx: {
+                  width: 400,
+                  maxHeight: 480,
+                  mt: 1,
+                  borderRadius: '16px',
+                  boxShadow: '0 4px 24px rgba(79, 70, 229, 0.12)',
+                  border: '1px solid rgba(99, 102, 241, 0.08)',
+                },
               },
             }}
           >
-            <Box sx={{ px: 2, py: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
-              <AiIcon fontSize="small" color="primary" />
-              <Typography variant="subtitle1" fontWeight={600}>
+            <Box sx={{ px: 2.5, py: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Box sx={{
+                width: 32,
+                height: 32,
+                borderRadius: '10px',
+                background: 'linear-gradient(135deg, #4F46E5, #6366F1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+                <AiIcon fontSize="small" sx={{ color: '#fff' }} />
+              </Box>
+              <Typography variant="subtitle1" fontWeight={700} sx={{ color: '#1E1B4B' }}>
                 AI Generation Logs
               </Typography>
             </Box>
-            <Divider />
+            <Divider sx={{ borderColor: 'rgba(99, 102, 241, 0.08)' }} />
             {loading ? (
               <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-                <CircularProgress size={28} />
+                <CircularProgress size={28} sx={{ color: '#6366F1' }} />
               </Box>
             ) : logs.length === 0 ? (
               <Box sx={{ py: 4, textAlign: 'center' }}>
@@ -148,7 +182,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
                   <ListItem
                     key={log.id}
                     disablePadding
-                    sx={{ borderBottom: '1px solid #f0f0f0' }}
+                    sx={{ borderBottom: '1px solid rgba(99, 102, 241, 0.06)' }}
                   >
                     <ListItemButton
                       onClick={() => {
@@ -157,13 +191,20 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
                           navigate('/admin/audio-tests');
                         }
                       }}
-                      sx={{ px: 2, py: 1.2 }}
+                      sx={{
+                        px: 2.5,
+                        py: 1.5,
+                        borderRadius: '8px',
+                        mx: 0.5,
+                        my: 0.25,
+                        '&:hover': { backgroundColor: 'rgba(99, 102, 241, 0.04)' },
+                      }}
                     >
                       <ListItemIcon sx={{ minWidth: 36 }}>
                         {log.status === 'SUCCESS' ? (
-                          <SuccessIcon fontSize="small" color="success" />
+                          <SuccessIcon fontSize="small" sx={{ color: '#10B981' }} />
                         ) : (
-                          <FailedIcon fontSize="small" color="error" />
+                          <FailedIcon fontSize="small" sx={{ color: '#EF4444' }} />
                         )}
                       </ListItemIcon>
                       <ListItemText
@@ -175,9 +216,14 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
                             <Chip
                               label={log.status}
                               size="small"
-                              color={log.status === 'SUCCESS' ? 'success' : 'error'}
-                              variant="outlined"
-                              sx={{ height: 20, fontSize: '0.7rem' }}
+                              sx={{
+                                height: 22,
+                                fontSize: '0.7rem',
+                                fontWeight: 600,
+                                borderRadius: '6px',
+                                backgroundColor: log.status === 'SUCCESS' ? '#ECFDF5' : '#FEF2F2',
+                                color: log.status === 'SUCCESS' ? '#059669' : '#DC2626',
+                              }}
                             />
                           </Box>
                         }
@@ -196,8 +242,20 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
 
           {/* Avatar & Dropdown */}
           <Tooltip title={adminName}>
-            <IconButton onClick={(e) => setAvatarAnchor(e.currentTarget)} sx={{ ml: 1 }}>
-              <Avatar sx={{ bgcolor: '#1976d2', width: 38, height: 38, fontSize: '1rem' }}>
+            <IconButton
+              onClick={(e) => setAvatarAnchor(e.currentTarget)}
+              sx={{ ml: 0.5 }}
+            >
+              <Avatar
+                sx={{
+                  background: 'linear-gradient(135deg, #4F46E5, #6366F1)',
+                  width: 38,
+                  height: 38,
+                  fontSize: '0.95rem',
+                  fontWeight: 700,
+                  boxShadow: '0 2px 8px rgba(79, 70, 229, 0.3)',
+                }}
+              >
                 {adminInitial}
               </Avatar>
             </IconButton>
@@ -211,23 +269,49 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
             transformOrigin={{ vertical: 'top', horizontal: 'right' }}
             slotProps={{
               paper: {
-                sx: { width: 200, mt: 1 },
+                sx: {
+                  width: 220,
+                  mt: 1,
+                  borderRadius: '16px',
+                  boxShadow: '0 4px 24px rgba(79, 70, 229, 0.12)',
+                  border: '1px solid rgba(99, 102, 241, 0.08)',
+                },
               },
             }}
           >
-            <Box sx={{ px: 2, py: 1 }}>
-              <Typography variant="subtitle2" fontWeight={600}>{adminName}</Typography>
-              <Typography variant="caption" color="text.secondary">Quản trị viên</Typography>
+            <Box sx={{ px: 2.5, py: 1.5 }}>
+              <Typography variant="subtitle2" fontWeight={700} sx={{ color: '#1E1B4B' }}>
+                {adminName}
+              </Typography>
+              <Typography variant="caption" sx={{ color: '#6366F1' }}>
+                Quản trị viên
+              </Typography>
             </Box>
-            <Divider />
-            <MenuItem onClick={() => { setAvatarAnchor(null); }}>
-              <ListItemIcon><PersonIcon fontSize="small" /></ListItemIcon>
+            <Divider sx={{ borderColor: 'rgba(99, 102, 241, 0.08)' }} />
+            <MenuItem
+              onClick={() => { setAvatarAnchor(null); }}
+              sx={{
+                borderRadius: '10px',
+                mx: 1,
+                my: 0.5,
+                '&:hover': { backgroundColor: 'rgba(99, 102, 241, 0.06)' },
+              }}
+            >
+              <ListItemIcon><PersonIcon fontSize="small" sx={{ color: '#6366F1' }} /></ListItemIcon>
               <ListItemText>Hồ sơ</ListItemText>
             </MenuItem>
-            <Divider />
-            <MenuItem onClick={() => { setAvatarAnchor(null); handleLogout(); }}>
-              <ListItemIcon><LogoutIcon fontSize="small" sx={{ color: '#ef5350' }} /></ListItemIcon>
-              <ListItemText sx={{ '& .MuiTypography-root': { color: '#ef5350' } }}>Đăng xuất</ListItemText>
+            <Divider sx={{ borderColor: 'rgba(99, 102, 241, 0.08)' }} />
+            <MenuItem
+              onClick={() => { setAvatarAnchor(null); handleLogout(); }}
+              sx={{
+                borderRadius: '10px',
+                mx: 1,
+                my: 0.5,
+                '&:hover': { backgroundColor: 'rgba(239, 68, 68, 0.06)' },
+              }}
+            >
+              <ListItemIcon><LogoutIcon fontSize="small" sx={{ color: '#EF4444' }} /></ListItemIcon>
+              <ListItemText sx={{ '& .MuiTypography-root': { color: '#EF4444', fontWeight: 500 } }}>Đăng xuất</ListItemText>
             </MenuItem>
           </Menu>
         </Box>

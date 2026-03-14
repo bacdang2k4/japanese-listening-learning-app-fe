@@ -91,8 +91,8 @@ const TestHistoryPage: React.FC = () => {
     <LearnerLayout>
       <div className="max-w-6xl mx-auto py-8">
         <div className="flex items-center gap-4 mb-8 animate-in fade-in slide-in-from-left-4">
-          <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center text-primary shrink-0">
-            <History className="w-8 h-8" />
+          <div className="w-14 h-14 bg-gradient-to-br from-elsa-indigo-500 to-elsa-purple-500 rounded-2xl flex items-center justify-center text-white shrink-0 shadow-lg shadow-elsa-indigo-500/20">
+            <History className="w-7 h-7" />
           </div>
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-foreground">Lịch sử làm bài</h1>
@@ -100,7 +100,7 @@ const TestHistoryPage: React.FC = () => {
           </div>
         </div>
 
-        <Card className="mb-6 border-none shadow-md animate-in slide-in-from-bottom-4 duration-500">
+        <Card className="mb-6 border-none shadow-elsa-sm rounded-2xl animate-in slide-in-from-bottom-4 duration-500">
           <CardContent className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
               <div className="md:col-span-4 space-y-2">
@@ -138,7 +138,7 @@ const TestHistoryPage: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="border-none shadow-md overflow-hidden animate-in fade-in duration-700">
+        <Card className="border-none shadow-elsa-sm overflow-hidden animate-in fade-in duration-700 rounded-2xl">
           {loading ? (
             <div className="flex items-center justify-center py-20">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -146,8 +146,8 @@ const TestHistoryPage: React.FC = () => {
           ) : (
             <div className="overflow-x-auto">
               <Table>
-                <TableHeader className="bg-muted/50">
-                  <TableRow className="hover:bg-transparent">
+                <TableHeader className="bg-elsa-indigo-50/50">
+                  <TableRow className="hover:bg-transparent border-elsa-indigo-100">
                     <TableHead className="font-bold">Tên bài thi</TableHead>
                     <TableHead className="font-bold text-center">Chế độ</TableHead>
                     <TableHead className="font-bold text-center">Điểm</TableHead>
@@ -165,7 +165,7 @@ const TestHistoryPage: React.FC = () => {
                     </TableRow>
                   ) : (
                     filteredResults.map(result => (
-                      <TableRow key={result.resultId} className="cursor-default hover:bg-muted/30">
+                      <TableRow key={result.resultId} className="cursor-default hover:bg-elsa-indigo-50/30 transition-colors">
                         <TableCell className="font-medium">{result.testName}</TableCell>
                         <TableCell className="text-center">
                           <Badge variant="outline" className="font-medium text-blue-600 border-blue-200 bg-blue-50">
@@ -177,7 +177,7 @@ const TestHistoryPage: React.FC = () => {
                         </TableCell>
                         <TableCell className="text-center">
                           {result.isPassed ? (
-                            <Badge className="bg-green-500 hover:bg-green-600"><CheckCircle2 className="w-3 h-3 mr-1" /> Đạt</Badge>
+                            <Badge className="bg-emerald-500 hover:bg-emerald-600 shadow-sm"><CheckCircle2 className="w-3 h-3 mr-1" /> Đạt</Badge>
                           ) : (
                             <Badge variant="destructive"><XCircle className="w-3 h-3 mr-1" /> Chưa đạt</Badge>
                           )}
@@ -186,7 +186,7 @@ const TestHistoryPage: React.FC = () => {
                           {formatDate(result.createdAt)}
                         </TableCell>
                         <TableCell className="text-right pr-6">
-                          <Button variant="ghost" size="sm" onClick={() => handleViewDetail(result)} className="text-primary hover:text-primary hover:bg-primary/10">
+                          <Button variant="ghost" size="sm" onClick={() => handleViewDetail(result)} className="text-elsa-indigo-600 hover:text-elsa-indigo-700 hover:bg-elsa-indigo-50 rounded-lg">
                             <Eye className="w-4 h-4 mr-1.5" /> Chi tiết
                           </Button>
                         </TableCell>
@@ -209,14 +209,14 @@ const TestHistoryPage: React.FC = () => {
 
         {/* Detail Dialog */}
         <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
-          <DialogContent className="sm:max-w-lg p-0 overflow-hidden max-h-[80vh] overflow-y-auto">
+          <DialogContent className="sm:max-w-lg p-0 overflow-hidden max-h-[80vh] overflow-y-auto rounded-2xl">
             {selectedResult && (
               <>
-                <div className={`h-2 w-full ${selectedResult.isPassed ? 'bg-green-500' : 'bg-red-500'}`} />
+                <div className={`h-2 w-full ${selectedResult.isPassed ? 'bg-gradient-to-r from-emerald-400 to-emerald-500' : 'bg-gradient-to-r from-red-400 to-red-500'}`} />
                 <div className="p-6">
                   <DialogHeader className="mb-6">
                     <DialogTitle className="text-2xl font-bold flex items-center gap-2">
-                      <BarChart3 className="w-6 h-6 text-primary" /> Chi tiết kết quả
+                      <BarChart3 className="w-6 h-6 text-elsa-indigo-500" /> Chi tiết kết quả
                     </DialogTitle>
                   </DialogHeader>
 
@@ -226,12 +226,12 @@ const TestHistoryPage: React.FC = () => {
                     <div>
                       <h3 className="text-xl font-bold text-foreground mb-4">{selectedDetail.testName}</h3>
                       <div className="grid grid-cols-2 gap-4 mb-6">
-                        <div className="bg-muted/50 rounded-2xl p-4 text-center border">
+                        <div className="bg-elsa-indigo-50/50 rounded-2xl p-4 text-center border border-elsa-indigo-100">
                           <div className={`text-4xl font-black mb-1 ${selectedDetail.isPassed ? 'text-green-500' : 'text-red-500'}`}>{selectedDetail.score}%</div>
                           <div className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Điểm số</div>
                         </div>
-                        <div className="bg-muted/50 rounded-2xl p-4 text-center border">
-                          <div className="text-4xl font-black text-primary mb-1">
+                        <div className="bg-elsa-indigo-50/50 rounded-2xl p-4 text-center border border-elsa-indigo-100">
+                          <div className="text-4xl font-black text-elsa-indigo-600 mb-1">
                             {selectedDetail.questionResults.filter(q => q.isCorrect).length}
                             <span className="text-2xl text-muted-foreground font-medium">/{selectedDetail.questionResults.length}</span>
                           </div>
@@ -259,7 +259,7 @@ const TestHistoryPage: React.FC = () => {
                           <h4 className="font-bold text-sm uppercase tracking-wider text-muted-foreground mb-3">Chi tiết câu hỏi</h4>
                           <div className="space-y-2">
                             {selectedDetail.questionResults.map((qr, i) => (
-                              <div key={qr.questionId} className={`p-3 rounded-lg border text-sm ${qr.isCorrect ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+                              <div key={qr.questionId} className={`p-3.5 rounded-xl border text-sm ${qr.isCorrect ? 'bg-emerald-50 border-emerald-200' : 'bg-red-50 border-red-200'}`}>
                                 <p className="font-medium mb-1">{i + 1}. {qr.questionContent}</p>
                                 <div className="flex flex-col gap-1 text-xs">
                                   <span>Bạn chọn: <span className="font-semibold">{qr.selectedAnswer || '(bỏ trống)'}</span></span>
@@ -271,7 +271,7 @@ const TestHistoryPage: React.FC = () => {
                         </div>
                       )}
 
-                      <Button className="w-full h-12 text-base mt-6" onClick={() => setDetailOpen(false)}>Đóng</Button>
+                      <Button className="w-full h-12 text-base mt-6 rounded-xl bg-gradient-to-r from-elsa-indigo-500 to-elsa-indigo-600 hover:from-elsa-indigo-600 hover:to-elsa-indigo-700" onClick={() => setDetailOpen(false)}>Đóng</Button>
                     </div>
                   ) : null}
                 </div>

@@ -16,7 +16,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
         component="main"
         sx={{
           flexGrow: 1,
-          backgroundColor: '#f5f5f5',
+          background: 'linear-gradient(135deg, #F8F7FF 0%, #F1F0FF 50%, #EEF2FF 100%)',
           display: 'flex',
           flexDirection: 'column',
         }}

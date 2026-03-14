@@ -249,7 +249,7 @@ const ProfilePage: React.FC = () => {
   if (loading) {
     return (
       <LearnerLayout>
-        <div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
+        <div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-elsa-indigo-500" /></div>
       </LearnerLayout>
     );
   }
@@ -259,15 +259,15 @@ const ProfilePage: React.FC = () => {
       <div className="max-w-4xl mx-auto py-6">
         {error && <Alert variant="destructive" className="mb-6"><AlertDescription>{error}</AlertDescription></Alert>}
         {successMessage && (
-          <Alert className="mb-6 bg-green-50 text-green-700 border-green-200">
+          <Alert className="mb-6 bg-emerald-50 text-emerald-700 border-emerald-200 rounded-xl">
             <CheckCircle2 className="h-4 w-4" />
             <AlertDescription>{successMessage}</AlertDescription>
           </Alert>
         )}
 
         {/* Account Header Section */}
-        <Card className="border-none shadow-lg overflow-hidden mb-8">
-          <div className="h-32 bg-gradient-to-r from-primary via-primary/80 to-primary/50 relative" />
+        <Card className="border-none shadow-elsa-md overflow-hidden mb-8 rounded-2xl">
+          <div className="h-32 bg-gradient-to-r from-elsa-indigo-600 via-elsa-indigo-500 to-elsa-purple-500 relative" />
           <CardContent className="relative px-6 pb-6">
             <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4 -mt-16">
               {/* Avatar with hover overlay */}
@@ -275,9 +275,9 @@ const ProfilePage: React.FC = () => {
                 className="relative group cursor-pointer shrink-0"
                 onClick={handleAvatarClick}
               >
-                <Avatar className="w-32 h-32 border-4 border-background shadow-xl">
+                <Avatar className="w-32 h-32 border-4 border-white shadow-xl rounded-3xl">
                   <AvatarImage src={account?.avatarUrl || ''} className="object-cover" />
-                  <AvatarFallback className="bg-primary/10 text-primary text-4xl font-bold">
+                  <AvatarFallback className="bg-gradient-to-br from-elsa-indigo-100 to-elsa-purple-100 text-elsa-indigo-600 text-4xl font-bold">
                     {account?.firstName?.charAt(0) || 'L'}
                   </AvatarFallback>
                 </Avatar>
@@ -311,12 +311,12 @@ const ProfilePage: React.FC = () => {
               {/* Edit Button */}
               <div className="shrink-0">
                 {!editing ? (
-                  <Button variant="outline" size="sm" onClick={startEditing} className="gap-2">
+                  <Button variant="outline" size="sm" onClick={startEditing} className="gap-2 rounded-xl border-elsa-indigo-200 hover:bg-elsa-indigo-50">
                     <Pencil className="w-4 h-4" /> Chỉnh sửa
                   </Button>
                 ) : (
                   <div className="flex gap-2">
-                    <Button size="sm" onClick={handleSaveInfo} disabled={saving} className="gap-2">
+                    <Button size="sm" onClick={handleSaveInfo} disabled={saving} className="gap-2 rounded-xl bg-gradient-to-r from-elsa-indigo-500 to-elsa-indigo-600">
                       {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                       Lưu
                     </Button>
@@ -332,10 +332,10 @@ const ProfilePage: React.FC = () => {
 
         {/* Account Info Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <Card className="border-none shadow-md">
+          <Card className="border-none shadow-elsa-sm rounded-2xl">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center gap-2">
-                <User2 className="w-5 h-5 text-primary" />
+                <User2 className="w-5 h-5 text-elsa-indigo-500" />
                 Thông tin tài khoản
               </CardTitle>
             </CardHeader>
@@ -360,7 +360,7 @@ const ProfilePage: React.FC = () => {
               ) : (
                 <>
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                    <div className="w-9 h-9 rounded-xl bg-elsa-indigo-50 flex items-center justify-center shrink-0">
                       <User2 className="w-4 h-4 text-muted-foreground" />
                     </div>
                     <div>
@@ -369,7 +369,7 @@ const ProfilePage: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                    <div className="w-9 h-9 rounded-xl bg-elsa-indigo-50 flex items-center justify-center shrink-0">
                       <Mail className="w-4 h-4 text-muted-foreground" />
                     </div>
                     <div className="min-w-0">
@@ -378,7 +378,7 @@ const ProfilePage: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                    <div className="w-9 h-9 rounded-xl bg-elsa-indigo-50 flex items-center justify-center shrink-0">
                       <Calendar className="w-4 h-4 text-muted-foreground" />
                     </div>
                     <div>
@@ -391,10 +391,10 @@ const ProfilePage: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card className="border-none shadow-md">
+          <Card className="border-none shadow-elsa-sm rounded-2xl">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-green-500" />
+                <ShieldCheck className="w-5 h-5 text-emerald-500" />
                 Bảo mật & trạng thái
               </CardTitle>
             </CardHeader>
@@ -406,7 +406,7 @@ const ProfilePage: React.FC = () => {
               <Separator />
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Trạng thái</span>
-                <Badge className={account?.status === 'ACTIVE' ? 'bg-green-500' : 'bg-red-500'}>
+                <Badge className={account?.status === 'ACTIVE' ? 'bg-emerald-500 shadow-sm' : 'bg-red-500'}>
                   {account?.status === 'ACTIVE' ? 'Hoạt động' : account?.status}
                 </Badge>
               </div>
@@ -423,19 +423,19 @@ const ProfilePage: React.FC = () => {
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold flex items-center gap-2">
-              <GraduationCap className="w-6 h-6 text-primary" />
+              <GraduationCap className="w-6 h-6 text-elsa-indigo-500" />
               Hồ sơ học tập
             </h2>
-            <Button size="sm" onClick={() => setCreateDialogOpen(true)} className="gap-2">
+            <Button size="sm" onClick={() => setCreateDialogOpen(true)} className="gap-2 rounded-xl bg-gradient-to-r from-elsa-indigo-500 to-elsa-indigo-600 hover:from-elsa-indigo-600 hover:to-elsa-indigo-700">
               <Plus className="w-4 h-4" /> Tạo mới
             </Button>
           </div>
 
           {profiles.length === 0 ? (
-            <Card className="border-2 border-dashed border-muted-foreground/20">
+            <Card className="border-2 border-dashed border-elsa-indigo-200 rounded-2xl">
               <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                  <BookOpen className="w-8 h-8 text-primary" />
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-elsa-indigo-100 to-elsa-purple-100 flex items-center justify-center mb-4">
+                  <BookOpen className="w-8 h-8 text-elsa-indigo-500" />
                 </div>
                 <h3 className="font-semibold text-lg mb-2">Chưa có hồ sơ học tập</h3>
                 <p className="text-muted-foreground mb-4 max-w-sm">Tạo hồ sơ học tập đầu tiên để bắt đầu hành trình chinh phục tiếng Nhật!</p>
@@ -451,25 +451,25 @@ const ProfilePage: React.FC = () => {
                 return (
                   <Card
                     key={profile.profileId}
-                    className={`border shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5
-                      ${isActive ? 'ring-2 ring-primary border-primary/50' : ''}`}
+                    className={`border-none shadow-elsa-sm hover:shadow-elsa-md transition-all duration-200 hover:-translate-y-0.5 rounded-2xl
+                      ${isActive ? 'ring-2 ring-elsa-indigo-400 bg-elsa-indigo-50/30' : ''}`}
                   >
                     <CardContent className="p-5">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-start gap-3">
                           {profile.avatarUrl ? (
-                            <img src={profile.avatarUrl} alt="" className="w-12 h-12 rounded-full object-cover border-2 border-primary/20 shrink-0" />
+                            <img src={profile.avatarUrl} alt="" className="w-12 h-12 rounded-2xl object-cover border-2 border-elsa-indigo-100 shrink-0" />
                           ) : (
-                            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                              <GraduationCap className="w-6 h-6 text-primary" />
+                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-elsa-indigo-100 to-elsa-purple-100 flex items-center justify-center shrink-0">
+                              <GraduationCap className="w-6 h-6 text-elsa-indigo-500" />
                             </div>
                           )}
                           <div>
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="text-xl font-bold text-primary">
+                            <span className="text-xl font-bold text-foreground">
                               {profile.name || profile.currentLevelName || 'N/A'}
                             </span>
-                            {isActive && <Badge className="bg-primary text-xs px-1.5 py-0">Đang dùng</Badge>}
+                            {isActive && <Badge className="bg-elsa-indigo-500 text-xs px-1.5 py-0">Đang dùng</Badge>}
                           </div>
                           <p className="text-xs text-muted-foreground">
                             {profile.name ? (profile.currentLevelName || 'N/A') : `Hồ sơ #${profile.profileId}`}
@@ -502,7 +502,7 @@ const ProfilePage: React.FC = () => {
                           </div>
                         </div>
                         <Badge variant={profile.status === 'PASS' ? 'default' : 'secondary'}
-                          className={profile.status === 'PASS' ? 'bg-green-500' : 'bg-blue-500/10 text-blue-600'}>
+                          className={profile.status === 'PASS' ? 'bg-emerald-500 shadow-sm' : 'bg-elsa-indigo-50 text-elsa-indigo-600 border border-elsa-indigo-200'}>
                           {profile.status === 'PASS' ? 'Hoàn thành' : 'Đang học'}
                         </Badge>
                       </div>
@@ -513,9 +513,7 @@ const ProfilePage: React.FC = () => {
                       </div>
 
                       <Button
-                        className="w-full gap-2"
-                        size="sm"
-                        variant={isActive ? 'default' : 'outline'}
+                        className={`w-full gap-2 rounded-xl ${isActive ? 'bg-gradient-to-r from-elsa-indigo-500 to-elsa-indigo-600 hover:from-elsa-indigo-600 hover:to-elsa-indigo-700' : ''}`}
                         onClick={() => handleSelectProfile(profile)}
                       >
                         <Play className="w-3.5 h-3.5" />
@@ -537,7 +535,7 @@ const ProfilePage: React.FC = () => {
             handleRemoveCreateAvatar();
           }
         }}>
-          <DialogContent className="sm:max-w-md">
+          <DialogContent className="sm:max-w-md rounded-2xl">
             <DialogHeader>
               <DialogTitle className="text-xl font-bold">Tạo hồ sơ học tập mới</DialogTitle>
               <DialogDescription>
@@ -550,7 +548,7 @@ const ProfilePage: React.FC = () => {
                 <div className="flex items-center gap-3">
                   <div
                     onClick={() => createAvatarInputRef.current?.click()}
-                    className="w-14 h-14 rounded-full border-2 border-dashed border-muted-foreground/30 flex items-center justify-center cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors shrink-0"
+                    className="w-14 h-14 rounded-2xl border-2 border-dashed border-elsa-indigo-200 flex items-center justify-center cursor-pointer hover:border-elsa-indigo-400 hover:bg-elsa-indigo-50 transition-all shrink-0"
                   >
                     {avatarPreview ? (
                       <img src={avatarPreview} alt="" className="w-full h-full rounded-full object-cover" />
@@ -603,8 +601,8 @@ const ProfilePage: React.FC = () => {
               </div>
             </div>
             <DialogFooter className="flex-col sm:flex-row gap-2">
-              <Button variant="outline" className="w-full" onClick={() => setCreateDialogOpen(false)}>Hủy</Button>
-              <Button className="w-full gap-2" onClick={handleCreateProfile} disabled={!selectedLevelId || creating}>
+              <Button variant="outline" className="w-full rounded-xl" onClick={() => setCreateDialogOpen(false)}>Hủy</Button>
+              <Button className="w-full gap-2 rounded-xl bg-gradient-to-r from-elsa-indigo-500 to-elsa-indigo-600 hover:from-elsa-indigo-600 hover:to-elsa-indigo-700" onClick={handleCreateProfile} disabled={!selectedLevelId || creating}>
                 {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                 Tạo hồ sơ
               </Button>

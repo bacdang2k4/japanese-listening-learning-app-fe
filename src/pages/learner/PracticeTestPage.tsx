@@ -174,7 +174,7 @@ const PracticeTestPage: React.FC = () => {
     return (
       <LearnerLayout>
         <div className="flex flex-col items-center justify-center py-20 gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <Loader2 className="h-8 w-8 animate-spin text-elsa-indigo-500" />
           <p className="text-muted-foreground">{phase === 'submitting' ? 'Đang nộp bài...' : 'Đang tải...'}</p>
         </div>
       </LearnerLayout>
@@ -185,7 +185,7 @@ const PracticeTestPage: React.FC = () => {
     return (
       <LearnerLayout>
         <div className="max-w-2xl mx-auto py-12">
-          {error && <div className="mb-4 p-4 bg-red-50 text-red-700 rounded-xl border border-red-200">{error}</div>}
+          {error && <div className="mb-4 p-4 bg-red-50 text-red-700 rounded-2xl border border-red-200">{error}</div>}
           <h1 className="text-3xl font-bold mb-8 text-center">Chọn bài luyện tập</h1>
           {tests.length === 0 ? (
             <div className="text-center text-muted-foreground py-12">
@@ -197,7 +197,7 @@ const PracticeTestPage: React.FC = () => {
           ) : (
             <div className="space-y-4">
               {tests.map(test => (
-                <Card key={test.testId} className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => startTest(test.testId)}>
+                <Card key={test.testId} className="cursor-pointer hover:shadow-elsa-md transition-all duration-200 hover:-translate-y-0.5 rounded-2xl border-none shadow-elsa-sm" onClick={() => startTest(test.testId)}>
                   <CardContent className="p-6 flex justify-between items-center">
                     <div>
                       <h3 className="text-lg font-bold">{test.testName}</h3>
@@ -205,7 +205,7 @@ const PracticeTestPage: React.FC = () => {
                         {test.duration ? `${test.duration}s` : 'N/A'} | Đỗ: {test.passCondition || 80}%
                       </p>
                     </div>
-                    <Button><Play className="w-4 h-4 mr-2" /> Bắt đầu</Button>
+                    <Button className="rounded-xl bg-gradient-to-r from-elsa-indigo-500 to-elsa-indigo-600 hover:from-elsa-indigo-600 hover:to-elsa-indigo-700"><Play className="w-4 h-4 mr-2" /> Bắt đầu</Button>
                   </CardContent>
                 </Card>
               ))}
@@ -237,7 +237,7 @@ const PracticeTestPage: React.FC = () => {
         )}
 
         <div className="mb-8 text-center animate-in fade-in slide-in-from-top-4">
-          <Badge variant="outline" className="mb-4 bg-primary/5 text-primary border-primary/20 px-4 py-1 text-sm font-medium">
+          <Badge variant="outline" className="mb-4 bg-elsa-indigo-50 text-elsa-indigo-600 border-elsa-indigo-200 px-4 py-1 text-sm font-semibold">
             Chế độ luyện tập
           </Badge>
           <h1 className="text-3xl font-bold tracking-tight mb-2">{testInfo?.testName || 'Luyện nghe'}</h1>
@@ -246,7 +246,7 @@ const PracticeTestPage: React.FC = () => {
         </div>
 
         {testInfo?.audioUrl && (
-          <Card className="mb-6 bg-primary text-primary-foreground border-none shadow-xl animate-in zoom-in-95 duration-500">
+          <Card className="mb-6 bg-gradient-to-br from-elsa-indigo-600 via-elsa-indigo-500 to-elsa-purple-500 text-white border-none shadow-xl shadow-elsa-indigo-500/20 animate-in zoom-in-95 duration-500 rounded-2xl">
             <CardContent className="p-6">
               <div className="flex items-center gap-2 mb-4 opacity-90">
                 <Volume2 className="h-5 w-5" />
@@ -274,7 +274,7 @@ const PracticeTestPage: React.FC = () => {
         )}
 
         <div className="animate-in slide-in-from-bottom-8 duration-700">
-          <Card className="mb-6 border-none shadow-lg">
+          <Card className="mb-6 border-none shadow-elsa-md rounded-2xl">
             <CardContent className="p-6 md:p-8">
               <h2 className="text-xl font-bold mb-6 text-foreground leading-relaxed">
                 {currentQuestionIndex + 1}. {currentQuestion?.content}
@@ -310,17 +310,17 @@ const PracticeTestPage: React.FC = () => {
         </div>
 
         <div className="flex justify-between items-center animate-in fade-in">
-          <Button variant="outline" size="lg" className="h-14 px-6 rounded-xl" onClick={handlePrevious} disabled={currentQuestionIndex === 0}>
+          <Button variant="outline" size="lg" className="h-14 px-6 rounded-xl border-elsa-indigo-200 hover:bg-elsa-indigo-50" onClick={handlePrevious} disabled={currentQuestionIndex === 0}>
             <ChevronLeft className="mr-2 h-5 w-5" /> Câu trước
           </Button>
-          <Button size="lg" className="h-14 px-8 rounded-xl font-bold shadow-md" onClick={handleNext} disabled={!isAnswered}>
+          <Button size="lg" className="h-14 px-8 rounded-xl font-bold shadow-md bg-gradient-to-r from-elsa-indigo-500 to-elsa-indigo-600 hover:from-elsa-indigo-600 hover:to-elsa-indigo-700" onClick={handleNext} disabled={!isAnswered}>
             {currentQuestionIndex === questions.length - 1 ? 'Hoàn thành' : 'Câu tiếp'}
             {currentQuestionIndex !== questions.length - 1 && <ChevronRight className="ml-2 h-5 w-5" />}
           </Button>
         </div>
 
         <Dialog open={resultDialogOpen} onOpenChange={setResultDialogOpen}>
-          <DialogContent className="sm:max-w-md text-center p-8">
+          <DialogContent className="sm:max-w-md text-center p-8 rounded-2xl">
             <DialogHeader>
               <DialogTitle className="text-2xl font-bold mb-2">Kết quả luyện tập</DialogTitle>
               <DialogDescription className="text-base">
@@ -334,7 +334,7 @@ const PracticeTestPage: React.FC = () => {
               <div className="text-lg font-medium text-muted-foreground mb-6">
                 {getCorrectCount()}/{questions.length} câu đúng
               </div>
-              <Badge className={`text-base px-4 py-1.5 ${calculateScore() >= 60 ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600'}`}>
+              <Badge className={`text-base px-4 py-1.5 shadow-sm ${calculateScore() >= 60 ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-red-500 hover:bg-red-600'}`}>
                 {calculateScore() >= 60 ? 'Đạt yêu cầu' : 'Chưa đạt'}
               </Badge>
               <p className="text-sm text-muted-foreground mt-8">
@@ -342,8 +342,8 @@ const PracticeTestPage: React.FC = () => {
               </p>
             </div>
             <DialogFooter className="flex-col sm:flex-row gap-3">
-              <Button variant="outline" className="w-full h-12 text-base" onClick={() => navigate(-1)}>Quay lại</Button>
-              <Button className="w-full h-12 text-base" onClick={() => { setResultDialogOpen(false); fetchTests(); setCurrentQuestionIndex(0); setShowExplanation(false); }}>
+              <Button variant="outline" className="w-full h-12 text-base rounded-xl" onClick={() => navigate(-1)}>Quay lại</Button>
+              <Button className="w-full h-12 text-base rounded-xl bg-gradient-to-r from-elsa-indigo-500 to-elsa-indigo-600 hover:from-elsa-indigo-600 hover:to-elsa-indigo-700" onClick={() => { setResultDialogOpen(false); fetchTests(); setCurrentQuestionIndex(0); setShowExplanation(false); }}>
                 <RotateCcw className="w-4 h-4 mr-2" /> Làm lại
               </Button>
             </DialogFooter>

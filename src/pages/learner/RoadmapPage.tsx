@@ -8,6 +8,7 @@ import {
   FileText,
   Loader2,
   Info,
+  Sparkles,
 } from 'lucide-react';
 import LearnerLayout from '../../components/learner/LearnerLayout';
 import {
@@ -163,7 +164,7 @@ const RoadmapPage: React.FC = () => {
     return (
       <LearnerLayout>
         <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <Loader2 className="h-8 w-8 animate-spin text-elsa-indigo-500" />
         </div>
       </LearnerLayout>
     );
@@ -172,79 +173,107 @@ const RoadmapPage: React.FC = () => {
   return (
     <LearnerLayout>
       <div className="max-w-4xl mx-auto py-6">
+        {/* Header Section with gradient accent */}
         <div className="mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight mb-1">
-            Lộ trình học tập của {displayName}
-          </h1>
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <span>{totalTopics} Đơn vị</span>
-            <span>•</span>
-            <Badge variant="outline" className="text-primary border-primary/50">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-elsa-indigo-500 to-elsa-purple-500 flex items-center justify-center">
+              <Sparkles className="w-4 h-4 text-white" />
+            </div>
+            <Badge variant="outline" className="text-elsa-indigo-600 border-elsa-indigo-200 bg-elsa-indigo-50 font-semibold">
               {currentLevel?.levelName || 'N5'}
             </Badge>
           </div>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight mb-1 text-foreground">
+            Lộ trình học tập của {displayName}
+          </h1>
+          <p className="text-muted-foreground">
+            {totalTopics} Đơn vị học tập
+          </p>
         </div>
 
         {topics.length === 0 ? (
           <div className="text-center py-16 text-muted-foreground">
-            <BookOpen className="h-16 w-16 mx-auto mb-4 opacity-50" />
-            <p>Chưa có nội dung học trong cấp độ này.</p>
+            <div className="w-20 h-20 rounded-3xl bg-elsa-indigo-50 flex items-center justify-center mx-auto mb-4">
+              <BookOpen className="h-10 w-10 text-elsa-indigo-400" />
+            </div>
+            <p className="text-lg font-medium">Chưa có nội dung học trong cấp độ này.</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-5">
             {topics.map((topic, unitIndex) => {
               const { passed, total } = getTopicLessonCount(topic);
               const lessons = getLessonsForTopic(topic);
+              const progressPercent = total > 0 ? (passed / total) * 100 : 0;
 
               return (
-                <Card key={topic.id} className="overflow-hidden border shadow-sm">
-                  <div className="p-5">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Badge variant="secondary" className="bg-primary/10 text-primary">
+                <Card
+                  key={topic.id}
+                  className="overflow-hidden border-none shadow-elsa-sm hover:shadow-elsa-md transition-all duration-300 rounded-2xl"
+                  style={{ animationDelay: `${unitIndex * 100}ms` }}
+                >
+                  {/* Topic Header */}
+                  <div className="p-6 pb-4">
+                    <div className="flex items-center gap-2.5 mb-2">
+                      <Badge className="bg-gradient-to-r from-elsa-indigo-500 to-elsa-indigo-600 text-white font-semibold px-3 py-1 rounded-lg">
                         Đơn vị {unitIndex + 1}
                       </Badge>
-                      <span className="text-sm text-muted-foreground">
+                      <span className="text-sm text-muted-foreground font-medium">
                         {passed}/{total} Bài học
                       </span>
-                      <Info className="h-4 w-4 text-muted-foreground" />
                     </div>
-                    <h3 className="text-xl font-bold tracking-tight">{topic.topicName}</h3>
+                    <h3 className="text-xl font-bold tracking-tight text-foreground">{topic.topicName}</h3>
                     <p className="text-sm text-muted-foreground mt-1">
                       Học từ vựng và luyện tập theo chủ đề
                     </p>
-                    <div className="mt-3">
+                    <div className="mt-3 flex items-center gap-3">
                       <Progress
-                        value={total > 0 ? (passed / total) * 100 : 0}
-                        className="h-2 w-48"
+                        value={progressPercent}
+                        className="h-2 flex-1 max-w-[200px]"
                       />
+                      <span className="text-xs font-bold text-elsa-indigo-600">{Math.round(progressPercent)}%</span>
                     </div>
                   </div>
-                  <div className="border-t bg-muted/20 px-5 pb-5 pt-2">
+
+                  {/* Lessons List */}
+                  <div className="border-t border-elsa-indigo-50 bg-gradient-to-b from-elsa-indigo-50/30 to-transparent px-6 pb-5 pt-3">
                     <div className="space-y-2">
                       {lessons.map((lesson) => (
                         <div
                           key={lesson.id}
-                          className={`flex items-center gap-4 p-3 rounded-lg transition-colors ${
-                            lesson.isNext ? 'bg-primary/10 border border-primary/20' : 'bg-background'
+                          className={`flex items-center gap-4 p-3.5 rounded-xl transition-all duration-200 ${
+                            lesson.isNext
+                              ? 'bg-white shadow-elsa-sm border border-elsa-indigo-100/80'
+                              : 'bg-white/60 hover:bg-white/80'
                           }`}
                         >
-                          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                            {lesson.type === 'vocabulary' ? (
-                              <FileText className="h-5 w-5 text-primary" />
+                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                            lesson.isCompleted
+                              ? 'bg-emerald-100'
+                              : lesson.isNext
+                                ? 'bg-gradient-to-br from-elsa-indigo-500 to-elsa-indigo-600'
+                                : 'bg-elsa-indigo-50'
+                          }`}>
+                            {lesson.isCompleted ? (
+                              <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+                            ) : lesson.type === 'vocabulary' ? (
+                              <FileText className={`h-5 w-5 ${lesson.isNext ? 'text-white' : 'text-elsa-indigo-500'}`} />
                             ) : (
-                              <Mic className="h-5 w-5 text-primary" />
+                              <Mic className={`h-5 w-5 ${lesson.isNext ? 'text-white' : 'text-elsa-indigo-500'}`} />
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="font-medium truncate">{lesson.title}</p>
+                            <p className="font-medium truncate text-foreground">{lesson.title}</p>
                             <p className="text-xs text-muted-foreground">{lesson.typeLabel}</p>
                           </div>
                           {lesson.isCompleted && (
-                            <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" />
+                            <Badge className="bg-emerald-50 text-emerald-600 border-emerald-200 font-medium" variant="outline">
+                              Hoàn thành
+                            </Badge>
                           )}
                           {lesson.isNext && (
                             <Button
                               size="sm"
+                              className="rounded-xl bg-gradient-to-r from-elsa-indigo-500 to-elsa-indigo-600 hover:from-elsa-indigo-600 hover:to-elsa-indigo-700 shadow-md hover:shadow-lg transition-all"
                               onClick={() => handleStartLesson(topic, lesson)}
                             >
                               <Play className="h-4 w-4 mr-1" />
