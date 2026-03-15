@@ -8,6 +8,7 @@ import {
   Loader2,
   Sparkles,
   Lock,
+  RotateCcw,
 } from 'lucide-react';
 import LearnerLayout from '../../components/learner/LearnerLayout';
 import {
@@ -269,9 +270,20 @@ const RoadmapPage: React.FC = () => {
                                 </p>
                               </div>
                               {testItem.isPassed && (
-                                <Badge className="bg-emerald-50 text-emerald-600 border-emerald-200 font-medium" variant="outline">
-                                  Đã đạt
-                                </Badge>
+                                <>
+                                  <Badge className="bg-emerald-50 text-emerald-600 border-emerald-200 font-medium" variant="outline">
+                                    Đã đạt
+                                  </Badge>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="rounded-xl border-emerald-200 text-emerald-600 hover:bg-emerald-50"
+                                    onClick={() => handleStartTest(topic, testItem)}
+                                  >
+                                    <RotateCcw className="h-4 w-4 mr-1" />
+                                    Làm lại
+                                  </Button>
+                                </>
                               )}
                               {testItem.isNext && (
                                 <Button

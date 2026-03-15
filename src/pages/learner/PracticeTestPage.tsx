@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import {
   Play,
   Pause,
@@ -34,7 +34,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
-type Phase = 'loading' | 'select-test' | 'in-progress' | 'submitting';
+type Phase = 'loading' | 'in-progress' | 'submitting';
 
 interface AnswerState {
   questionId: number;
@@ -45,11 +45,14 @@ interface AnswerState {
 const PracticeTestPage: React.FC = () => {
   const navigate = useNavigate();
   const { topicId } = useParams<{ topicId: string }>();
+  const [searchParams] = useSearchParams();
+  const testIdFromUrl = searchParams.get('testId');
   const profileId = getActiveProfileId();
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const [phase, setPhase] = useState<Phase>('loading');
   const [tests, setTests] = useState<TestSummaryResponse[]>([]);
+  const [passedTestCount, setPassedTestCount] = useState(0);
   const [testInfo, setTestInfo] = useState<StartTestResponse | null>(null);
   const [questions, setQuestions] = useState<LearnerQuestionResponse[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -65,21 +68,43 @@ const PracticeTestPage: React.FC = () => {
   const fetchTests = useCallback(async () => {
     if (!topicId) return;
     try {
-      const res = await learnerApi.getTestsByTopic(Number(topicId));
-      const items = res.data.content;
+      const topicIdNum = Number(topicId);
+      const [testsRes, progressRes] = await Promise.all([
+        learnerApi.getTestsByTopic(topicIdNum),
+        profileId ? learnerApi.getProfileProgress(profileId) : Promise.resolve({ data: null }),
+      ]);
+      const items = testsRes.data.content;
       setTests(items);
-      if (items.length === 1) {
-        await startTest(items[0].testId);
-      } else if (items.length === 0) {
-        setPhase('select-test');
+
+      let passed = 0;
+      if (progressRes?.data?.levels) {
+        const topicProgress = progressRes.data.levels
+          .flatMap((l) => l.topics)
+          .find((t) => t.topicId === topicIdNum);
+        passed = topicProgress?.passedTestCount ?? 0;
+      }
+      setPassedTestCount(passed);
+
+      let targetTestId: number | null = null;
+      if (testIdFromUrl) {
+        const id = parseInt(testIdFromUrl, 10);
+        if (!isNaN(id) && items.some((t) => t.testId === id)) targetTestId = id;
+      }
+      if (targetTestId === null && items.length === 1) targetTestId = items[0].testId;
+      if (targetTestId === null && items.length > 1) {
+        const nextIdx = Math.min(passed, items.length - 1);
+        targetTestId = items[nextIdx].testId;
+      }
+
+      if (targetTestId !== null) {
+        await startTest(targetTestId);
       } else {
-        setPhase('select-test');
+        setError('Chưa có bài test nào cho chủ đề này.');
       }
     } catch (err: any) {
       setError(err.message);
-      setPhase('select-test');
     }
-  }, [topicId]);
+  }, [topicId, profileId, testIdFromUrl]);
 
   useEffect(() => { fetchTests(); }, [fetchTests]);
 
@@ -96,7 +121,6 @@ const PracticeTestPage: React.FC = () => {
       setPhase('in-progress');
     } catch (err: any) {
       setError(err.message);
-      setPhase('select-test');
     }
   };
 
@@ -170,47 +194,23 @@ const PracticeTestPage: React.FC = () => {
 
   const getCorrectCount = () => answers.filter(a => a.isCorrect === true).length;
 
+  if (error && !testInfo) {
+    return (
+      <LearnerLayout>
+        <div className="max-w-2xl mx-auto py-12 text-center">
+          <div className="mb-4 p-4 bg-red-50 text-red-700 rounded-2xl border border-red-200">{error}</div>
+          <Button variant="outline" onClick={() => navigate('/learn')}>Quay lại lộ trình</Button>
+        </div>
+      </LearnerLayout>
+    );
+  }
+
   if (phase === 'loading' || phase === 'submitting') {
     return (
       <LearnerLayout>
         <div className="flex flex-col items-center justify-center py-20 gap-4">
           <Loader2 className="h-8 w-8 animate-spin text-elsa-indigo-500" />
           <p className="text-muted-foreground">{phase === 'submitting' ? 'Đang nộp bài...' : 'Đang tải...'}</p>
-        </div>
-      </LearnerLayout>
-    );
-  }
-
-  if (phase === 'select-test') {
-    return (
-      <LearnerLayout>
-        <div className="max-w-2xl mx-auto py-12">
-          {error && <div className="mb-4 p-4 bg-red-50 text-red-700 rounded-2xl border border-red-200">{error}</div>}
-          <h1 className="text-3xl font-bold mb-8 text-center">Chọn bài luyện tập</h1>
-          {tests.length === 0 ? (
-            <div className="text-center text-muted-foreground py-12">
-              Chưa có bài test nào cho chủ đề này.
-              <div className="mt-4">
-                <Button variant="outline" onClick={() => navigate(-1)}>Quay lại</Button>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {tests.map(test => (
-                <Card key={test.testId} className="cursor-pointer hover:shadow-elsa-md transition-all duration-200 hover:-translate-y-0.5 rounded-2xl border-none shadow-elsa-sm" onClick={() => startTest(test.testId)}>
-                  <CardContent className="p-6 flex justify-between items-center">
-                    <div>
-                      <h3 className="text-lg font-bold">{test.testName}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {test.duration ? `${test.duration}s` : 'N/A'} | Đỗ: {test.passCondition || 80}%
-                      </p>
-                    </div>
-                    <Button className="rounded-xl bg-gradient-to-r from-elsa-indigo-500 to-elsa-indigo-600 hover:from-elsa-indigo-600 hover:to-elsa-indigo-700"><Play className="w-4 h-4 mr-2" /> Bắt đầu</Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
         </div>
       </LearnerLayout>
     );
@@ -341,10 +341,9 @@ const PracticeTestPage: React.FC = () => {
                 Đây là chế độ luyện tập, kết quả sẽ không ảnh hưởng đến tiến độ.
               </p>
             </div>
-            <DialogFooter className="flex-col sm:flex-row gap-3">
-              <Button variant="outline" className="w-full h-12 text-base rounded-xl" onClick={() => navigate(-1)}>Quay lại</Button>
-              <Button className="w-full h-12 text-base rounded-xl bg-gradient-to-r from-elsa-indigo-500 to-elsa-indigo-600 hover:from-elsa-indigo-600 hover:to-elsa-indigo-700" onClick={() => { setResultDialogOpen(false); fetchTests(); setCurrentQuestionIndex(0); setShowExplanation(false); }}>
-                <RotateCcw className="w-4 h-4 mr-2" /> Làm lại
+            <DialogFooter>
+              <Button className="w-full h-12 text-base rounded-xl bg-gradient-to-r from-elsa-indigo-500 to-elsa-indigo-600 hover:from-elsa-indigo-600 hover:to-elsa-indigo-700" onClick={() => navigate('/learn')}>
+                Quay lại lộ trình
               </Button>
             </DialogFooter>
           </DialogContent>
