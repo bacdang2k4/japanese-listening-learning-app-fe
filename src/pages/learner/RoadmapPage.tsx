@@ -69,9 +69,10 @@ const RoadmapPage: React.FC = () => {
       ]);
       setProgress(progressRes.data);
 
-      const currentLevel = progressRes.data.levels.find(
-        (l) => l.status === 'LEARNING' || l.status === 'PASS'
-      ) || progressRes.data.levels[0];
+      // Ưu tiên level đang học (LEARNING); nếu đã xong hết thì dùng level đã PASS cuối
+      const currentLevel = progressRes.data.levels.find((l) => l.status === 'LEARNING')
+        || progressRes.data.levels.filter((l) => l.status === 'PASS').pop()
+        || progressRes.data.levels[0];
 
       if (currentLevel) {
         const topicsRes = await learnerApi.getTopicsByLevel(currentLevel.levelId, profileId);
@@ -140,7 +141,8 @@ const RoadmapPage: React.FC = () => {
     navigate(`/learn/topic/${topic.id}/practice?testId=${testItem.testId}`);
   };
 
-  const currentLevel = progress?.levels.find((l) => l.status === 'LEARNING' || l.status === 'PASS')
+  const currentLevel = progress?.levels.find((l) => l.status === 'LEARNING')
+    || progress?.levels.filter((l) => l.status === 'PASS').pop()
     || progress?.levels[0];
   const totalTopics = progress?.levels.reduce((sum, l) => sum + l.topics.length, 0) ?? 0;
 

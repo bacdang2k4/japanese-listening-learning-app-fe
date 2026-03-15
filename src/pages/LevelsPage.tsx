@@ -14,6 +14,7 @@ import {
   Delete as DeleteIcon,
 } from '@mui/icons-material';
 import MainLayout from '../components/layout/MainLayout';
+import { formatBackendDateTime } from '../lib/dateUtils';
 import DataTable from '../components/common/DataTable';
 import FormDialog from '../components/common/FormDialog';
 import ConfirmDialog from '../components/common/ConfirmDialog';
@@ -115,6 +116,7 @@ const LevelsPage: React.FC = () => {
       id: 'createdAt',
       label: 'Ngày tạo',
       minWidth: 150,
+      format: (value: any) => formatBackendDateTime(value),
     },
     {
       id: 'actions',

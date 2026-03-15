@@ -12,6 +12,7 @@ import {
   Alert,
 } from '@mui/material';
 import MainLayout from '../components/layout/MainLayout';
+import { formatBackendDateTime } from '../lib/dateUtils';
 import DataTable from '../components/common/DataTable';
 import { adminTestResultApi, AdminTestResultResponse } from '../services/api';
 
@@ -90,16 +91,7 @@ const TestResultsPage: React.FC = () => {
       id: 'completedAt',
       label: 'Thời gian',
       minWidth: 140,
-      format: (value: string | null) =>
-        value
-          ? new Date(value).toLocaleString('vi-VN', {
-              day: '2-digit',
-              month: '2-digit',
-              year: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit',
-            })
-          : '—',
+      format: (value: string | null) => (value ? formatBackendDateTime(value) : '—'),
     },
   ];
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Play, Loader2, GraduationCap, Calendar, CheckCircle2, BookOpen, Camera, X, Sparkles } from 'lucide-react';
 import LearnerLayout from '../../components/learner/LearnerLayout';
+import { formatBackendDateTime } from '@/lib/dateUtils';
 import { learnerApi, LevelResponse, ProfileResponse } from '@/services/api';
 import { useActiveProfile } from '@/hooks/useActiveProfile';
 import { Card, CardContent } from '@/components/ui/card';
@@ -112,11 +113,7 @@ const ProfileManagementPage: React.FC = () => {
     }
   };
 
-  const formatDate = (dateStr: string) => {
-    try {
-      return new Intl.DateTimeFormat('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(dateStr));
-    } catch { return dateStr; }
-  };
+  const formatDate = (value: unknown) => formatBackendDateTime(value);
 
   const getStatusBadge = (status: string) => {
     switch (status) {

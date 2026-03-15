@@ -19,6 +19,7 @@ import {
 import MainLayout from '../components/layout/MainLayout';
 import DataTable from '../components/common/DataTable';
 import ConfirmDialog from '../components/common/ConfirmDialog';
+import { formatBackendDateTime } from '../lib/dateUtils';
 import { adminLearnerApi, LearnerResponse } from '../services/api';
 
 const LearnersPage: React.FC = () => {
@@ -116,8 +117,8 @@ const LearnersPage: React.FC = () => {
     {
       id: 'createdAt',
       label: 'Ngày đăng ký',
-      minWidth: 120,
-      format: (value: string) => new Date(value).toLocaleDateString('vi-VN'),
+      minWidth: 140,
+      format: (value: any) => formatBackendDateTime(value),
     },
     {
       id: 'actions',

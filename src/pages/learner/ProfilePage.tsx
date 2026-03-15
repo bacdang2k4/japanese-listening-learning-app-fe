@@ -17,6 +17,7 @@ import {
   User2,
 } from 'lucide-react';
 import LearnerLayout from '../../components/learner/LearnerLayout';
+import { formatBackendDateTime } from '@/lib/dateUtils';
 import {
   learnerApi,
   LearnerAccountResponse,
@@ -240,11 +241,7 @@ const ProfilePage: React.FC = () => {
     }
   };
 
-  const formatDate = (dateStr: string) => {
-    try {
-      return new Intl.DateTimeFormat('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(dateStr));
-    } catch { return dateStr; }
-  };
+  const formatDate = (value: unknown) => formatBackendDateTime(value);
 
   if (loading) {
     return (

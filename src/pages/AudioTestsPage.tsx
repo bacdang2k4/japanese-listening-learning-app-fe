@@ -40,6 +40,7 @@ import {
 } from '@mui/icons-material';
 import Backdrop from '@mui/material/Backdrop';
 import MainLayout from '../components/layout/MainLayout';
+import { formatBackendDateTime } from '../lib/dateUtils';
 import DataTable from '../components/common/DataTable';
 import FormDialog from '../components/common/FormDialog';
 import ConfirmDialog from '../components/common/ConfirmDialog';
@@ -612,8 +613,14 @@ const AudioTestsPage: React.FC = () => {
     {
       id: 'duration',
       label: 'Thời lượng',
-      minWidth: 80,
-      format: (value: number) => `${value} phút`,
+      minWidth: 100,
+      format: (value: number) => {
+        const m = Math.floor((value ?? 0) / 60);
+        const s = (value ?? 0) % 60;
+        if (m > 0 && s > 0) return `${m} phút ${s} giây`;
+        if (m > 0) return `${m} phút`;
+        return `${s} giây`;
+      },
     },
     {
       id: 'passCondition',
@@ -633,7 +640,7 @@ const AudioTestsPage: React.FC = () => {
         />
       ),
     },
-    { id: 'createdAt', label: 'Ngày tạo', minWidth: 150 },
+    { id: 'createdAt', label: 'Ngày tạo', minWidth: 150, format: (value: any) => formatBackendDateTime(value) },
     {
       id: 'actions',
       label: 'Thao tác',

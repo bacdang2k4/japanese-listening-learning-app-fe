@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { History, Search, Eye, CheckCircle2, XCircle, CalendarCheck, HelpCircle, BarChart3, Loader2 } from 'lucide-react';
 import LearnerLayout from '../../components/learner/LearnerLayout';
+import { formatBackendDateTime } from '@/lib/dateUtils';
 import { learnerApi, TestHistoryResponse, TestResultDetailResponse, QuestionResultResponse } from '@/services/api';
 import { getActiveProfileId } from '@/hooks/useActiveProfile';
 import { Card, CardContent } from '@/components/ui/card';
@@ -71,11 +72,7 @@ const TestHistoryPage: React.FC = () => {
     }
   };
 
-  const formatDate = (dateStr: string) => {
-    try {
-      return new Intl.DateTimeFormat('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(dateStr));
-    } catch { return dateStr; }
-  };
+  const formatDate = (value: unknown) => formatBackendDateTime(value);
 
   return (
     <LearnerLayout>
