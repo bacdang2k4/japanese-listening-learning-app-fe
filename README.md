@@ -1,73 +1,108 @@
-# Welcome to your Lovable project
+# JPLearning - Frontend
 
-## Project info
+Giao diện web cho ứng dụng học nghe tiếng Nhật (Japanese Listening Learning App).
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Công nghệ sử dụng
 
-## How can I edit this code?
+- **Vite 5** – Build tool
+- **React 18** & **TypeScript**
+- **React Router** – Điều hướng
+- **TanStack Query** – Quản lý state server
+- **React Hook Form** & **Zod** – Form & validation
+- **shadcn/ui** & **Radix UI** – Component library
+- **Tailwind CSS** – Styling
+- **MUI Icons** & **Lucide React** – Icons
+- **Recharts** – Biểu đồ
+- **date-fns** – Xử lý ngày tháng
 
-There are several ways of editing your application.
+## Yêu cầu
 
-**Use Lovable**
+- Node.js 18+
+- npm hoặc pnpm
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## Cài đặt & chạy
 
-Changes made via Lovable will be committed automatically to this repo.
+### 1. Clone repository
 
-**Use your preferred IDE**
+```bash
+git clone <repository-url>
+cd fe-jplearning/nam-fe
+```
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### 2. Cài đặt dependencies
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+```bash
+npm install
+```
 
-Follow these steps:
+### 3. Cấu hình môi trường (tùy chọn)
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+Tạo file `.env` hoặc `.env.local` nếu cần override URL API:
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+```env
+# Mặc định: /api/v1 (proxy tới http://localhost:8080/api/v1)
+VITE_API_BASE_URL=/api/v1
+```
 
-# Step 3: Install the necessary dependencies.
-npm i
+Trong môi trường dev, Vite proxy `/api` tới `http://localhost:8080`, nên thường không cần cấu hình thêm.
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+### 4. Chạy development server
+
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Ứng dụng chạy tại: http://localhost:3000
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### 5. Build production
 
-**Use GitHub Codespaces**
+```bash
+npm run build
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### 6. Preview build
 
-## What technologies are used for this project?
+```bash
+npm run preview
+```
 
-This project is built with:
+## Cấu trúc thư mục
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+```
+src/
+├── components/      # UI components (shadcn, custom)
+├── pages/           # Trang (Admin, Learner)
+├── services/        # API client (api.ts)
+├── hooks/           # Custom hooks
+├── lib/             # Utilities
+├── routes/          # Định nghĩa routes
+├── App.tsx
+└── main.tsx
+```
 
-## How can I deploy this project?
+## Scripts
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+| Lệnh | Mô tả |
+|------|-------|
+| `npm run dev` | Chạy dev server (port 3000) |
+| `npm run build` | Build production |
+| `npm run build:dev` | Build mode development |
+| `npm run preview` | Xem trước build |
+| `npm run lint` | Chạy ESLint |
+| `npm run test` | Chạy Vitest |
+| `npm run test:watch` | Chạy Vitest watch mode |
 
-## Can I connect a custom domain to my Lovable project?
+## Kết nối Backend
 
-Yes, you can!
+- **Dev:** Frontend proxy `/api` → `http://localhost:8080`
+- **API base:** `/api/v1` (qua proxy hoặc `VITE_API_BASE_URL`)
+- Backend phải chạy tại `http://localhost:8080` khi dev
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## Phân quyền
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+- **Learner:** Đăng nhập qua `/auth/login`, token lưu `learner_token`
+- **Admin:** Đăng nhập qua `/admin/auth/login`, token lưu `admin_token`
+
+## License
+
+Dự án học tập - SWD392
