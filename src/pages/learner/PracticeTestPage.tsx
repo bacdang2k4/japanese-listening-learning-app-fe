@@ -161,7 +161,8 @@ const PracticeTestPage: React.FC = () => {
         questionId: a.questionId,
         selectedAnswerId: a.selectedAnswerId,
       }));
-      await learnerApi.submitTest(testInfo.resultId, { profileId, answers: answerPayload });
+      const res = await learnerApi.submitTest(testInfo.resultId, { profileId, answers: answerPayload });
+      setSubmitResult({ score: res.data.score, isPassed: res.data.isPassed });
       setResultDialogOpen(true);
       setPhase('in-progress');
     } catch (err: any) {
@@ -328,14 +329,14 @@ const PracticeTestPage: React.FC = () => {
               </DialogDescription>
             </DialogHeader>
             <div className="py-8">
-              <div className={`text-7xl font-black tracking-tighter mb-4 ${calculateScore() >= 60 ? 'text-green-500' : 'text-red-500'}`}>
-                {calculateScore()}%
+              <div className={`text-7xl font-black tracking-tighter mb-4 ${submitResult?.isPassed ? 'text-green-500' : 'text-red-500'}`}>
+                {submitResult?.score}%
               </div>
               <div className="text-lg font-medium text-muted-foreground mb-6">
                 {getCorrectCount()}/{questions.length} câu đúng
               </div>
-              <Badge className={`text-base px-4 py-1.5 shadow-sm ${calculateScore() >= 60 ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-red-500 hover:bg-red-600'}`}>
-                {calculateScore() >= 60 ? 'Đạt yêu cầu' : 'Chưa đạt'}
+              <Badge className={`text-base px-4 py-1.5 shadow-sm ${submitResult?.isPassed ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-red-500 hover:bg-red-600'}`}>
+                {submitResult?.isPassed ? 'Đạt yêu cầu' : 'Chưa đạt'}
               </Badge>
               <p className="text-sm text-muted-foreground mt-8">
                 Đây là chế độ luyện tập, kết quả sẽ không ảnh hưởng đến tiến độ.

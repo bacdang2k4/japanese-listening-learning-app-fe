@@ -10,19 +10,33 @@ import {
   Typography,
   CircularProgress,
   Alert,
+  Button,
 } from '@mui/material';
+import { ArrowBack } from '@mui/icons-material';
 import MainLayout from '../components/layout/MainLayout';
 import { formatBackendDateTime } from '../lib/dateUtils';
 import DataTable from '../components/common/DataTable';
 import { adminTestResultApi, AdminTestResultResponse } from '../services/api';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 
 const TestResultsPage: React.FC = () => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [results, setResults] = useState<AdminTestResultResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterResult, setFilterResult] = useState<string>('');
   const [page] = useState(0);
+  const [filteredLearnerName, setFilteredLearnerName] = useState<string>('');
+
+  useEffect(() => {
+    const learnerNameParam = searchParams.get('learnerName');
+    if (learnerNameParam) {
+      setSearchQuery(learnerNameParam);
+      setFilteredLearnerName(learnerNameParam);
+    }
+  }, [searchParams]);
 
   const fetchResults = useCallback(async () => {
     setLoading(true);
@@ -43,6 +57,13 @@ const TestResultsPage: React.FC = () => {
   }, [page, searchQuery, filterResult]);
 
   useEffect(() => { fetchResults(); }, [fetchResults]);
+
+  const handleClearFilter = () => {
+    setSearchQuery('');
+    setFilteredLearnerName('');
+    setFilterResult('');
+    navigate('/admin/test-results', { replace: true });
+  };
 
   const columns = [
     {
@@ -69,8 +90,8 @@ const TestResultsPage: React.FC = () => {
       id: 'score',
       label: 'Điểm',
       minWidth: 80,
-      format: (value: number) => (
-        <Typography fontWeight={600} color={value >= 60 ? 'success.main' : 'error.main'}>
+      format: (value: number, row: AdminTestResultResponse) => (
+        <Typography fontWeight={600} color={row.isPassed ? 'success.main' : 'error.main'}>
           {value}%
         </Typography>
       ),
@@ -101,6 +122,22 @@ const TestResultsPage: React.FC = () => {
         <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>
           {error}
         </Alert>
+      )}
+
+      {filteredLearnerName && (
+        <Box sx={{ mb: 2 }}>
+          <Button
+            startIcon={<ArrowBack />}
+            onClick={handleClearFilter}
+            variant="outlined"
+            size="small"
+          >
+            Quay lại tất cả kết quả
+          </Button>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            Đang lọc kết quả của học viên: <strong>{filteredLearnerName}</strong>
+          </Typography>
+        </Box>
       )}
 
       <Box sx={{ mb: 3, display: 'flex', gap: 2, flexWrap: 'wrap' }}>

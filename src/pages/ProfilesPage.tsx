@@ -7,12 +7,17 @@ import {
   Typography,
   CircularProgress,
   Alert,
+  IconButton,
+  Tooltip,
 } from '@mui/material';
+import Visibility from '@mui/icons-material/Visibility';
 import MainLayout from '../components/layout/MainLayout';
 import DataTable from '../components/common/DataTable';
 import { adminProfileApi, AdminProfileResponse } from '../services/api';
+import { useNavigate } from 'react-router-dom';
 
 const ProfilesPage: React.FC = () => {
+  const navigate = useNavigate();
   const [profiles, setProfiles] = useState<AdminProfileResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -34,6 +39,10 @@ const ProfilesPage: React.FC = () => {
   }, [page, searchQuery]);
 
   useEffect(() => { fetchProfiles(); }, [fetchProfiles]);
+
+  const handleViewDetails = (learnerName: string) => {
+    navigate(`/admin/test-results?learnerName=${encodeURIComponent(learnerName)}`);
+  };
 
   const getStatusChip = (status: string) => {
     const config: Record<string, { label: string; color: 'info' | 'success' | 'error' }> = {
@@ -90,13 +99,20 @@ const ProfilesPage: React.FC = () => {
       ),
     },
     {
-      id: 'totalScore',
-      label: 'Tổng điểm',
-      minWidth: 100,
-      format: (value: number) => (
-        <Typography fontWeight={600} color="primary">
-          {value.toLocaleString()}
-        </Typography>
+      id: 'actions',
+      label: 'Thao tác',
+      minWidth: 120,
+      align: 'center' as const,
+      format: (_: any, row: AdminProfileResponse) => (
+        <Tooltip title="Xem chi tiết kết quả thi">
+          <IconButton
+            size="small"
+            color="primary"
+            onClick={() => handleViewDetails(row.learnerName)}
+          >
+            <Visibility fontSize="small" />
+          </IconButton>
+        </Tooltip>
       ),
     },
   ];
