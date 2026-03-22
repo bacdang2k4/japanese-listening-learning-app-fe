@@ -80,6 +80,19 @@ const AdminAudioTestDetailPage: React.FC = () => {
   const { testId } = useParams<{ testId: string }>();
   const navigate = useNavigate();
 
+  // Helper to strip SSML tags
+  const stripSSML = (ssml: string): string => {
+    if (!ssml) return '';
+    return ssml
+      .replace(/<[^>]*>/g, '') // Remove all tags
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&apos;/g, "'")
+      .trim();
+  };
+
   const [test, setTest] = useState<AudioTestResponse | null>(null);
   const [questions, setQuestions] = useState<QuestionResponse[]>([]);
   const [loading, setLoading] = useState(true);
@@ -96,6 +109,7 @@ const AdminAudioTestDetailPage: React.FC = () => {
     audioUrl: '',
     duration: 60,
     passCondition: 70,
+    testOrder: 1,
   });
   const [topics, setTopics] = useState<TopicResponse[]>([]);
   const [topicsLoading, setTopicsLoading] = useState(true);
@@ -162,6 +176,7 @@ const AdminAudioTestDetailPage: React.FC = () => {
         audioUrl: testRes.data.audioUrl || '',
         duration: testRes.data.duration,
         passCondition: testRes.data.passCondition || 70,
+        testOrder: testRes.data.testOrder || 1,
       });
       setHasChanges(false);
     } catch (err: any) {
@@ -202,6 +217,7 @@ const AdminAudioTestDetailPage: React.FC = () => {
         audioUrl: editForm.audioUrl || undefined,
         duration: editForm.duration,
         passCondition: editForm.passCondition,
+        testOrder: editForm.testOrder,
       });
       setSuccessMsg('Đã lưu thay đổi');
       setHasChanges(false);
@@ -499,7 +515,7 @@ const AdminAudioTestDetailPage: React.FC = () => {
                   color="success"
                   startIcon={<PublishIcon />}
                   onClick={() => setPublishDialogOpen(true)}
-                  disabled={saving || !hasChanges}
+                  disabled={saving}
                 >
                   Xuất bản
                 </Button>
@@ -585,7 +601,40 @@ const AdminAudioTestDetailPage: React.FC = () => {
                   )}
                 </FormControl>
               </Box>
-              <Box sx={{ display: 'flex', gap: 2 }}>
+              <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, flex: 1 }}>
+                  <Typography variant="caption" color="text.secondary">Thứ tự bài test</Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Tooltip title="Tăng thứ tự">
+                      <IconButton
+                        size="small"
+                        onClick={() => handleEditChange('testOrder', editForm.testOrder - 1)}
+                        disabled={saving || editForm.testOrder <= 1}
+                      >
+                        <ArrowUpIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                    <TextField
+                      label=""
+                      type="number"
+                      value={editForm.testOrder}
+                      onChange={(e) => handleEditChange('testOrder', Number(e.target.value))}
+                      inputProps={{ min: 1 }}
+                      sx={{ width: 80 }}
+                      disabled={saving}
+                      size="small"
+                    />
+                    <Tooltip title="Giảm thứ tự">
+                      <IconButton
+                        size="small"
+                        onClick={() => handleEditChange('testOrder', editForm.testOrder + 1)}
+                        disabled={saving}
+                      >
+                        <ArrowDownIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
+                </Box>
                 <TextField
                   label="Thời lượng (phút)"
                   type="number"
@@ -604,13 +653,36 @@ const AdminAudioTestDetailPage: React.FC = () => {
                 />
               </Box>
               <TextField
-                label="Transcript"
+                label="Transcript (SSML)"
                 value={editForm.transcript}
                 onChange={(e) => handleEditChange('transcript', e.target.value)}
                 fullWidth multiline rows={6}
                 disabled={saving}
-                helperText="Nội dung transcript của audio (có thể chứa SSML)"
+                helperText="Nội dung transcript với SSML markup (dành cho AWS Polly)"
               />
+              {test?.plainTranscript && (
+                <Box sx={{ mt: 2 }}>
+                  <Typography variant="subtitle2" fontWeight={600} gutterBottom>
+                    Transcript (đã parse, không SSML)
+                  </Typography>
+                  <Paper
+                    variant="outlined"
+                    sx={{
+                      p: 2,
+                      bgcolor: '#f5f5f5',
+                      maxHeight: 200,
+                      overflow: 'auto',
+                    }}
+                  >
+                    <Typography
+                      variant="body2"
+                      sx={{ whiteSpace: 'pre-wrap', lineHeight: 1.8 }}
+                    >
+                      {test.plainTranscript}
+                    </Typography>
+                  </Paper>
+                </Box>
+              )}
               <TextField
                 label="Audio URL"
                 value={editForm.audioUrl}
@@ -806,11 +878,11 @@ const AdminAudioTestDetailPage: React.FC = () => {
                 {test.transcript && (
                   <Box sx={{ mt: 4 }}>
                     <Typography variant="subtitle2" gutterBottom fontWeight={600}>
-                      📝 Transcript:
+                      📝 Transcript (plain text):
                     </Typography>
                     <Paper variant="outlined" sx={{ p: 3, mt: 1, bgcolor: '#f5f5f5' }}>
-                      <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap', lineHeight: 1.8, fontFamily: 'monospace' }}>
-                        {test.transcript}
+                      <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap', lineHeight: 1.8 }}>
+                        {test.plainTranscript || stripSSML(test.transcript)}
                       </Typography>
                     </Paper>
                   </Box>
