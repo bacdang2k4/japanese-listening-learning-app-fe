@@ -111,9 +111,11 @@ export interface AudioTestRequest {
     testName: string;
     topicId: number;
     transcript?: string;
+    plainTranscript?: string;
     audioUrl?: string;
     duration: number;
     passCondition?: number;
+    testOrder?: number;
 }
 
 export interface AudioTestResponse {
@@ -122,12 +124,14 @@ export interface AudioTestResponse {
     topicId: number;
     topicName: string;
     transcript: string;
+    plainTranscript?: string | null;
     audioUrl: string;
     duration: number;
     passCondition: number;
     status: string;
     createdAt: string;
     updatedAt: string;
+    testOrder: number | null;
 }
 
 // ─── Question / Answer Types ──────────────────────────────────
@@ -286,6 +290,7 @@ export interface AiTestResponse {
     testId: number;
     testName: string;
     transcript: string;
+    plainTranscript?: string | null;
     topicId: number;
     status: string;
     audioUrl: string;

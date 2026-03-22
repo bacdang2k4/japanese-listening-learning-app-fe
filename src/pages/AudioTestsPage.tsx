@@ -186,6 +186,7 @@ const AudioTestsPage: React.FC = () => {
 
   const columns = [
     { id: 'testId', label: 'ID', minWidth: 60 },
+    { id: 'testOrder', label: 'Thứ tự', minWidth: 80, align: 'center' as const },
     { id: 'testName', label: 'Tên bài test', minWidth: 200 },
     {
       id: 'topicName',
