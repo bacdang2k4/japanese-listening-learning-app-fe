@@ -11,8 +11,10 @@ import {
   CircularProgress,
   Alert,
   Button,
+  IconButton,
+  Tooltip,
 } from '@mui/material';
-import { ArrowBack } from '@mui/icons-material';
+import { ArrowBack, Visibility } from '@mui/icons-material';
 import MainLayout from '../components/layout/MainLayout';
 import { formatBackendDateTime } from '../lib/dateUtils';
 import DataTable from '../components/common/DataTable';
@@ -113,6 +115,25 @@ const TestResultsPage: React.FC = () => {
       label: 'Thời gian',
       minWidth: 140,
       format: (value: string | null) => (value ? formatBackendDateTime(value) : '—'),
+    },
+    {
+      id: 'actions',
+      label: 'Chi tiết',
+      minWidth: 100,
+      align: 'center' as const,
+      format: (_: any, row: AdminTestResultResponse) => (
+        <Tooltip title="Xem chi tiết bài thi">
+          <IconButton
+            size="small"
+            color="primary"
+            onClick={() => navigate(`/admin/test-results/${row.resultId}`, {
+              state: { learnerName: filteredLearnerName || row.learnerName }
+            })}
+          >
+            <Visibility fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      ),
     },
   ];
 

@@ -12,6 +12,7 @@ import AudioTestsPage from './pages/AudioTestsPage';
 import LearnersPage from './pages/LearnersPage';
 import ProfilesPage from './pages/ProfilesPage';
 import TestResultsPage from './pages/TestResultsPage';
+import AdminTestDetailPage from './pages/AdminTestDetailPage';
 import NotFound from './pages/NotFound';
 
 // Auth guards
@@ -56,6 +57,7 @@ const App = () => (
           <Route path="learners" element={<AdminRouteGuard><LearnersPage /></AdminRouteGuard>} />
           <Route path="profiles" element={<AdminRouteGuard><ProfilesPage /></AdminRouteGuard>} />
           <Route path="test-results" element={<AdminRouteGuard><TestResultsPage /></AdminRouteGuard>} />
+          <Route path="test-results/:resultId" element={<AdminRouteGuard><AdminTestDetailPage /></AdminRouteGuard>} />
         </Route>
 
         {/* Learner Routes (protected) */}

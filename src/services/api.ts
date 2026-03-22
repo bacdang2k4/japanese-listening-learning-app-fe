@@ -251,6 +251,23 @@ export interface AdminTestResultResponse {
     completedAt: string | null;
 }
 
+// ─── Admin Test Detail (with question results) ───────────────────
+
+export interface AdminTestDetailResponse {
+    resultId: number;
+    learnerId: number;
+    learnerName: string;
+    learnerEmail: string | null;
+    testName: string;
+    levelName: string | null;
+    topicName: string | null;
+    score: number;
+    isPassed: boolean;
+    totalTime: number;
+    completedAt: string | null;
+    questionResults: QuestionResultResponse[];
+}
+
 // ─── AI Test Types ────────────────────────────────────────────
 
 export interface AiGenerateRequest {
@@ -806,6 +823,12 @@ export const adminTestResultApi = {
             headers: getAdminHeaders(),
         });
     },
+
+    getById: (resultId: number) =>
+        request<AdminTestDetailResponse>(`${API_BASE}/admin/test-results/${resultId}`, {
+            method: 'GET',
+            headers: getAdminHeaders(),
+        }),
 };
 
 // ─── Admin Learner API ────────────────────────────────────────

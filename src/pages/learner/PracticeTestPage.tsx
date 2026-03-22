@@ -60,6 +60,7 @@ const PracticeTestPage: React.FC = () => {
   const [showExplanation, setShowExplanation] = useState(false);
   const [resultDialogOpen, setResultDialogOpen] = useState(false);
   const [error, setError] = useState('');
+  const [submitResult, setSubmitResult] = useState<{ score: number; isPassed: boolean } | null>(null);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioProgress, setAudioProgress] = useState(0);
