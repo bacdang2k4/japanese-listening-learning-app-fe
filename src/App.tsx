@@ -9,6 +9,7 @@ import TopicsPage from './pages/TopicsPage';
 import VocabulariesPage from './pages/VocabulariesPage';
 import VocabBanksPage from './pages/VocabBanksPage';
 import AudioTestsPage from './pages/AudioTestsPage';
+import AdminAudioTestDetailPage from './pages/AdminAudioTestDetailPage';
 import LearnersPage from './pages/LearnersPage';
 import ProfilesPage from './pages/ProfilesPage';
 import TestResultsPage from './pages/TestResultsPage';
@@ -54,6 +55,7 @@ const App = () => (
           <Route path="vocabularies" element={<AdminRouteGuard><VocabulariesPage /></AdminRouteGuard>} />
           <Route path="vocab-banks" element={<AdminRouteGuard><VocabBanksPage /></AdminRouteGuard>} />
           <Route path="audio-tests" element={<AdminRouteGuard><AudioTestsPage /></AdminRouteGuard>} />
+          <Route path="audio-tests/:testId" element={<AdminRouteGuard><AdminAudioTestDetailPage /></AdminRouteGuard>} />
           <Route path="learners" element={<AdminRouteGuard><LearnersPage /></AdminRouteGuard>} />
           <Route path="profiles" element={<AdminRouteGuard><ProfilesPage /></AdminRouteGuard>} />
           <Route path="test-results" element={<AdminRouteGuard><TestResultsPage /></AdminRouteGuard>} />
