@@ -55,6 +55,8 @@ const statusLabels: Record<string, string> = {
 const AudioTestsPage: React.FC = () => {
   const [tests, setTests] = useState<AudioTestResponse[]>([]);
   const [topics, setTopics] = useState<TopicResponse[]>([]);
+  const [topicsLoading, setTopicsLoading] = useState(true);
+  const [topicsError, setTopicsError] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -82,10 +84,17 @@ const AudioTestsPage: React.FC = () => {
   const navigate = useNavigate();
 
   const fetchTopics = useCallback(async () => {
+    setTopicsLoading(true);
+    setTopicsError('');
     try {
       const result = await adminTopicApi.getAll(0, 100);
       setTopics(result.data.content);
-    } catch { /* silent */ }
+    } catch (err: any) {
+      setTopicsError(err.message || 'Không thể tải danh sách chủ đề');
+      console.error('Failed to fetch topics:', err);
+    } finally {
+      setTopicsLoading(false);
+    }
   }, []);
 
   const fetchTests = useCallback(async () => {
@@ -289,18 +298,29 @@ const AudioTestsPage: React.FC = () => {
             onChange={(e) => setFormData({ ...formData, testName: e.target.value })}
             fullWidth required disabled={submitting}
           />
-          <FormControl fullWidth required>
+          <FormControl fullWidth required disabled={submitting || topicsLoading}>
             <InputLabel>Chủ đề</InputLabel>
             <Select
               value={formData.topicId}
               label="Chủ đề"
               onChange={(e) => setFormData({ ...formData, topicId: e.target.value })}
-              disabled={submitting}
             >
-              {topics.map((t) => (
+              {topicsError ? (
+                <MenuItem value="" disabled>{topicsError}</MenuItem>
+              ) : topics.map((t) => (
                 <MenuItem key={t.id} value={String(t.id)}>{t.topicName} ({t.levelName})</MenuItem>
               ))}
             </Select>
+            {topicsLoading && (
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                Đang tải chủ đề...
+              </Typography>
+            )}
+            {topicsError && !topicsLoading && (
+              <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
+                {topicsError}
+              </Typography>
+            )}
           </FormControl>
           <TextField
             label="Transcript"
@@ -351,18 +371,29 @@ const AudioTestsPage: React.FC = () => {
             fullWidth required disabled={submitting}
             placeholder="VD: Hội thoại đi chợ"
           />
-          <FormControl fullWidth required>
+          <FormControl fullWidth required disabled={submitting || topicsLoading}>
             <InputLabel>Chủ đề</InputLabel>
             <Select
               value={aiFormData.topicId}
               label="Chủ đề"
               onChange={(e) => setAiFormData({ ...aiFormData, topicId: e.target.value })}
-              disabled={submitting}
             >
-              {topics.map((t) => (
+              {topicsError ? (
+                <MenuItem value="" disabled>{topicsError}</MenuItem>
+              ) : topics.map((t) => (
                 <MenuItem key={t.id} value={String(t.id)}>{t.topicName} ({t.levelName})</MenuItem>
               ))}
             </Select>
+            {topicsLoading && (
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                Đang tải chủ đề...
+              </Typography>
+            )}
+            {topicsError && !topicsLoading && (
+              <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
+                {topicsError}
+              </Typography>
+            )}
           </FormControl>
           <FormControl fullWidth>
             <InputLabel>Mức độ</InputLabel>

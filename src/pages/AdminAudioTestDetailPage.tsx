@@ -58,8 +58,10 @@ import { formatBackendDateTime } from '../lib/dateUtils';
 import {
   adminAudioTestApi,
   adminQuestionApi,
+  adminTopicApi,
   AudioTestResponse,
   QuestionResponse,
+  TopicResponse,
 } from '../services/api';
 
 interface TabPanelProps {
@@ -96,6 +98,8 @@ const AdminAudioTestDetailPage: React.FC = () => {
     passCondition: 70,
   });
   const [topics, setTopics] = useState<TopicResponse[]>([]);
+  const [topicsLoading, setTopicsLoading] = useState(true);
+  const [topicsError, setTopicsError] = useState('');
   const [hasChanges, setHasChanges] = useState(false);
 
   // Audio player state
@@ -126,10 +130,17 @@ const AdminAudioTestDetailPage: React.FC = () => {
   });
 
   const fetchTopics = useCallback(async () => {
+    setTopicsLoading(true);
+    setTopicsError('');
     try {
       const result = await adminTopicApi.getAll(0, 100);
       setTopics(result.data.content);
-    } catch { /* silent */ }
+    } catch (err: any) {
+      setTopicsError(err.message || 'Không thể tải danh sách chủ đề');
+      console.error('Failed to fetch topics:', err);
+    } finally {
+      setTopicsLoading(false);
+    }
   }, []);
 
   const fetchTestAndQuestions = useCallback(async () => {
@@ -547,17 +558,31 @@ const AdminAudioTestDetailPage: React.FC = () => {
                   fullWidth required
                   disabled={saving}
                 />
-                <FormControl fullWidth required disabled={saving}>
+                <FormControl fullWidth required disabled={saving || topicsLoading}>
                   <InputLabel>Chủ đề</InputLabel>
                   <Select
                     value={editForm.topicId}
                     label="Chủ đề"
                     onChange={(e) => handleEditChange('topicId', e.target.value)}
                   >
-                    {topics.map((t) => (
+                    {topicsError ? (
+                      <MenuItem value="" disabled>
+                        {topicsError}
+                      </MenuItem>
+                    ) : topics.map((t) => (
                       <MenuItem key={t.id} value={String(t.id)}>{t.topicName} ({t.levelName})</MenuItem>
                     ))}
                   </Select>
+                  {topicsLoading && (
+                    <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                      Đang tải chủ đề...
+                    </Typography>
+                  )}
+                  {topicsError && !topicsLoading && (
+                    <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
+                      {topicsError}
+                    </Typography>
+                  )}
                 </FormControl>
               </Box>
               <Box sx={{ display: 'flex', gap: 2 }}>
