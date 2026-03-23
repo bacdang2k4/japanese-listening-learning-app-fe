@@ -36,6 +36,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { useToast } from '@/components/ui/use-toast';
 
 type Phase = 'loading' | 'select-test' | 'pre-exam' | 'in-progress' | 'submitting';
 
@@ -49,6 +50,7 @@ const ExamTestPage: React.FC = () => {
   const { topicId } = useParams<{ topicId: string }>();
   const profileId = getActiveProfileId();
   const audioRef = useRef<HTMLAudioElement>(null);
+  const { toast } = useToast();
 
   const [phase, setPhase] = useState<Phase>('loading');
   const [tests, setTests] = useState<TestSummaryResponse[]>([]);
@@ -58,6 +60,7 @@ const ExamTestPage: React.FC = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<AnswerState[]>([]);
   const [timeRemaining, setTimeRemaining] = useState(30 * 60);
+  const [timeElapsed, setTimeElapsed] = useState(0); // Track elapsed seconds
   const [error, setError] = useState('');
 
   const [isPlaying, setIsPlaying] = useState(false);
@@ -68,6 +71,7 @@ const ExamTestPage: React.FC = () => {
   const [resultDialogOpen, setResultDialogOpen] = useState(false);
   const [confirmSubmitOpen, setConfirmSubmitOpen] = useState(false);
   const [submitResult, setSubmitResult] = useState<{ score: number; isPassed: boolean } | null>(null);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
 
   const fetchTests = useCallback(async () => {
     if (!topicId) return;
@@ -97,7 +101,9 @@ const ExamTestPage: React.FC = () => {
     try {
       const startRes = await learnerApi.startTest(selectedTest.testId, { profileId });
       setTestInfo(startRes.data);
-      setTimeRemaining((startRes.data.duration || 30 * 60));
+      const duration = startRes.data.duration || 30 * 60; // Default 30 min
+      setTimeRemaining(duration);
+      setTimeElapsed(0); // Reset elapsed time
 
       const qRes = await learnerApi.getTestQuestions(selectedTest.testId, startRes.data.resultId);
       setQuestions(qRes.data);
@@ -110,21 +116,55 @@ const ExamTestPage: React.FC = () => {
     }
   };
 
-  // Timer
+  // Timer with auto-submit when time expires
   useEffect(() => {
     if (phase !== 'in-progress') return;
+
     const timer = setInterval(() => {
       setTimeRemaining(prev => {
         if (prev <= 1) {
           clearInterval(timer);
-          handleSubmit();
+          // Auto-submit when time expires
+          handleSubmit(true);
           return 0;
         }
         return prev - 1;
       });
+      setTimeElapsed(prev => prev + 1);
     }, 1000);
     return () => clearInterval(timer);
   }, [phase]);
+
+  // Auto-submit on page unload/close
+  useEffect(() => {
+    if (phase !== 'in-progress') return;
+
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      // Send partial answers via Beacon API (fire-and-forget, works during unload)
+      const payload = JSON.stringify({
+        profileId: profileId,
+        answers: answers.map(a => ({
+          questionId: a.questionId,
+          selectedAnswerId: a.selectedAnswerId,
+        }))
+      });
+
+      // Use sendBeacon for reliable background send during page unload
+      const url = `${import.meta.env.VITE_API_BASE_URL || '/api/v1'}/test-results/${testInfo.resultId}/submit`;
+      const blob = new Blob([payload], { type: 'application/json' });
+      const success = navigator.sendBeacon(url, blob);
+
+      // Show warning to user about auto-save
+      event.preventDefault();
+      event.returnValue = 'Bài thi của bạn sẽ được tự động nộp nếu bạn thoát. Bạn có chắc muốn thoát?';
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [phase, profileId, answers, testInfo]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -177,9 +217,17 @@ const ExamTestPage: React.FC = () => {
     setAudioPlayed(newPlayed);
   };
 
-  const handleSubmit = async () => {
-    if (!testInfo || !profileId) return;
-    setConfirmSubmitOpen(false);
+  const handleSubmit = async (isAutoSubmit = false) => {
+    if (!testInfo || !profileId || hasSubmitted) return;
+
+    // Prevent duplicate submissions
+    setHasSubmitted(true);
+
+    // If not auto-submit, show confirmation dialog
+    if (!isAutoSubmit) {
+      setConfirmSubmitOpen(false);
+    }
+
     setPhase('submitting');
     try {
       const payload: LearnerAnswerRequest[] = answers.map(a => ({
@@ -189,10 +237,18 @@ const ExamTestPage: React.FC = () => {
       const res = await learnerApi.submitTest(testInfo.resultId, { profileId, answers: payload });
       setSubmitResult({ score: res.data.score, isPassed: res.data.isPassed });
       setResultDialogOpen(true);
-      setPhase('in-progress');
+
+      // Show success toast for manual submit
+      if (!isAutoSubmit) {
+        toast({
+          title: "Nộp bài thành công",
+          description: `Điểm của bạn: ${res.data.score}%`,
+        });
+      }
     } catch (err: any) {
       setError(err.message);
-      setPhase('in-progress');
+      setHasSubmitted(false); // Allow retry
+      setPhase('in-progress'); // Return to in-progress so user can retry
     }
   };
 
@@ -292,6 +348,8 @@ const ExamTestPage: React.FC = () => {
 
   // In-progress exam
   const isTimeLow = timeRemaining < 300;
+  const totalDuration = testInfo?.duration || 30 * 60; // Only declare once
+  const timeProgressPercent = totalDuration > 0 ? (timeElapsed / totalDuration) * 100 : 0;
 
   return (
     <LearnerLayout>
@@ -318,14 +376,29 @@ const ExamTestPage: React.FC = () => {
                 <Badge variant="destructive" className="bg-orange-500 uppercase tracking-widest text-[10px] px-2 py-0.5">Thi thật</Badge>
                 <h1 className="text-xl font-bold">{testInfo?.testName}</h1>
               </div>
-              <p className="text-sm text-muted-foreground">Câu {currentQuestionIndex + 1} / {questions.length}</p>
+              <div className="flex gap-4 text-sm text-muted-foreground">
+                <span>Câu {currentQuestionIndex + 1} / {questions.length}</span>
+                <span>{formatTime(timeElapsed)} / {formatTime(totalDuration)}</span>
+              </div>
             </div>
             <div className={`flex items-center gap-2 px-4 py-2 rounded-xl font-mono text-xl font-bold tracking-tight shadow-sm transition-colors ${isTimeLow ? 'bg-destructive text-destructive-foreground animate-pulse' : 'bg-primary text-primary-foreground'}`}>
               <TimerIcon className="h-5 w-5" />
               {formatTime(timeRemaining)}
             </div>
           </div>
-          <Progress value={((currentQuestionIndex + 1) / questions.length) * 100} className="h-1 mt-4" />
+          {/* Question progress bar */}
+          <div className="flex items-center gap-2 mt-3">
+            <span className="text-xs text-muted-foreground w-24">Tiến độ câu hỏi:</span>
+            <Progress value={((currentQuestionIndex + 1) / questions.length) * 100} className="h-2 flex-1" />
+          </div>
+          {/* Time progress bar */}
+          <div className="flex items-center gap-2 mt-2">
+            <span className="text-xs text-muted-foreground w-24">Thời gian:</span>
+            <Progress
+              value={timeProgressPercent}
+              className={`h-2 flex-1 ${isTimeLow ? '[&>div]:bg-destructive' : ''}`}
+            />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -468,7 +541,7 @@ const ExamTestPage: React.FC = () => {
             </div>
             <DialogFooter className="flex-col sm:flex-row gap-2">
               <Button variant="outline" className="w-full h-11" onClick={() => setConfirmSubmitOpen(false)}>Quay lại làm tiếp</Button>
-              <Button variant="destructive" className="w-full h-11" onClick={handleSubmit}>Xác nhận nộp bài</Button>
+              <Button variant="destructive" className="w-full h-11" onClick={() => { setConfirmSubmitOpen(false); handleSubmit(false); }}>Xác nhận nộp bài</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
