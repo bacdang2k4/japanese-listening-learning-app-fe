@@ -46,6 +46,21 @@ const menuItems: MenuItem[] = [
     path: '/admin/profiles',
     icon: <AssessmentIcon />
   },
+  {
+    title: 'Bài kiểm tra',
+    path: '/admin/audio-tests',
+    icon: <HeadphonesIcon />
+  }, 
+  {
+    title: 'Từ vựng',
+    path: '/admin/vocabularies',
+    icon: <TranslateIcon />
+  },
+  {
+    title: 'Ngân hàng từ vựng',
+    path: '/admin/vocab-banks',
+    icon: <LibraryBooksIcon />
+  },
   // Separator
   // Priority 3: Content Management (important but less frequent)
   {
@@ -57,22 +72,6 @@ const menuItems: MenuItem[] = [
     title: 'Chủ đề',
     path: '/admin/topics',
     icon: <TopicIcon />
-  },
-  {
-    title: 'Từ vựng',
-    path: '/admin/vocabularies',
-    path: '/admin/vocabularies',
-    icon: <TranslateIcon />
-  },
-  {
-    title: 'Ngân hàng từ vựng',
-    path: '/admin/vocab-banks',
-    icon: <LibraryBooksIcon />
-  },
-  {
-    title: 'Bài kiểm tra',
-    path: '/admin/audio-tests',
-    icon: <HeadphonesIcon />
   }
 ];
 
